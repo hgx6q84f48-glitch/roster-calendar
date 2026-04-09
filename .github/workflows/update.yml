@@ -24,7 +24,7 @@ jobs:
           python -m playwright install chromium
 
       - name: Run script
-        run: python your_script.py
+        run: python roster_to_ics.py
 
       - name: Commit & push if changed
         run: |
