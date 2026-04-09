@@ -1,3 +1,4 @@
+playwright
 requests
 icalendar
-playwright
+urllib3

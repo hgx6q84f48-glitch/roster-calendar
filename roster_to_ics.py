@@ -1,209 +1,110 @@
-import requests
-import xml.etree.ElementTree as ET
-from datetime import datetime
-from icalendar import Calendar, Event
 import os
-import subprocess
+import requests
 import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
+from datetime import datetime, timedelta
+from icalendar import Calendar, Event
 from playwright.sync_api import sync_playwright
+import xml.etree.ElementTree as ET
 
-# ===== CONFIG =====
-USERNAME = "SBW412E"
-PASSWORD = "9532"
+urllib3.disable_warnings()
 
-API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
+USERNAME = os.environ.get("CREW_USER")
+PASSWORD = os.environ.get("CREW_PASS")
 
-WORKING_DIR = "/Users/KIT/Library/Mobile Documents/com~apple~CloudDocs/Aviation/SAA/Rosters/Automation"
-ICS_FILE = os.path.join(WORKING_DIR, "roster.ics")
+LOGIN_URL = "https://crewconnect.saa.co.za/"
+API_URL = "https://crewconnect.saa.co.za/crewApi"
 
-
-# ===== GET TOKEN =====
 def get_token():
+    print("🔐 Logging in...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        page.goto("https://saacrewconnect.cocre8.africa/html/home.html")
-        page.wait_for_selector('input[type="password"]', timeout=15000)
+        page.goto(LOGIN_URL)
 
         page.fill('input[type="text"]', USERNAME)
         page.fill('input[type="password"]', PASSWORD)
 
-        # Multi-strategy login
-        try:
-            page.press('input[type="password"]', 'Enter')
-        except:
-            pass
+        page.keyboard.press("Enter")
 
-        page.wait_for_timeout(2000)
+        page.wait_for_function(
+            "() => localStorage.getItem('crew_token') !== null"
+        )
 
-        try:
-            page.locator("button:visible").first.click(timeout=3000)
-        except:
-            pass
-
-        try:
-            page.evaluate("""
-                () => {
-                    const buttons = Array.from(document.querySelectorAll('button'));
-                    const loginBtn = buttons.find(btn =>
-                        btn.innerText.toLowerCase().includes('login') ||
-                        btn.innerText.toLowerCase().includes('sign')
-                    );
-                    if (loginBtn) loginBtn.click();
-                }
-            """)
-        except:
-            pass
-
-        page.wait_for_load_state("networkidle")
-
-        page.wait_for_function("""
-            () => {
-                const data = localStorage.getItem('jStorage');
-                if (!data) return false;
-                try {
-                    return JSON.parse(data).crew_token !== undefined;
-                } catch {
-                    return false;
-                }
-            }
-        """, timeout=20000)
-
-        token = page.evaluate("""
-            JSON.parse(localStorage.getItem('jStorage')).crew_token
-        """)
+        token = page.evaluate("() => localStorage.getItem('crew_token')")
 
         browser.close()
+        print("✅ Token acquired")
         return token
 
+def get_roster(token):
+    today = datetime.utcnow()
+    start = today.strftime("%Y-%m-%d")
+    end = (today + timedelta(days=30)).strftime("%Y-%m-%d")
 
-print("🔐 Logging in...")
-TOKEN = get_token()
-print("✅ Token acquired")
+    body = f"""
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:crew="http://crewconnect/">
+       <soapenv:Header/>
+       <soapenv:Body>
+          <crew:getRoster>
+             <token>{token}</token>
+             <fromDate>{start}</fromDate>
+             <toDate>{end}</toDate>
+          </crew:getRoster>
+       </soapenv:Body>
+    </soapenv:Envelope>
+    """
 
+    headers = {
+        "Content-Type": "text/xml"
+    }
 
-# ===== BUILD SOAP =====
-HEADERS = {
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-}
+    response = requests.post(API_URL, data=body, headers=headers, verify=False)
+    return response.text
 
-SOAP_BODY = f"""<?xml version="1.0" encoding="utf-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-  <soapenv:Header/>
-  <soapenv:Body>
-    <RosterRequest Version="1.0">
-      <Token>{TOKEN}</Token>
-      <Data>
-        <startDate>2025-10-10</startDate>
-        <endDate>2026-10-05</endDate>
-        <emplNbr>{USERNAME}</emplNbr>
-        <rstrHist>0</rstrHist>
-      </Data>
-    </RosterRequest>
-  </soapenv:Body>
-</soapenv:Envelope>
-"""
+def parse_roster(xml_data):
+    root = ET.fromstring(xml_data)
+    activities = []
 
+    for act in root.iter("activity"):
+        start = act.findtext("start")
+        end = act.findtext("end")
+        code = act.findtext("code")
 
-# ===== FETCH =====
-response = requests.post(API_URL, data=SOAP_BODY, headers=HEADERS, verify=False)
+        activities.append({
+            "start": start,
+            "end": end,
+            "code": code
+        })
 
-if response.status_code != 200:
-    raise Exception("❌ API failed")
+    print(f"🔍 Found {len(activities)} activities")
+    return activities
 
-root = ET.fromstring(response.text)
+def create_ics(activities):
+    cal = Calendar()
 
+    for act in activities:
+        event = Event()
+        event.add("summary", act["code"])
+        event.add("dtstart", datetime.fromisoformat(act["start"]))
+        event.add("dtend", datetime.fromisoformat(act["end"]))
+        cal.add_component(event)
 
-# ===== PARSE =====
-activities = []
+    return cal
 
-for activity in root.iter():
-    if 'Activity' not in activity.tag:
-        continue
+def save_file(cal):
+    temp_file = "roster.ics.tmp"
+    final_file = "roster.ics"
 
-    def get(tag):
-        for elem in activity:
-            if tag in elem.tag:
-                return elem.text
-        return None
+    with open(temp_file, "wb") as f:
+        f.write(cal.to_ical())
 
-    title = get('TypeDescription') or "Duty"
-    start = get('LCLStart')
-    end = get('LCLEnd')
+    os.replace(temp_file, final_file)
+    print("📅 ICS file updated")
 
-    if not start or not end:
-        continue
-
-    try:
-        start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M")
-        end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M")
-    except:
-        continue
-
-    activities.append({
-        "title": title,
-        "start": start_dt,
-        "end": end_dt
-    })
-
-print(f"🔍 Found {len(activities)} activities")
-
-if len(activities) == 0:
-    raise Exception("❌ No activities found — token/API issue")
-
-
-# ===== SORT =====
-activities.sort(key=lambda x: x["start"])
-
-
-# ===== BUILD CALENDAR =====
-cal = Calendar()
-
-for act in activities:
-    title = act["title"].upper()
-
-    if "OFF" in title:
-        summary = "🟢 DAY OFF"
-    elif "OPEN" in title:
-        summary = "🟡 OPEN"
-    elif "LEAVE" in title:
-        summary = "🎉 LEAVE"
-    elif "TRAINING" in title or "APT" in title:
-        summary = "📘 TRAINING"
-    else:
-        summary = "🔴✈️ DUTY"
-
-    event = Event()
-    event.add('summary', summary)
-    event.add('dtstart', act["start"])
-    event.add('dtend', act["end"])
-
-    cal.add_component(event)
-
-
-# ===== WRITE FILE =====
-temp_file = ICS_FILE + ".tmp"
-
-with open(temp_file, 'wb') as f:
-    f.write(cal.to_ical())
-
-os.replace(temp_file, ICS_FILE)
-
-print("✅ Calendar updated")
-
-
-# ===== GIT PUSH (ONLY IF CHANGED) =====
-os.chdir(WORKING_DIR)
-
-diff = subprocess.run(["git", "diff", "--quiet", "roster.ics"])
-
-if diff.returncode != 0:
-    subprocess.run(["git", "add", "roster.ics"])
-    subprocess.run(["git", "commit", "-m", "auto update"])
-    subprocess.run(["git", "push"])
-    print("🚀 Changes pushed")
-else:
-    print("✅ No changes — skipping commit")
+if __name__ == "__main__":
+    token = get_token()
+    xml_data = get_roster(token)
+    activities = parse_roster(xml_data)
+    cal = create_ics(activities)
+    save_file(cal)
