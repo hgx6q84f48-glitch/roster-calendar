@@ -177,7 +177,7 @@ for act in activities:
     event = Event()
     event.add('summary', summary)
     event.add('dtstart', act["start"])
-    event.add('dtend', act["end'])
+    event.add('dtend', act["end"])
 
     cal.add_component(event)
 
