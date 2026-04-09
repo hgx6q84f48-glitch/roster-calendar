@@ -4,6 +4,8 @@ from datetime import datetime
 from icalendar import Calendar, Event
 import os
 import subprocess
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from playwright.sync_api import sync_playwright
 
@@ -107,7 +109,7 @@ SOAP_BODY = f"""<?xml version="1.0" encoding="utf-8"?>
 
 
 # ===== FETCH =====
-response = requests.post(API_URL, data=SOAP_BODY, headers=HEADERS)
+response = requests.post(API_URL, data=SOAP_BODY, headers=HEADERS, verify=False)
 
 if response.status_code != 200:
     raise Exception("❌ API failed")
