@@ -25,7 +25,6 @@ def get_token():
         page = browser.new_page()
 
         page.goto("https://saacrewconnect.cocre8.africa/html/home.html")
-
         page.wait_for_selector('input[type="password"]', timeout=15000)
 
         page.fill('input[type="text"]', USERNAME)
@@ -43,20 +42,6 @@ def get_token():
         except:
             pass
 
-        try:
-            page.evaluate("""
-                () => {
-                    const buttons = Array.from(document.querySelectorAll('button'));
-                    const loginBtn = buttons.find(btn =>
-                        btn.innerText.toLowerCase().includes('login') ||
-                        btn.innerText.toLowerCase().includes('sign')
-                    );
-                    if (loginBtn) loginBtn.click();
-                }
-            """)
-        except:
-            pass
-
         page.wait_for_load_state("networkidle")
 
         page.wait_for_function("""
@@ -71,9 +56,9 @@ def get_token():
             }
         """, timeout=20000)
 
-        token = page.evaluate("""
-            JSON.parse(localStorage.getItem('jStorage')).crew_token
-        """)
+        token = page.evaluate(
+            "JSON.parse(localStorage.getItem('jStorage')).crew_token"
+        )
 
         browser.close()
 
@@ -83,13 +68,6 @@ def get_token():
 
 # ===== FETCH =====
 def fetch_roster(token):
-    print("📡 Fetching roster...")
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
-
-   def fetch_roster(token):
     print("📡 Fetching roster...")
 
     import urllib3
@@ -120,13 +98,29 @@ def fetch_roster(token):
         API_URL,
         data=soap_body,
         headers=headers,
-        verify=False   # 🔥 THIS IS THE FIX
+        verify=False
     )
 
     if response.status_code != 200:
         raise Exception("❌ API failed")
 
     return response.text
+
+
+# ===== HELPERS =====
+def fmt_time(dt_str):
+    try:
+        return datetime.strptime(dt_str, "%Y-%m-%d %H:%M").strftime("%H:%M")
+    except:
+        return None
+
+
+def fmt_time_short(t):
+    try:
+        return datetime.strptime(t, "%H:%M").strftime("%H:%M")
+    except:
+        return t
+
 
 # ===== PARSE =====
 def parse(xml_data):
@@ -146,6 +140,7 @@ def parse(xml_data):
         title = get('TypeDescription') or "Duty"
         start = get('LCLStart')
         end = get('LCLEnd')
+        report = get('LCLExpectedSignOn')
 
         if not start or not end:
             continue
@@ -156,7 +151,88 @@ def parse(xml_data):
         except:
             continue
 
-        activities.append((title, start_dt, end_dt))
+        # ===== COURSE + MODULES =====
+        course_elem = None
+        for elem in activity:
+            if 'Course' in elem.tag:
+                course_elem = elem
+                break
+
+        description_lines = []
+
+        if course_elem is not None:
+            # COURSE INFO
+            course_name = None
+            base = None
+
+            for c in course_elem:
+                if 'Description' in c.tag:
+                    course_name = c.text
+                if 'Base' in c.tag:
+                    base = c.text
+
+            if report:
+                description_lines.append(f"Report: {fmt_time(report)}")
+
+            if course_name:
+                description_lines.append(f"Course: {course_name}")
+
+            if base:
+                description_lines.append(f"Location: {base}")
+
+            description_lines.append("")
+
+            # MODULES
+            modules = []
+            for m in course_elem.iter():
+                if 'Module' not in m.tag:
+                    continue
+
+                m_desc = None
+                m_start = None
+                m_end = None
+                m_type = None
+
+                for x in m:
+                    if 'Description' in x.tag:
+                        m_desc = x.text
+                    if 'LCLStart' in x.tag:
+                        m_start = x.text
+                    if 'LCLEnd' in x.tag:
+                        m_end = x.text
+                    if 'Type' in x.tag:
+                        for t in x:
+                            if 'Description' in t.tag:
+                                m_type = t.text
+
+                if not m_start or not m_end:
+                    continue
+
+                # TYPE CLEANUP
+                label = "EVENT"
+                if m_type:
+                    mt = m_type.lower()
+                    if "brief" in mt:
+                        label = "BRIEF"
+                    elif "sim" in mt:
+                        label = "SIM"
+                    elif "debrief" in mt:
+                        label = "DEBRIEF"
+
+                modules.append((
+                    m_start,
+                    f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
+                ))
+
+            # SORT MODULES
+            modules.sort(key=lambda x: x[0])
+
+            for _, line in modules:
+                description_lines.append(line)
+
+        description = "\n".join(description_lines) if description_lines else None
+
+        activities.append((title, start_dt, end_dt, description))
 
     print(f"🔍 Found {len(activities)} activities")
 
@@ -170,22 +246,28 @@ def parse(xml_data):
 def build_ics(activities):
     cal = Calendar()
 
-    for title, start, end in activities:
+    for title, start, end, description in activities:
         event = Event()
 
         t = title.upper()
-        if "OFF" in t:
+
+        if t == "OPEN DAY":
+            summary = "🟡 OPEN"
+        elif "OFF" in t:
             summary = "🟢 DAY OFF"
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
-        elif "TRAINING" in t:
+        elif description:  # has course/modules → training
             summary = "📘 TRAINING"
         else:
-            summary = "🔴✈️ DUTY"
+            summary = "🔴 DUTY"
 
         event.add('summary', summary)
         event.add('dtstart', start)
         event.add('dtend', end)
+
+        if description:
+            event.add('description', description)
 
         cal.add_component(event)
 
