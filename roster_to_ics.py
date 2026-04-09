@@ -89,6 +89,16 @@ def fetch_roster(token):
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
+   def fetch_roster(token):
+    print("📡 Fetching roster...")
+
+    import urllib3
+    urllib3.disable_warnings()
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+
     soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
       <soapenv:Header/>
@@ -106,13 +116,17 @@ def fetch_roster(token):
     </soapenv:Envelope>
     """
 
-    response = requests.post(API_URL, data=soap_body, headers=headers)
+    response = requests.post(
+        API_URL,
+        data=soap_body,
+        headers=headers,
+        verify=False   # 🔥 THIS IS THE FIX
+    )
 
     if response.status_code != 200:
         raise Exception("❌ API failed")
 
     return response.text
-
 
 # ===== PARSE =====
 def parse(xml_data):
