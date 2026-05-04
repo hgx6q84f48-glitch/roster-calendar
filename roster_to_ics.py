@@ -114,11 +114,11 @@ def fmt_time(dt_str):
         return None
 
 
-def fmt_time_short(t):
+def fmt_time_short(dt_str):
     try:
-        return datetime.strptime(t, "%Y-%m-%d %H:%M").strftime("%H:%M")
+        return datetime.strptime(dt_str, "%Y-%m-%d %H:%M").strftime("%H:%M")
     except:
-        return t
+        return dt_str
 
 
 # ===== PARSE =====
@@ -132,7 +132,7 @@ def parse(xml_data):
         if 'Activity' not in tag:
             continue
 
-        # 🔥 FIXED: recursive search
+        # Recursive getter (FIXED)
         def get(tag_name):
             for elem in activity.iter():
                 if tag_name in elem.tag:
@@ -145,14 +145,12 @@ def parse(xml_data):
         report = get('LCLExpectedSignOn')
 
         if not start or not end:
-            print(f"⚠️ Skipping (missing time): {title}")
             continue
 
         try:
             start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M")
             end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M")
         except:
-            print(f"⚠️ Bad datetime format: {start} / {end}")
             continue
 
         # ===== COURSE + MODULES =====
@@ -185,8 +183,11 @@ def parse(xml_data):
 
             description_lines.append("")
 
+            # ===== MODULES (FIXED CLEAN VERSION) =====
             modules = []
-            for m in course_elem.iter():
+            seen = set()
+
+            for m in course_elem:
                 if 'Module' not in m.tag:
                     continue
 
@@ -210,20 +211,24 @@ def parse(xml_data):
                 if not m_start or not m_end:
                     continue
 
+                # Label logic
                 label = "EVENT"
                 if m_type:
                     mt = m_type.lower()
-                    if "brief" in mt:
+                    if "brief" in mt and "debrief" not in mt:
                         label = "BRIEF"
-                    elif "sim" in mt:
-                        label = "SIM"
                     elif "debrief" in mt:
                         label = "DEBRIEF"
+                    elif "sim" in mt:
+                        label = "SIM"
 
-                modules.append((
-                    m_start,
-                    f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
-                ))
+                line = f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
+
+                if line in seen:
+                    continue
+
+                seen.add(line)
+                modules.append((m_start, line))
 
             modules.sort(key=lambda x: x[0])
 
@@ -258,7 +263,7 @@ def build_ics(activities):
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
         elif description:
-            summary = "📘 TRAINING"
+            summary = f"📘 {title.upper()}"
         else:
             summary = "🔴 DUTY"
 
