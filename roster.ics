@@ -4,9 +4,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260531T111500
 DTEND:20260531T171500
 DESCRIPTION:Report: 11:15\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n11:15–12:45  BRIEF — Briefing Module\n11:15–12:45  BRIEF 
- — Briefing Module\n12:45–16:45  SIM — Simulator Module\n16:45–17:1
- 5  BRIEF — Debriefing Module
+  Int'l\n\n11:15–12:45  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -23,18 +21,14 @@ SUMMARY:📘 TRAINING
 DTSTART:20260528T111500
 DTEND:20260528T171500
 DESCRIPTION:Report: 11:15\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n11:15–12:45  BRIEF — Briefing Module\n11:15–12:45  BRIEF 
- — Briefing Module\n12:45–16:45  SIM — Simulator Module\n16:45–17:1
- 5  BRIEF — Debriefing Module
+  Int'l\n\n11:15–12:45  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260527T070000
 DTEND:20260527T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -56,9 +50,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260523T070000
 DTEND:20260523T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -85,9 +77,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260518T070000
 DTEND:20260518T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -104,9 +94,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260515T070000
 DTEND:20260515T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -118,18 +106,14 @@ SUMMARY:📘 TRAINING
 DTSTART:20260513T070000
 DTEND:20260513T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260512T070000
 DTEND:20260512T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Briefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -146,18 +130,14 @@ SUMMARY:📘 TRAINING
 DTSTART:20260509T070000
 DTEND:20260509T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260508T111500
 DTEND:20260508T171500
 DESCRIPTION:Report: 11:15\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n11:15–12:45  BRIEF — Briefing Module\n11:15–12:45  BRIEF 
- — Briefing Module\n12:45–16:45  SIM — Simulator Module\n16:45–17:1
- 5  BRIEF — Debriefing Module
+  Int'l\n\n11:15–12:45  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -174,9 +154,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260505T153000
 DTEND:20260505T213000
 DESCRIPTION:Report: 15:30\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n15:30–17:00  BRIEF — Briefing Module\n15:30–17:00  BRIEF 
- — Briefing Module\n17:00–21:00  SIM — Simulator Module\n21:00–21:3
- 0  BRIEF — Debriefing Module
+  Int'l\n\n15:30–17:00  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -218,9 +196,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260427T111500
 DTEND:20260427T171500
 DESCRIPTION:Report: 11:15\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n11:15–12:45  BRIEF — Briefing Module\n11:15–12:45  BRIEF 
- — Briefing Module\n12:45–16:45  SIM — Simulator Module\n16:45–17:1
- 5  BRIEF — Debriefing Module
+  Int'l\n\n11:15–12:45  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🎉 LEAVE
@@ -247,9 +223,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260421T070000
 DTEND:20260421T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -321,9 +295,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260407T153000
 DTEND:20260407T213000
 DESCRIPTION:Report: 15:30\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n15:30–17:00  BRIEF — Briefing Module\n15:30–17:00  BRIEF 
- — Briefing Module\n17:00–21:00  SIM — Simulator Module\n21:00–21:3
- 0  BRIEF — Debriefing Module
+  Int'l\n\n15:30–17:00  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -370,9 +342,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260329T070000
 DTEND:20260329T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -464,9 +434,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260311T070000
 DTEND:20260311T130000
 DESCRIPTION:Report: 07:00\nCourse: Briefing Module\nLocation: Johannesburg
-  Int'l\n\n07:00–08:30  BRIEF — Briefing Module\n07:00–08:30  BRIEF 
- — Briefing Module\n08:30–12:30  SIM — Simulator Module\n12:30–13:0
- 0  BRIEF — Debriefing Module
+  Int'l\n\n07:00–08:30  BRIEF — Briefing Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -498,32 +466,28 @@ SUMMARY:📘 TRAINING
 DTSTART:20260305T083000
 DTEND:20260305T160000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:00  EVENT — Other Module\n08:30–16:00  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:00  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260304T083000
 DTEND:20260304T160000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:00  EVENT — Other Module\n08:30–16:00  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:00  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260303T083000
 DTEND:20260303T160000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:00  EVENT — Other Module\n08:30–16:00  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:00  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260302T083000
 DTEND:20260302T160000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:00  EVENT — Other Module\n08:30–16:00  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:00  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -545,16 +509,14 @@ SUMMARY:📘 TRAINING
 DTSTART:20260226T080000
 DTEND:20260226T160000
 DESCRIPTION:Report: 08:00\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:00–16:00  EVENT — Other Module\n08:00–16:00  EVENT — Oth
- er Module
+ t'l\n\n08:00–16:00  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260224T083000
 DTEND:20260225T163000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:30  EVENT — Other Module\n08:30–16:30  EVENT — Oth
- er Module\n08:30–16:30  EVENT — Other Module
+ t'l\n\n08:30–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -576,40 +538,35 @@ SUMMARY:📘 TRAINING
 DTSTART:20260220T080000
 DTEND:20260220T163000
 DESCRIPTION:Report: 08:00\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:00–16:30  EVENT — Other Module\n08:00–16:30  EVENT — Oth
- er Module
+ t'l\n\n08:00–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260219T080000
 DTEND:20260219T163000
 DESCRIPTION:Report: 08:00\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:00–16:30  EVENT — Other Module\n08:00–16:30  EVENT — Oth
- er Module
+ t'l\n\n08:00–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260218T080000
 DTEND:20260218T163000
 DESCRIPTION:Report: 08:00\nCourse: Classroom Module\nLocation: Johannesbur
- g Int'l\n\n08:00–16:30  EVENT — Classroom Module\n08:00–16:30  EVENT
-  — Classroom Module
+ g Int'l\n\n08:00–16:30  EVENT — Classroom Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260217T073000
 DTEND:20260217T173000
 DESCRIPTION:Report: 07:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n07:30–17:30  EVENT — Other Module\n07:30–17:30  EVENT — Oth
- er Module
+ t'l\n\n07:30–17:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260216T083000
 DTEND:20260216T163000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:30  EVENT — Other Module\n08:30–16:30  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -626,40 +583,35 @@ SUMMARY:📘 TRAINING
 DTSTART:20260213T083000
 DTEND:20260213T163000
 DESCRIPTION:Report: 08:30\nCourse: Classroom Module\nLocation: Johannesbur
- g Int'l\n\n08:30–16:30  EVENT — Classroom Module\n08:30–16:30  EVENT
-  — Classroom Module
+ g Int'l\n\n08:30–16:30  EVENT — Classroom Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260212T083000
 DTEND:20260212T163000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:30  EVENT — Other Module\n08:30–16:30  EVENT — Oth
- er Module
+ t'l\n\n08:30–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260211T083000
 DTEND:20260211T163000
 DESCRIPTION:Report: 08:30\nCourse: Classroom Module\nLocation: Johannesbur
- g Int'l\n\n08:30–16:30  EVENT — Classroom Module\n08:30–16:30  EVENT
-  — Classroom Module
+ g Int'l\n\n08:30–16:30  EVENT — Classroom Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260210T083000
 DTEND:20260210T163000
 DESCRIPTION:Report: 08:30\nCourse: Classroom Module\nLocation: Johannesbur
- g Int'l\n\n08:30–16:30  EVENT — Classroom Module\n08:30–16:30  EVENT
-  — Classroom Module
+ g Int'l\n\n08:30–16:30  EVENT — Classroom Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 TRAINING
 DTSTART:20260209T083000
 DTEND:20260209T163000
 DESCRIPTION:Report: 08:30\nCourse: Classroom Module\nLocation: Johannesbur
- g Int'l\n\n08:30–16:30  EVENT — Classroom Module\n08:30–16:30  EVENT
-  — Classroom Module
+ g Int'l\n\n08:30–16:30  EVENT — Classroom Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -681,9 +633,7 @@ SUMMARY:📘 TRAINING
 DTSTART:20260202T083000
 DTEND:20260205T163000
 DESCRIPTION:Report: 08:30\nCourse: Other Module\nLocation: Johannesburg In
- t'l\n\n08:30–16:30  EVENT — Other Module\n08:30–16:30  EVENT — Oth
- er Module\n08:30–16:30  EVENT — Other Module\n08:30–16:30  EVENT —
-  Other Module\n08:30–16:30  EVENT — Other Module
+ t'l\n\n08:30–16:30  EVENT — Other Module
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
