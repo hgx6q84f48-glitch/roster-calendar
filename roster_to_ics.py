@@ -3,6 +3,7 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from icalendar import Calendar, Event
+
 from playwright.sync_api import sync_playwright
 
 # ===== CONFIG =====
@@ -114,11 +115,11 @@ def fmt_time(dt_str):
         return None
 
 
-def fmt_time_short(dt_str):
+def fmt_time_short(t):
     try:
-        return datetime.strptime(dt_str, "%Y-%m-%d %H:%M").strftime("%H:%M")
+        return datetime.strptime(t, "%Y-%m-%d %H:%M").strftime("%H:%M")
     except:
-        return dt_str
+        return t
 
 
 # ===== PARSE =====
@@ -127,15 +128,15 @@ def parse(xml_data):
     activities = []
 
     for activity in root.iter():
+        # ✅ FIX: namespace-safe tag check
         tag = activity.tag.split('}')[-1]
-
         if 'Activity' not in tag:
             continue
 
-        # Recursive getter (FIXED)
-        def get(tag_name):
+        # ✅ FIX: recursive search
+        def get(tag):
             for elem in activity.iter():
-                if tag_name in elem.tag:
+                if tag in elem.tag:
                     return elem.text
             return None
 
@@ -155,7 +156,7 @@ def parse(xml_data):
 
         # ===== COURSE + MODULES =====
         course_elem = None
-        for elem in activity.iter():
+        for elem in activity:
             if 'Course' in elem.tag:
                 course_elem = elem
                 break
@@ -163,10 +164,11 @@ def parse(xml_data):
         description_lines = []
 
         if course_elem is not None:
+            # COURSE INFO
             course_name = None
             base = None
 
-            for c in course_elem.iter():
+            for c in course_elem:
                 if 'Description' in c.tag:
                     course_name = c.text
                 if 'Base' in c.tag:
@@ -183,11 +185,9 @@ def parse(xml_data):
 
             description_lines.append("")
 
-            # ===== MODULES (FIXED CLEAN VERSION) =====
+            # MODULES (UNCHANGED)
             modules = []
-            seen = set()
-
-            for m in course_elem:
+            for m in course_elem.iter():
                 if 'Module' not in m.tag:
                     continue
 
@@ -196,7 +196,7 @@ def parse(xml_data):
                 m_end = None
                 m_type = None
 
-                for x in m.iter():
+                for x in m:
                     if 'Description' in x.tag:
                         m_desc = x.text
                     if 'LCLStart' in x.tag:
@@ -204,32 +204,30 @@ def parse(xml_data):
                     if 'LCLEnd' in x.tag:
                         m_end = x.text
                     if 'Type' in x.tag:
-                        for t in x.iter():
+                        for t in x:
                             if 'Description' in t.tag:
                                 m_type = t.text
 
                 if not m_start or not m_end:
                     continue
 
-                # Label logic
+                # TYPE CLEANUP (UNCHANGED)
                 label = "EVENT"
                 if m_type:
                     mt = m_type.lower()
-                    if "brief" in mt and "debrief" not in mt:
+                    if "brief" in mt:
                         label = "BRIEF"
-                    elif "debrief" in mt:
-                        label = "DEBRIEF"
                     elif "sim" in mt:
                         label = "SIM"
+                    elif "debrief" in mt:
+                        label = "DEBRIEF"
 
-                line = f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
+                modules.append((
+                    m_start,
+                    f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
+                ))
 
-                if line in seen:
-                    continue
-
-                seen.add(line)
-                modules.append((m_start, line))
-
+            # SORT MODULES
             modules.sort(key=lambda x: x[0])
 
             for _, line in modules:
@@ -242,7 +240,7 @@ def parse(xml_data):
     print(f"🔍 Found {len(activities)} activities")
 
     if not activities:
-        raise Exception("❌ No activities parsed")
+        raise Exception("❌ No activities")
 
     return activities
 
@@ -263,7 +261,7 @@ def build_ics(activities):
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
         elif description:
-            summary = f"📘 {title.upper()}"
+            summary = "📘 TRAINING"
         else:
             summary = "🔴 DUTY"
 
