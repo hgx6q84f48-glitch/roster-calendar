@@ -105,7 +105,8 @@ def fetch_roster(token):
         raise Exception("❌ API failed")
 
     return response.text
-    
+
+
 # ===== FETCH FLIGHT CREW =====
 def get_flight_crew(
     token,
@@ -204,10 +205,14 @@ def get_flight_crew(
                 f"({position_code})"
             )
 
+        # Remove duplicates while keeping order
+        crew = list(dict.fromkeys(crew))
+
         return crew
 
     except:
         return []
+
 
 # ===== HELPERS =====
 def fmt_time(dt_str):
@@ -368,7 +373,7 @@ def parse(xml_data, token):
 
             for _, line in modules:
                 description_lines.append(line)
-                        
+
         # =====================================================
         # PAIRINGS / DUTIES
         # =====================================================
@@ -512,10 +517,8 @@ def parse(xml_data, token):
 
                         for c in crew:
                             description_lines.append(c)
-            description = (
-                "\n".join(description_lines)
-                if description_lines else None
-            )
+
+                        description_lines.append("")
 
         description = (
             "\n".join(description_lines)
@@ -568,14 +571,21 @@ def build_ics(activities):
 
                 for line in description.split("\n"):
 
-                    if "→" in line and "SA" in line:
+                    # Detect ANY flight line
+                    if "→" in line:
 
                         try:
 
                             route_section = line.split("  ")[1]
 
                             dep = route_section.split("→")[0].strip()
-                            arr = route_section.split("→")[1].strip().split(" ")[0]
+
+                            arr = (
+                                route_section
+                                .split("→")[1]
+                                .strip()
+                                .split(" ")[0]
+                            )
 
                             if not duty_routes:
                                 duty_routes.append(dep)
