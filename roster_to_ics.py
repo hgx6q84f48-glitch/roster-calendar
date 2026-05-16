@@ -345,6 +345,10 @@ def parse(xml_data, token):
         # =========================================================
         elif "DUTY" in title.upper():
 
+            print("\n================ DUTY XML ================\n")
+            print(ET.tostring(activity, encoding='unicode'))
+            print("\n==========================================\n")
+
             if report:
                 report_dt = datetime.strptime(
                     report,
@@ -355,101 +359,6 @@ def parse(xml_data, token):
                 description_lines.append(
                     f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
                 )
-                description_lines.append("")
-
-            sectors = []
-
-            for elem in activity.iter():
-
-                tag = elem.tag.split('}')[-1]
-
-                if tag != "Flight":
-                    continue
-
-                def fget(node_tag):
-                    for x in elem.iter():
-                        if node_tag in x.tag:
-                            return x.text
-                    return None
-
-                carrier = fget("CarrierCode")
-                number = fget("Number")
-                dep = fget("FromAirport")
-                arr = fget("ToAirport")
-
-                dep_time = fget("LCLDepartureTime")
-                arr_time = fget("LCLArrivalTime")
-
-                if not dep_time or not arr_time:
-                    continue
-
-                try:
-                    dep_dt = datetime.strptime(
-                        dep_time,
-                        "%Y-%m-%d %H:%M"
-                    )
-
-                    arr_dt = datetime.strptime(
-                        arr_time,
-                        "%Y-%m-%d %H:%M"
-                    )
-
-                except:
-                    continue
-
-                block = fmt_block(dep_dt, arr_dt)
-
-                sectors.append({
-                    "carrier": carrier,
-                    "number": number,
-                    "dep": dep,
-                    "arr": arr,
-                    "dep_dt": dep_dt,
-                    "arr_dt": arr_dt,
-                    "block": block
-                })
-
-            for sector in sectors:
-
-                description_lines.append(
-                    f"{sector['carrier']}{sector['number']}  "
-                    f"{sector['dep']} → {sector['arr']}"
-                )
-
-                description_lines.append(
-                    f"Dep: {fmt_full(sector['dep_dt'])} "
-                    f"({fmt_utc(sector['dep_dt'])})"
-                )
-
-                description_lines.append(
-                    f"Arr: {fmt_full(sector['arr_dt'])} "
-                    f"({fmt_utc(sector['arr_dt'])})"
-                )
-
-                description_lines.append(
-                    f"Block: {sector['block']}"
-                )
-
-                # ===== CREW =====
-                try:
-                    pilots = fetch_crew(
-                        token,
-                        sector['dep_dt'].strftime("%Y-%m-%d"),
-                        sector['carrier'],
-                        sector['number'],
-                        sector['dep']
-                    )
-
-                    if pilots:
-                        description_lines.append("")
-                        description_lines.append("Crew:")
-
-                        for p in pilots:
-                            description_lines.append(p)
-
-                except Exception as e:
-                    print(f"⚠️ Crew fetch failed: {e}")
-
                 description_lines.append("")
 
         description = (
