@@ -109,28 +109,7 @@ def fetch_roster_xml(page):
     raise Exception("❌ Could not find roster response")
 
 # =====================================================
-# DISMISS ANY BLOCKING MODAL
-# =====================================================
-
-def dismiss_modal(page, modal_id):
-    try:
-        modal = page.locator(f"#{modal_id}")
-        if modal.is_visible(timeout=2000):
-            close = modal.locator(
-                "button[data-dismiss='modal'], "
-                "button.close, "
-                ".modal-footer button"
-            ).first
-            close.click()
-            page.wait_for_timeout(1500)
-    except:
-        pass
-
-# =====================================================
 # FETCH CREW FOR A PAIRING
-# Clicks the pairing row, then clicks the first flight
-# leg inside the detail modal to get the crew list.
-# Returns a list of strings like "Captain: Ian Jackson"
 # =====================================================
 
 def fetch_crew_for_pairing(page, row):
@@ -151,143 +130,151 @@ def fetch_crew_for_pairing(page, row):
     page.on("response", on_response)
 
     try:
-        # Click the pairing row to open the flight detail modal
+        # Click the pairing calendar block
         row.click(timeout=10000)
         page.wait_for_timeout(2000)
 
-        # Wait for the activity modal
-        modal = page.locator("#activityModal")
+        # Wait for pairingModal (not activityModal!)
+        modal = page.locator("#pairingModal")
         modal.wait_for(state="visible", timeout=5000)
+        print("   ✅ pairingModal opened")
 
-        # Find flight leg rows inside the modal (rows with a plane icon)
-        # They contain flight numbers like SA280
-        flight_rows = modal.locator("tr, [class*='flight'], [class*='leg']")
+        # Find flight leg rows inside — they have class pairing-leg-flight-row
+        flight_rows = modal.locator(".pairing-leg-flight-row")
+        count = flight_rows.count()
+        print(f"   Found {count} flight leg rows")
 
-        # Try clicking the first flight row inside the modal
-        # that looks like a real flight (has a flight number)
-        clicked_flight = False
-        for j in range(min(flight_rows.count(), 10)):
-            try:
-                row_text = flight_rows.nth(j).inner_text()
-                # Flight rows contain airport codes like ZSSXD or flight numbers
-                if re.search(r'(SA|FA)\d{2,4}|ZSS|PER|JNB|CPT|DUR', row_text):
-                    captured.clear()
-                    flight_rows.nth(j).click(timeout=5000)
-                    page.wait_for_timeout(3000)
-                    clicked_flight = True
-                    break
-            except:
-                continue
-
-        if not clicked_flight:
-            # Fallback: just click the first row in the modal
+        for j in range(count):
             try:
                 captured.clear()
-                flight_rows.first.click(timeout=5000)
+                print(f"   🖱  Clicking flight leg {j+1}...")
+                flight_rows.nth(j).click(timeout=5000)
                 page.wait_for_timeout(3000)
-            except:
-                pass
 
-        # Parse crew from the captured response
-        if captured:
-            crew_lines = parse_crew_xml(captured[0])
-        else:
-            # Try parsing crew directly from the crew modal HTML
-            crew_modal = page.locator(".modal.show").last
-            crew_lines = parse_crew_html(crew_modal)
+                if captured:
+                    print(f"   📡 Got crew API response!")
+                    crew = parse_crew_response(captured[0])
+                    crew_lines.extend(crew)
+                    # Print raw response for debugging
+                    print(f"   📄 Raw response (500 chars): {captured[0][:500]}")
+                    break  # just need crew once per pairing
+            except Exception as e:
+                print(f"   ⚠️ Could not click leg {j+1}: {e}")
+                continue
+
+        # Close pairingModal
+        try:
+            modal.locator("button[data-dismiss='modal'], .btn").first.click()
+            page.wait_for_timeout(1500)
+            print("   🚪 pairingModal closed")
+        except:
+            pass
+
+        # Close crewListModal if it opened
+        try:
+            crew_modal = page.locator("#crewListModal")
+            if crew_modal.is_visible(timeout=2000):
+                crew_modal.locator("button").first.click()
+                page.wait_for_timeout(1000)
+                print("   🚪 crewListModal closed")
+        except:
+            pass
 
     except Exception as e:
         print(f"   ⚠️ Could not fetch crew: {e}")
-
-    finally:
-        page.remove_listener("response", on_response)
-        # Close any open modals
-        for modal_id in ["activityModal", "crewModal"]:
-            dismiss_modal(page, modal_id)
-        # Also try closing any visible modal
+        # Try closing any open modal
         try:
-            page.locator(".modal.show button[data-dismiss='modal']").first.click()
+            page.locator(".modal.show .btn").first.click()
             page.wait_for_timeout(1000)
         except:
             pass
 
+    finally:
+        page.remove_listener("response", on_response)
+
     return crew_lines
 
 # =====================================================
-# PARSE CREW FROM XML RESPONSE
+# PARSE CREW RESPONSE
+# Handles both XML and HTML responses
 # =====================================================
 
-def parse_crew_xml(xml_text):
+def parse_crew_response(text):
     crew_lines = []
+
+    # Try XML first
     try:
-        root = ET.fromstring(xml_text)
+        root = ET.fromstring(text)
+        for elem in root.iter():
+            tag = elem.tag.split('}')[-1].lower()
+            if "crew" in tag and elem.text:
+                # Print all tags so we can see structure
+                print(f"   🏷  XML tag: {elem.tag} = {elem.text[:50] if elem.text else ''}")
+        # Try to find crew members
         for elem in root.iter():
             tag = elem.tag.split('}')[-1]
-            if "CrewMember" in tag or "Crew" in tag:
+            children = list(elem)
+            if len(children) >= 2:
                 role = None
                 name = None
                 subrole = None
-                for child in elem:
+                for child in children:
                     ct = child.tag.split('}')[-1].lower()
+                    val = (child.text or "").strip()
+                    if not val:
+                        continue
                     if "role" in ct and "sub" not in ct:
-                        role = child.text
-                    elif "name" in ct or "firstname" in ct or "lastname" in ct:
-                        name = child.text
-                    elif "sub" in ct or "function" in ct or "position" in ct:
-                        subrole = child.text
+                        role = val
+                    elif "name" in ct or "first" in ct or "last" in ct:
+                        name = val
+                    elif "function" in ct or "position" in ct or "sub" in ct:
+                        subrole = val
                 if role and name:
                     line = f"{role}: {name}"
-                    if subrole:
+                    if subrole and subrole.lower() not in ["due", ""]:
                         line += f" ({subrole})"
                     crew_lines.append(line)
+        if crew_lines:
+            return crew_lines
     except:
         pass
-    return crew_lines
 
-# =====================================================
-# PARSE CREW FROM HTML (fallback)
-# =====================================================
-
-def parse_crew_html(modal):
-    crew_lines = []
+    # Try HTML parsing
     try:
-        # The crew modal has rows with role, name, subrole
-        rows = modal.locator("tr, .crew-row")
-        for i in range(rows.count()):
-            try:
-                text = rows.nth(i).inner_text().strip()
-                if not text:
+        # Look for table rows with role/name pattern
+        rows = re.findall(
+            r'<tr[^>]*>(.*?)</tr>',
+            text,
+            re.DOTALL
+        )
+        for row in rows:
+            cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
+            cells = [re.sub(r'<[^>]+>', '', c).strip() for c in cells]
+            cells = [c for c in cells if c and c.lower() != "due"]
+            if len(cells) >= 2:
+                role = cells[0]
+                name = cells[1]
+                subrole = cells[2] if len(cells) > 2 else None
+                skip = ["role", "name", "crew", "position", "function"]
+                if any(s in role.lower() for s in skip):
                     continue
-                # Skip header rows
-                if any(h in text.lower() for h in ["role", "name", "crew list"]):
-                    continue
-                # Clean up whitespace between columns
-                parts = re.split(r'\s{2,}|\t', text)
-                parts = [p.strip() for p in parts if p.strip()]
-                if len(parts) >= 2:
-                    role = parts[0]
-                    name = parts[1]
-                    subrole = parts[2] if len(parts) > 2 else None
-                    line = f"{role}: {name}"
-                    if subrole and subrole.lower() != "due":
-                        line += f" ({subrole})"
-                    crew_lines.append(line)
-            except:
-                continue
+                line = f"{role}: {name}"
+                if subrole and subrole.lower() not in ["due", ""]:
+                    line += f" ({subrole})"
+                crew_lines.append(line)
     except:
         pass
+
     return crew_lines
 
 # =====================================================
-# FETCH ALL CREW DATA
-# Navigates month by month and collects crew for
-# every pairing row found across all months.
+# FETCH ALL CREW
 # =====================================================
 
 def fetch_all_crew(page):
     print("\n🧑‍✈️ Fetching crew data for all pairings...")
 
-    # Dismiss the notify modal first
+    # Dismiss notify modal
     try:
         notify = page.locator("#notifyModal")
         if notify.is_visible(timeout=3000):
@@ -297,73 +284,66 @@ def fetch_all_crew(page):
     except:
         pass
 
-    crew_by_pairing = {}  # key: pairing label, value: list of crew strings
+    crew_by_pairing = {}
 
-    # We'll scan the current month plus the next 2 months
+    # Scan current month + next 2 months
     for month_offset in range(3):
 
         if month_offset > 0:
             print(f"\n   ➡️  Navigating to next month...")
             try:
-                next_btn = page.locator("button.fc-next-button, a.fc-next-button, button:has-text('>'), [aria-label='next']")
-                if next_btn.count() == 0:
-                    # Try the blue > button visible in your screenshots
-                    next_btn = page.locator("button").filter(has_text=re.compile(r'^>$'))
-                if next_btn.count() == 0:
-                    # Last resort: find buttons with right-arrow styling
-                    next_btn = page.locator(".fc-next-button, [class*='next']").first
-                next_btn.first.click()
+                # From your screenshot the next button is a plain > button
+                next_btn = page.locator("button.fc-next-button").first
+                if not next_btn.is_visible(timeout=1000):
+                    next_btn = page.locator("button:has-text('›'), button:has-text('>')").first
+                if not next_btn.is_visible(timeout=1000):
+                    next_btn = page.locator("a[ng-click*='next'], button[ng-click*='next']").first
+                next_btn.click()
                 page.wait_for_timeout(3000)
             except Exception as e:
-                print(f"   ⚠️ Could not navigate to next month: {e}")
+                print(f"   ⚠️ Could not navigate: {e}")
                 break
 
-        # Get current month label
+        # Get month label
         try:
             month_label = page.locator("h2, .fc-toolbar-title, [class*='title']").first.inner_text()
             print(f"\n   📅 Scanning: {month_label}")
         except:
             print(f"\n   📅 Scanning month {month_offset + 1}")
 
-        # Find all pairing rows — they have "Pairing" in their text
-        rows = page.locator("table tbody tr, .fc-event, [class*='event']")
-        count = rows.count()
-        print(f"   Found {count} rows")
+        # Find all elements containing "Pairing"
+        pairing_elems = page.locator("text=Pairing")
+        count = pairing_elems.count()
+        print(f"   ✈️  Found {count} pairing elements")
 
-        pairing_indices = []
         for i in range(count):
             try:
-                text = rows.nth(i).inner_text().strip()
-                if "Pairing" in text or "pairing" in text:
-                    pairing_indices.append((i, text))
-            except:
-                continue
+                elem = pairing_elems.nth(i)
+                label = elem.inner_text().strip()[:60]
 
-        print(f"   ✈️  Found {len(pairing_indices)} pairing rows")
+                if label in crew_by_pairing:
+                    print(f"   ⏭  Already have: {label}")
+                    continue
 
-        for i, label in pairing_indices:
-            label_clean = label.strip()[:50]
-            if label_clean in crew_by_pairing:
-                print(f"   ⏭  Already have crew for: {label_clean}")
-                continue
+                print(f"\n   🖱  Clicking: {label}")
+                crew = fetch_crew_for_pairing(page, elem)
 
-            print(f"   🖱  Clicking pairing: {label_clean}")
-            try:
-                row = rows.nth(i)
-                crew = fetch_crew_for_pairing(page, row)
                 if crew:
-                    crew_by_pairing[label_clean] = crew
-                    print(f"   ✅ Got {len(crew)} crew members")
+                    crew_by_pairing[label] = crew
+                    print(f"   ✅ Got {len(crew)} crew members:")
                     for c in crew:
                         print(f"      {c}")
                 else:
-                    print(f"   ⚠️  No crew found for this pairing")
+                    crew_by_pairing[label] = []
+                    print(f"   ⚠️  No crew found")
+
                 page.wait_for_timeout(1000)
+
             except Exception as e:
-                print(f"   ⚠️  Error: {e}")
+                print(f"   ⚠️  Error on pairing {i+1}: {e}")
                 continue
 
-    print(f"\n✅ Crew fetch complete — {len(crew_by_pairing)} pairings with crew data")
+    print(f"\n✅ Done — {len(crew_by_pairing)} pairings processed")
     return crew_by_pairing
 
 # =====================================================
@@ -385,11 +365,10 @@ def parse(xml_data, crew_by_pairing):
                     return elem.text
             return None
 
-        title = get("TypeDescription") or "Duty"
-        start = get("LCLStart")
-        end   = get("LCLEnd")
+        title  = get("TypeDescription") or "Duty"
+        start  = get("LCLStart")
+        end    = get("LCLEnd")
         report = get("LCLExpectedSignOn")
-        pairing_id = get("PairingId") or get("PairingCode") or get("Code") or ""
 
         if not start or not end:
             continue
@@ -507,23 +486,13 @@ def parse(xml_data, crew_by_pairing):
 
                 description_lines.append("")
 
-        # Add crew if we have it for this pairing
+        # Match crew to this activity
         crew = []
-
-        # Try matching by pairing id from XML
-        if pairing_id:
-            for key, val in crew_by_pairing.items():
-                if pairing_id in key:
-                    crew = val
-                    break
-
-        # Fallback: match by date
-        if not crew:
-            date_str = start_dt.strftime("%Y-%m-%d")
-            for key, val in crew_by_pairing.items():
-                if date_str in key:
-                    crew = val
-                    break
+        date_str = start_dt.strftime("%Y-%m-%d")
+        for key, val in crew_by_pairing.items():
+            if date_str in key or (val and "Pairing" in title):
+                crew = val
+                break
 
         if crew:
             description_lines.append("Crew")
