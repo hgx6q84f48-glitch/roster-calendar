@@ -1,7 +1,7 @@
 import os
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
 from icalendar import Calendar, Event
 
 from playwright.sync_api import sync_playwright
@@ -66,7 +66,7 @@ def get_token():
         return token
 
 
-# ===== FETCH =====
+# ===== FETCH ROSTER =====
 def fetch_roster(token):
     print("📡 Fetching roster...")
 
@@ -107,33 +107,126 @@ def fetch_roster(token):
     return response.text
 
 
+# ===== FETCH CREW =====
+def fetch_crew(token, flight_date, carrier, flight_number, from_airport):
+    import urllib3
+    urllib3.disable_warnings()
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+
+    soap_body = f"""<?xml version="1.0" encoding="UTF-8"?>
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <FlightCrewListRequest Version="1.0">
+          <Token>{token}</Token>
+          <Data>
+            <Flight>
+              <Date>{flight_date}</Date>
+              <CarrierCode>{carrier}</CarrierCode>
+              <Number>{flight_number}</Number>
+              <OperationalSuffix></OperationalSuffix>
+              <FromAirport>{from_airport}</FromAirport>
+              <Status>S</Status>
+            </Flight>
+          </Data>
+        </FlightCrewListRequest>
+      </soapenv:Body>
+    </soapenv:Envelope>
+    """
+
+    response = requests.post(
+        API_URL,
+        data=soap_body,
+        headers=headers,
+        verify=False
+    )
+
+    if response.status_code != 200:
+        return []
+
+    try:
+        root = ET.fromstring(response.text)
+    except:
+        return []
+
+    pilots = []
+
+    for crew in root.iter():
+        tag = crew.tag.split('}')[-1]
+
+        if tag != "Crew":
+            continue
+
+        def get(node_tag):
+            for elem in crew.iter():
+                if node_tag in elem.tag:
+                    return elem.text
+            return None
+
+        crew_group = get("CrewGroupCode")
+
+        # Flight crew only
+        if crew_group != "1":
+            continue
+
+        rank_code = get("RankCode")
+        position_code = get("PositionCode")
+        first_name = get("FirstName")
+        surname = get("Surname")
+
+        full_name = f"{first_name} {surname}"
+
+        if rank_code == "CAPT":
+            pilots.append(f"CPT {full_name} ({position_code})")
+
+        elif rank_code == "FO":
+            pilots.append(f"FO {full_name} ({position_code})")
+
+    return pilots
+
+
 # ===== HELPERS =====
 def fmt_time(dt_str):
     try:
-        return datetime.strptime(dt_str, "%Y-%m-%d %H:%M").strftime("%H:%M")
+        return datetime.strptime(
+            dt_str,
+            "%Y-%m-%d %H:%M"
+        ).strftime("%H:%M")
     except:
         return None
 
 
-def fmt_time_short(t):
-    try:
-        return datetime.strptime(t, "%Y-%m-%d %H:%M").strftime("%H:%M")
-    except:
-        return t
+def fmt_full(dt):
+    return dt.strftime("%d %b %Y %H:%M")
+
+
+def fmt_utc(dt):
+    utc = dt.astimezone(timezone.utc)
+    return utc.strftime("%H:%MZ")
+
+
+def fmt_block(start, end):
+    diff = end - start
+    mins = int(diff.total_seconds() / 60)
+    h = mins // 60
+    m = mins % 60
+    return f"{h}h {m}m"
 
 
 # ===== PARSE =====
-def parse(xml_data):
+def parse(xml_data, token):
     root = ET.fromstring(xml_data)
     activities = []
 
     for activity in root.iter():
-        # ✅ FIX: namespace-safe tag check
         tag = activity.tag.split('}')[-1]
+
         if 'Activity' not in tag:
             continue
 
-        # ✅ FIX: recursive search
         def get(tag):
             for elem in activity.iter():
                 if tag in elem.tag:
@@ -154,39 +247,48 @@ def parse(xml_data):
         except:
             continue
 
-        # ===== COURSE + MODULES =====
+        description_lines = []
+
+        # =========================================================
+        # TRAINING (UNCHANGED)
+        # =========================================================
         course_elem = None
+
         for elem in activity:
             if 'Course' in elem.tag:
                 course_elem = elem
                 break
 
-        description_lines = []
-
         if course_elem is not None:
-            # COURSE INFO
             course_name = None
             base = None
 
             for c in course_elem:
                 if 'Description' in c.tag:
                     course_name = c.text
+
                 if 'Base' in c.tag:
                     base = c.text
 
             if report:
-                description_lines.append(f"Report: {fmt_time(report)}")
+                description_lines.append(
+                    f"Report: {fmt_time(report)}"
+                )
 
             if course_name:
-                description_lines.append(f"Course: {course_name}")
+                description_lines.append(
+                    f"Course: {course_name}"
+                )
 
             if base:
-                description_lines.append(f"Location: {base}")
+                description_lines.append(
+                    f"Location: {base}"
+                )
 
             description_lines.append("")
 
-            # MODULES (UNCHANGED)
             modules = []
+
             for m in course_elem.iter():
                 if 'Module' not in m.tag:
                     continue
@@ -199,10 +301,13 @@ def parse(xml_data):
                 for x in m:
                     if 'Description' in x.tag:
                         m_desc = x.text
+
                     if 'LCLStart' in x.tag:
                         m_start = x.text
+
                     if 'LCLEnd' in x.tag:
                         m_end = x.text
+
                     if 'Type' in x.tag:
                         for t in x:
                             if 'Description' in t.tag:
@@ -211,31 +316,153 @@ def parse(xml_data):
                 if not m_start or not m_end:
                     continue
 
-                # TYPE CLEANUP (UNCHANGED)
                 label = "EVENT"
+
                 if m_type:
                     mt = m_type.lower()
+
                     if "brief" in mt:
                         label = "BRIEF"
+
                     elif "sim" in mt:
                         label = "SIM"
+
                     elif "debrief" in mt:
                         label = "DEBRIEF"
 
                 modules.append((
                     m_start,
-                    f"{fmt_time_short(m_start)}–{fmt_time_short(m_end)}  {label} — {m_desc}"
+                    f"{fmt_time(m_start)}–{fmt_time(m_end)}  {label} — {m_desc}"
                 ))
 
-            # SORT MODULES
             modules.sort(key=lambda x: x[0])
 
             for _, line in modules:
                 description_lines.append(line)
 
-        description = "\n".join(description_lines) if description_lines else None
+        # =========================================================
+        # DUTY ENHANCEMENT
+        # =========================================================
+        elif "DUTY" in title.upper():
 
-        activities.append((title, start_dt, end_dt, description))
+            if report:
+                report_dt = datetime.strptime(
+                    report,
+                    "%Y-%m-%d %H:%M"
+                )
+
+                description_lines.append("Report:")
+                description_lines.append(
+                    f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
+                )
+                description_lines.append("")
+
+            sectors = []
+
+            for elem in activity.iter():
+
+                tag = elem.tag.split('}')[-1]
+
+                if tag != "Flight":
+                    continue
+
+                def fget(node_tag):
+                    for x in elem.iter():
+                        if node_tag in x.tag:
+                            return x.text
+                    return None
+
+                carrier = fget("CarrierCode")
+                number = fget("Number")
+                dep = fget("FromAirport")
+                arr = fget("ToAirport")
+
+                dep_time = fget("LCLDepartureTime")
+                arr_time = fget("LCLArrivalTime")
+
+                if not dep_time or not arr_time:
+                    continue
+
+                try:
+                    dep_dt = datetime.strptime(
+                        dep_time,
+                        "%Y-%m-%d %H:%M"
+                    )
+
+                    arr_dt = datetime.strptime(
+                        arr_time,
+                        "%Y-%m-%d %H:%M"
+                    )
+
+                except:
+                    continue
+
+                block = fmt_block(dep_dt, arr_dt)
+
+                sectors.append({
+                    "carrier": carrier,
+                    "number": number,
+                    "dep": dep,
+                    "arr": arr,
+                    "dep_dt": dep_dt,
+                    "arr_dt": arr_dt,
+                    "block": block
+                })
+
+            for sector in sectors:
+
+                description_lines.append(
+                    f"{sector['carrier']}{sector['number']}  "
+                    f"{sector['dep']} → {sector['arr']}"
+                )
+
+                description_lines.append(
+                    f"Dep: {fmt_full(sector['dep_dt'])} "
+                    f"({fmt_utc(sector['dep_dt'])})"
+                )
+
+                description_lines.append(
+                    f"Arr: {fmt_full(sector['arr_dt'])} "
+                    f"({fmt_utc(sector['arr_dt'])})"
+                )
+
+                description_lines.append(
+                    f"Block: {sector['block']}"
+                )
+
+                # ===== CREW =====
+                try:
+                    pilots = fetch_crew(
+                        token,
+                        sector['dep_dt'].strftime("%Y-%m-%d"),
+                        sector['carrier'],
+                        sector['number'],
+                        sector['dep']
+                    )
+
+                    if pilots:
+                        description_lines.append("")
+                        description_lines.append("Crew:")
+
+                        for p in pilots:
+                            description_lines.append(p)
+
+                except Exception as e:
+                    print(f"⚠️ Crew fetch failed: {e}")
+
+                description_lines.append("")
+
+        description = (
+            "\n".join(description_lines)
+            if description_lines else None
+        )
+
+        activities.append((
+            title,
+            start_dt,
+            end_dt,
+            description
+        ))
 
     print(f"🔍 Found {len(activities)} activities")
 
@@ -256,14 +483,18 @@ def build_ics(activities):
 
         if t == "OPEN DAY":
             summary = "🟡 OPEN"
+
         elif "OFF" in t:
             summary = "🟢 DAY OFF"
+
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
-        elif description:
+
+        elif description and "Course:" in description:
             summary = "📘 TRAINING"
+
         else:
-            summary = "🔴 DUTY"
+            summary = "✈️ DUTY"
 
         event.add('summary', summary)
         event.add('dtstart', start)
@@ -289,6 +520,6 @@ def save(cal):
 if __name__ == "__main__":
     token = get_token()
     xml_data = fetch_roster(token)
-    activities = parse(xml_data)
+    activities = parse(xml_data, token)
     cal = build_ics(activities)
     save(cal)
