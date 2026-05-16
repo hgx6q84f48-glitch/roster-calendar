@@ -493,8 +493,37 @@ def build_ics(activities):
         elif description and "Course:" in description:
             summary = "📘 TRAINING"
 
+        ```
+    else:
+        duty_routes = []
+
+        if description:
+            for line in description.split("\n"):
+
+                # Match lines like:
+                # SA280  JNB → PER
+                if "→" in line and "SA" in line:
+
+                    try:
+                        route = line.split("  ")[1]
+                        dep = route.split("→")[0].strip()
+                        arr = route.split("→")[1].strip()
+
+                        if not duty_routes:
+                            duty_routes.append(dep)
+
+                        duty_routes.append(arr)
+
+                    except:
+                        pass
+
+        if len(duty_routes) >= 2:
+            route_text = "-".join(duty_routes)
+            summary = f"✈️ {route_text}"
         else:
             summary = "✈️ DUTY"
+```
+
 
         event.add('summary', summary)
         event.add('dtstart', start)
