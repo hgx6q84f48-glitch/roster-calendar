@@ -4,7 +4,7 @@ import requests
 import urllib3
 import xml.etree.ElementTree as ET
 
-from datetime import datetime
+from datetime import datetime, timezone
 from icalendar import Calendar, Event
 from playwright.sync_api import sync_playwright
 
@@ -29,21 +29,32 @@ ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
 # HELPERS
 # =====================================================
 
-def fmt_time(dt_str):
+def fmt_local(dt):
 
-    try:
-        return datetime.strptime(
-            dt_str,
-            "%Y-%m-%d %H:%M"
-        ).strftime("%H:%M")
+    return dt.strftime("%d %b %H:%ML")
 
-    except:
+
+def fmt_zulu(dt):
+
+    utc = dt.astimezone(timezone.utc)
+
+    return utc.strftime("%H:%MZ")
+
+
+def fmt_block(duration):
+
+    if not duration:
         return ""
 
+    duration = duration.strip()
 
-def fmt_full(dt):
+    if ":" in duration:
 
-    return dt.strftime("%d %b %Y %H:%M")
+        h, m = duration.split(":")
+
+        return f"{h.zfill(2)}h{m.zfill(2)}"
+
+    return duration
 
 
 def clean(s):
@@ -90,19 +101,23 @@ def login():
     )
 
     try:
+
         page.press(
             'input[type="password"]',
             'Enter'
         )
+
     except:
         pass
 
     page.wait_for_timeout(3000)
 
     try:
+
         page.locator(
             "button:visible"
         ).first.click(timeout=3000)
+
     except:
         pass
 
@@ -171,7 +186,7 @@ def fetch_roster_xml(page):
 
 
 # =====================================================
-# PARSE ROSTER XML
+# PARSE XML
 # =====================================================
 
 def parse(xml_data):
@@ -222,9 +237,9 @@ def parse(xml_data):
 
         description_lines = []
 
-        # =============================================
+        # =================================================
         # REPORT
-        # =============================================
+        # =================================================
 
         if report:
 
@@ -233,15 +248,17 @@ def parse(xml_data):
                 "%Y-%m-%d %H:%M"
             )
 
+            description_lines.append("Report")
             description_lines.append(
-                f"Report: {fmt_full(report_dt)}"
+                f"{fmt_local(report_dt)} "
+                f"({fmt_zulu(report_dt)})"
             )
 
             description_lines.append("")
 
-        # =============================================
+        # =================================================
         # PAIRING
-        # =============================================
+        # =================================================
 
         pairing = None
 
@@ -252,8 +269,6 @@ def parse(xml_data):
                 break
 
         if pairing is not None:
-
-            flight_lines = []
 
             for leg in pairing.iter():
 
@@ -323,32 +338,115 @@ def parse(xml_data):
                     if child_tag == "Duration":
                         duration = child.text or ""
 
-                dep_fmt = fmt_time(dep_time)
-                arr_fmt = fmt_time(arr_time)
+                try:
+
+                    dep_dt = datetime.strptime(
+                        dep_time,
+                        "%Y-%m-%d %H:%M"
+                    )
+
+                    arr_dt = datetime.strptime(
+                        arr_time,
+                        "%Y-%m-%d %H:%M"
+                    )
+
+                except:
+                    continue
 
                 flight_no = f"{carrier}{number}"
 
-                line = (
-                    f"{flight_no}  "
-                    f"{dep} → {arr}  "
-                    f"{dep_fmt}-{arr_fmt}"
+                description_lines.append(
+                    dep_dt.strftime("%d %b")
+                )
+
+                description_lines.append(
+                    f"{flight_no}  {dep} → {arr}"
+                )
+
+                description_lines.append(
+                    f"Dep {dep_dt.strftime('%H:%M')}L "
+                    f"({fmt_zulu(dep_dt)})"
+                )
+
+                description_lines.append(
+                    f"Arr "
+                    f"{arr_dt.strftime('%d %b %H:%M')}L "
+                    f"({fmt_zulu(arr_dt)})"
                 )
 
                 if duration:
-                    line += f"  ({duration})"
 
-                flight_lines.append(line)
+                    description_lines.append(
+                        f"Block {fmt_block(duration)}"
+                    )
 
-            if flight_lines:
+                # =========================================
+                # LAYOVER INFO
+                # =========================================
 
-                description_lines.append("Flights")
-                description_lines.append("────────")
+                hotel_name = None
+                hotel_arr = None
+                hotel_dep = None
 
-                for line in flight_lines:
-                    description_lines.append(line)
+                for elem in leg.iter():
+
+                    et = elem.tag.split('}')[-1]
+
+                    txt = elem.text
+
+                    if not txt:
+                        continue
+
+                    txt = txt.strip()
+
+                    if "Hotel" in et and not hotel_name:
+                        hotel_name = txt
+
+                    if "HotelArrival" in et:
+                        hotel_arr = txt
+
+                    if "HotelDeparture" in et:
+                        hotel_dep = txt
+
+                if hotel_name:
+
+                    description_lines.append("")
+                    description_lines.append("Layover")
+                    description_lines.append(hotel_name)
+
+                    try:
+
+                        if hotel_arr:
+
+                            ha = datetime.strptime(
+                                hotel_arr,
+                                "%Y-%m-%d %H:%M"
+                            )
+
+                            description_lines.append(
+                                f"{ha.strftime('%d %b %H:%M')}L "
+                                f"({fmt_zulu(ha)})"
+                            )
+
+                        if hotel_dep:
+
+                            hd = datetime.strptime(
+                                hotel_dep,
+                                "%Y-%m-%d %H:%M"
+                            )
+
+                            description_lines.append(
+                                f"{hd.strftime('%d %b %H:%M')}L "
+                                f"({fmt_zulu(hd)})"
+                            )
+
+                    except:
+                        pass
+
+                description_lines.append("")
 
         description = (
-            "\n".join(description_lines)
+            "\n".join(description_lines).strip()
             if description_lines else None
         )
 
@@ -378,10 +476,6 @@ def build_ics(activities):
 
         t = title.upper()
 
-        # =============================================
-        # SPECIAL DAYS
-        # =============================================
-
         if t == "OPEN DAY":
             summary = "🟡 OPEN"
 
@@ -404,19 +498,18 @@ def build_ics(activities):
 
                     try:
 
-                        route_section = line.split("  ")[1]
+                        route = line.split("  ")[1]
 
                         dep = (
-                            route_section
+                            route
                             .split("→")[0]
                             .strip()
                         )
 
                         arr = (
-                            route_section
+                            route
                             .split("→")[1]
                             .strip()
-                            .split(" ")[0]
                         )
 
                         if not routes:
