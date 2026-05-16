@@ -1,4 +1,5 @@
 import os
+import re
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
@@ -8,15 +9,60 @@ from icalendar import Calendar, Event
 from playwright.sync_api import sync_playwright
 
 
-# ===== CONFIG =====
+# =====================================================
+# CONFIG
+# =====================================================
+
 USERNAME = os.environ.get("CREW_USER")
 PASSWORD = os.environ.get("CREW_PASS")
 
 if not USERNAME or not PASSWORD:
-    raise Exception("❌ Missing credentials")
+    raise Exception("❌ Missing CREW_USER / CREW_PASS")
 
 
-# ===== LOGIN =====
+LOGIN_URL = "https://saacrewconnect.cocre8.africa/html/home.html"
+ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
+
+
+# =====================================================
+# HELPERS
+# =====================================================
+
+def fmt_time(dt_str):
+
+    try:
+        return datetime.strptime(
+            dt_str,
+            "%Y-%m-%d %H:%M"
+        ).strftime("%H:%M")
+    except:
+        return None
+
+
+def fmt_full(dt):
+
+    return dt.strftime("%d %b %Y %H:%M")
+
+
+def fmt_utc(dt):
+
+    utc = dt.astimezone(timezone.utc)
+
+    return utc.strftime("%H:%MZ")
+
+
+def clean(s):
+
+    if not s:
+        return ""
+
+    return re.sub(r"\s+", " ", s).strip()
+
+
+# =====================================================
+# LOGIN
+# =====================================================
+
 def login():
 
     print("🔐 Logging in...")
@@ -29,9 +75,7 @@ def login():
 
     page = browser.new_page()
 
-    page.goto(
-        "https://saacrewconnect.cocre8.africa/html/home.html"
-    )
+    page.goto(LOGIN_URL)
 
     page.wait_for_selector(
         'input[type="password"]',
@@ -56,7 +100,7 @@ def login():
     except:
         pass
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(3000)
 
     try:
         page.locator(
@@ -72,21 +116,25 @@ def login():
     return playwright, browser, page
 
 
-# ===== OPEN ROSTER =====
+# =====================================================
+# OPEN ROSTER
+# =====================================================
+
 def open_roster(page):
 
-    print("📡 Opening roster...")
+    print("🛰 Opening roster...")
 
-    page.goto(
-        "https://saacrewconnect.cocre8.africa/php/roster.php"
-    )
+    page.goto(ROSTER_URL)
 
     page.wait_for_load_state("networkidle")
 
     page.wait_for_timeout(5000)
 
 
-# ===== FETCH ROSTER XML =====
+# =====================================================
+# FETCH ROSTER XML
+# =====================================================
+
 def fetch_roster_xml(page):
 
     responses = []
@@ -122,14 +170,33 @@ def fetch_roster_xml(page):
     )
 
 
-# ===== GET CREW FROM UI =====
-def get_crew_from_ui(page, flight_no):
+# =====================================================
+# GET CREW
+# =====================================================
+
+def get_crew_for_flight(page, flight_no):
 
     print(f"🔎 Crew lookup {flight_no}")
 
     crew = []
 
     try:
+
+        # IMPORTANT:
+        # Find ACTUAL roster event containing flight number
+        # instead of generic page text search
+
+        event_locator = page.locator(
+            ".fc-event, .event, .roster-event"
+        ).filter(
+            has_text=flight_no
+        ).first
+
+        event_locator.wait_for(timeout=10000)
+
+        event_locator.scroll_into_view_if_needed()
+
+        page.wait_for_timeout(500)
 
         with page.expect_response(
             lambda r:
@@ -138,14 +205,7 @@ def get_crew_from_ui(page, flight_no):
             timeout=15000
         ) as response_info:
 
-            locator = page.get_by_text(
-                flight_no,
-                exact=False
-            ).first
-
-            locator.wait_for(timeout=10000)
-
-            locator.click()
+            event_locator.click(force=True)
 
         response = response_info.value
 
@@ -194,13 +254,13 @@ def get_crew_from_ui(page, flight_no):
 
         print("👨‍✈️ CREW FOUND:", crew)
 
+        # close popup if exists
         try:
-            page.get_by_text(
-                "Close",
-                exact=False
-            ).click(timeout=3000)
+            page.keyboard.press("Escape")
         except:
             pass
+
+        page.wait_for_timeout(500)
 
         return crew
 
@@ -211,31 +271,10 @@ def get_crew_from_ui(page, flight_no):
         return []
 
 
-# ===== HELPERS =====
-def fmt_time(dt_str):
+# =====================================================
+# PARSE ROSTER XML
+# =====================================================
 
-    try:
-        return datetime.strptime(
-            dt_str,
-            "%Y-%m-%d %H:%M"
-        ).strftime("%H:%M")
-    except:
-        return None
-
-
-def fmt_full(dt):
-
-    return dt.strftime("%d %b %Y %H:%M")
-
-
-def fmt_utc(dt):
-
-    utc = dt.astimezone(timezone.utc)
-
-    return utc.strftime("%H:%MZ")
-
-
-# ===== PARSE =====
 def parse(xml_data, page):
 
     root = ET.fromstring(xml_data)
@@ -284,7 +323,10 @@ def parse(xml_data, page):
 
         description_lines = []
 
-        # ===== REPORT =====
+        # =================================================
+        # REPORT
+        # =================================================
+
         if report:
 
             report_dt = datetime.strptime(
@@ -300,7 +342,10 @@ def parse(xml_data, page):
 
             description_lines.append("")
 
-        # ===== FLIGHTS =====
+        # =================================================
+        # PAIRING
+        # =================================================
+
         pairing = None
 
         for elem in activity:
@@ -399,10 +444,13 @@ def parse(xml_data, page):
 
                 description_lines.append(line)
 
-                # ===== CREW LOOKUP =====
+                # =============================================
+                # CREW LOOKUP
+                # =============================================
+
                 try:
 
-                    crew = get_crew_from_ui(
+                    crew = get_crew_for_flight(
                         page,
                         flight_no
                     )
@@ -417,7 +465,10 @@ def parse(xml_data, page):
                         e
                     )
 
-            # ===== CREW SECTION =====
+            # =================================================
+            # CREW SECTION
+            # =================================================
+
             all_crew = list(dict.fromkeys(all_crew))
 
             if all_crew:
@@ -445,7 +496,10 @@ def parse(xml_data, page):
     return activities
 
 
-# ===== BUILD ICS =====
+# =====================================================
+# BUILD ICS
+# =====================================================
+
 def build_ics(activities):
 
     cal = Calendar()
@@ -521,7 +575,10 @@ def build_ics(activities):
     return cal
 
 
-# ===== SAVE =====
+# =====================================================
+# SAVE
+# =====================================================
+
 def save(cal):
 
     with open("roster.ics", "wb") as f:
@@ -530,7 +587,10 @@ def save(cal):
     print("📅 roster.ics saved")
 
 
-# ===== MAIN =====
+# =====================================================
+# MAIN
+# =====================================================
+
 if __name__ == "__main__":
 
     playwright = None
