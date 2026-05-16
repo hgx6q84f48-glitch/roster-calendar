@@ -1,9 +1,14 @@
 import os
+import json
 import requests
 import xml.etree.ElementTree as ET
+
 from datetime import datetime, timezone
+
 from icalendar import Calendar, Event
+
 from playwright.sync_api import sync_playwright
+
 
 # ===== CONFIG =====
 USERNAME = os.environ.get("CREW_USER")
@@ -15,81 +20,113 @@ if not USERNAME or not PASSWORD:
 API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
 
 
-# ===== GET TOKEN =====
-def get_token():
+# ===== LOGIN =====
+def login():
 
     print("🔐 Logging in...")
 
-    with sync_playwright() as p:
+    playwright = sync_playwright().start()
 
-        browser = p.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(
+        headless=True
+    )
 
-        page = browser.new_page()
+    page = browser.new_page()
 
-        page.goto(
-            "https://saacrewconnect.cocre8.africa/html/home.html"
-        )
+    page.goto(
+        "https://saacrewconnect.cocre8.africa/html/home.html"
+    )
 
-        page.wait_for_selector(
+    page.wait_for_selector(
+        'input[type="password"]',
+        timeout=15000
+    )
+
+    page.fill(
+        'input[type="text"]',
+        USERNAME
+    )
+
+    page.fill(
+        'input[type="password"]',
+        PASSWORD
+    )
+
+    try:
+        page.press(
             'input[type="password"]',
-            timeout=15000
+            'Enter'
         )
+    except:
+        pass
 
-        page.fill('input[type="text"]', USERNAME)
-        page.fill('input[type="password"]', PASSWORD)
+    page.wait_for_timeout(2000)
 
-        try:
-            page.press('input[type="password"]', 'Enter')
-        except:
-            pass
+    try:
+        page.locator(
+            "button:visible"
+        ).first.click(timeout=3000)
+    except:
+        pass
 
-        page.wait_for_timeout(2000)
+    page.wait_for_load_state("networkidle")
 
-        try:
-            page.locator(
-                "button:visible"
-            ).first.click(timeout=3000)
-        except:
-            pass
+    page.wait_for_function("""
+        () => {
+            const data = localStorage.getItem('jStorage');
 
-        page.wait_for_load_state("networkidle")
+            if (!data) return false;
 
-        page.wait_for_function("""
-            () => {
-                const data = localStorage.getItem('jStorage');
-
-                if (!data) return false;
-
-                try {
-                    return JSON.parse(data).crew_token !== undefined;
-                } catch {
-                    return false;
-                }
+            try {
+                return JSON.parse(data).crew_token !== undefined;
+            } catch {
+                return false;
             }
-        """, timeout=20000)
+        }
+    """, timeout=20000)
 
-        token = page.evaluate(
-            "JSON.parse(localStorage.getItem('jStorage')).crew_token"
-        )
+    token = page.evaluate(
+        "JSON.parse(localStorage.getItem('jStorage')).crew_token"
+    )
 
-        browser.close()
+    print("✅ Token acquired")
 
-        print("✅ Token acquired")
+    return playwright, browser, page, token
 
-        return token
+
+# ===== API POST USING PLAYWRIGHT SESSION =====
+def api_post(page, xml_body):
+
+    response_text = page.evaluate(
+        """
+        async ({ url, body }) => {
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded; charset=UTF-8",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: body
+            });
+
+            return await response.text();
+        }
+        """,
+        {
+            "url": API_URL,
+            "body": xml_body
+        }
+    )
+
+    return response_text
 
 
 # ===== FETCH ROSTER =====
-def fetch_roster(token):
+def fetch_roster(page, token):
 
     print("📡 Fetching roster...")
-
-    import urllib3
-    urllib3.disable_warnings()
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
 
     soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
@@ -108,34 +145,18 @@ def fetch_roster(token):
     </soapenv:Envelope>
     """
 
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
-
-    if response.status_code != 200:
-        raise Exception("❌ API failed")
-
-    return response.text
+    return api_post(page, soap_body)
 
 
 # ===== FETCH CREW =====
 def get_flight_crew(
+    page,
     token,
     date,
     carrier,
     number,
     from_airport
 ):
-
-    import urllib3
-    urllib3.disable_warnings()
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
 
     print(
         f"🔎 Crew lookup "
@@ -165,22 +186,14 @@ def get_flight_crew(
     </soapenv:Envelope>
     """
 
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
-
-    if response.status_code != 200:
-
-        print("⚠️ Crew request failed")
-
-        return []
-
     try:
 
-        root = ET.fromstring(response.text)
+        response_text = api_post(
+            page,
+            soap_body
+        )
+
+        root = ET.fromstring(response_text)
 
         crew = []
 
@@ -229,7 +242,7 @@ def get_flight_crew(
 
     except Exception as e:
 
-        print("⚠️ CREW PARSE ERROR:", e)
+        print("⚠️ CREW LOOKUP ERROR:", e)
 
         return []
 
@@ -259,7 +272,7 @@ def fmt_utc(dt):
 
 
 # ===== PARSE =====
-def parse(xml_data, token):
+def parse(xml_data, page, token):
 
     root = ET.fromstring(xml_data)
 
@@ -317,7 +330,8 @@ def parse(xml_data, token):
 
             description_lines.append("Report:")
             description_lines.append(
-                f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
+                f"{fmt_full(report_dt)} "
+                f"({fmt_utc(report_dt)})"
             )
 
             description_lines.append("")
@@ -435,6 +449,7 @@ def parse(xml_data, token):
                 try:
 
                     crew = get_flight_crew(
+                        page,
                         token,
                         flight_date,
                         carrier,
@@ -447,7 +462,10 @@ def parse(xml_data, token):
 
                 except Exception as e:
 
-                    print("⚠️ Crew lookup failed:", e)
+                    print(
+                        "⚠️ Crew lookup failed:",
+                        e
+                    )
 
             # ===== CREW SECTION =====
             all_crew = list(dict.fromkeys(all_crew))
@@ -511,7 +529,11 @@ def build_ics(activities):
 
                             route_section = line.split("  ")[1]
 
-                            dep = route_section.split("→")[0].strip()
+                            dep = (
+                                route_section
+                                .split("→")[0]
+                                .strip()
+                            )
 
                             arr = (
                                 route_section
@@ -561,12 +583,36 @@ def save(cal):
 # ===== MAIN =====
 if __name__ == "__main__":
 
-    token = get_token()
+    playwright = None
+    browser = None
 
-    xml_data = fetch_roster(token)
+    try:
 
-    activities = parse(xml_data, token)
+        playwright, browser, page, token = login()
 
-    cal = build_ics(activities)
+        xml_data = fetch_roster(
+            page,
+            token
+        )
 
-    save(cal)
+        activities = parse(
+            xml_data,
+            page,
+            token
+        )
+
+        cal = build_ics(activities)
+
+        save(cal)
+
+    finally:
+
+        try:
+            browser.close()
+        except:
+            pass
+
+        try:
+            playwright.stop()
+        except:
+            pass
