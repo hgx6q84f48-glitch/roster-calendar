@@ -343,8 +343,8 @@ def parse(xml_data, token):
         # =========================================================
         # DUTY ENHANCEMENT
         # =========================================================
-        elif "DUTY" in title.upper():
-
+       else:
+           
             print("\n================ DUTY XML ================\n")
             print(ET.tostring(activity, encoding='unicode'))
             print("\n==========================================\n")
