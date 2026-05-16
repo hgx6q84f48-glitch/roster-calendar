@@ -129,6 +129,7 @@ def fmt_utc(dt):
 
 # ===== PARSE =====
 def parse(xml_data):
+
     root = ET.fromstring(xml_data)
     activities = []
 
@@ -267,13 +268,9 @@ def parse(xml_data):
                 description_lines.append(line)
 
         # =====================================================
-        # EVERYTHING ELSE (DEBUG)
+        # PAIRINGS / DUTIES
         # =====================================================
         else:
-
-            print("\n================ ACTIVITY XML ================\n")
-            print(ET.tostring(activity, encoding='unicode'))
-            print("\n==============================================\n")
 
             if report:
 
@@ -287,6 +284,112 @@ def parse(xml_data):
                     f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
                 )
                 description_lines.append("")
+
+            duty_routes = []
+
+            pairing = None
+
+            for elem in activity:
+                if 'Pairing' in elem.tag:
+                    pairing = elem
+                    break
+
+            if pairing is not None:
+
+                description_lines.append("Flights:")
+
+                for leg in pairing.iter():
+
+                    tag_name = leg.tag.split('}')[-1]
+
+                    if tag_name != "Leg":
+                        continue
+
+                    leg_type = None
+
+                    for child in leg:
+                        child_tag = child.tag.split('}')[-1]
+
+                        if child_tag == "Type":
+                            leg_type = child.text
+
+                    if leg_type != "Flight":
+                        continue
+
+                    flight_elem = None
+
+                    for child in leg:
+                        child_tag = child.tag.split('}')[-1]
+
+                        if child_tag == "Flight":
+                            flight_elem = child
+
+                    if flight_elem is None:
+                        continue
+
+                    carrier = ""
+                    number = ""
+                    dep = ""
+                    arr = ""
+                    dep_time = ""
+                    arr_time = ""
+                    duration = ""
+
+                    for f in flight_elem.iter():
+
+                        ft = f.tag.split('}')[-1]
+
+                        if ft == "CarrierCode":
+                            carrier = f.text or ""
+
+                        elif ft == "Number":
+                            number = f.text or ""
+
+                        elif ft == "FromAirport":
+                            dep = f.text or ""
+
+                        elif ft == "ToAirport":
+                            arr = f.text or ""
+
+                        elif ft == "LCLLTD":
+                            dep_time = f.text or ""
+
+                        elif ft == "LCLLTA":
+                            arr_time = f.text or ""
+
+                    for child in leg:
+                        child_tag = child.tag.split('}')[-1]
+
+                        if child_tag == "Duration":
+                            duration = child.text or ""
+
+                    if dep and arr:
+
+                        if not duty_routes:
+                            duty_routes.append(dep)
+
+                        duty_routes.append(arr)
+
+                    dep_fmt = fmt_time(dep_time)
+                    arr_fmt = fmt_time(arr_time)
+
+                    flight_no = f"{carrier}{number}"
+
+                    line = (
+                        f"{flight_no}  "
+                        f"{dep} → {arr}  "
+                        f"{dep_fmt}-{arr_fmt}"
+                    )
+
+                    if duration:
+                        line += f"  ({duration})"
+
+                    description_lines.append(line)
+
+            description = (
+                "\n".join(description_lines)
+                if description_lines else None
+            )
 
         description = (
             "\n".join(description_lines)
@@ -332,7 +435,38 @@ def build_ics(activities):
             summary = "📘 TRAINING"
 
         else:
-            summary = "✈️ DUTY"
+
+            duty_routes = []
+
+            if description:
+
+                for line in description.split("\n"):
+
+                    if "→" in line and "SA" in line:
+
+                        try:
+
+                            route_section = line.split("  ")[1]
+
+                            dep = route_section.split("→")[0].strip()
+                            arr = route_section.split("→")[1].strip().split(" ")[0]
+
+                            if not duty_routes:
+                                duty_routes.append(dep)
+
+                            duty_routes.append(arr)
+
+                        except:
+                            pass
+
+            if len(duty_routes) >= 2:
+
+                route_text = "-".join(duty_routes)
+
+                summary = f"✈️ {route_text}"
+
+            else:
+                summary = "✈️ DUTY"
 
         event.add('summary', summary)
         event.add('dtstart', start)
