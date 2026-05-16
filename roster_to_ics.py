@@ -260,7 +260,7 @@ def get_crew_for_flight(
             "X-Requested-With":
                 "XMLHttpRequest",
         }
-
+    print(xml_payload)
         response = session.post(
             CREW_API_URL,
             data=xml_payload,
