@@ -182,21 +182,27 @@ def get_crew_for_flight(page, flight_no):
 
     try:
 
-        # IMPORTANT:
-        # Find ACTUAL roster event containing flight number
-        # instead of generic page text search
+        # ==========================================
+        # FIND REAL FULLCALENDAR EVENT
+        # ==========================================
 
         event_locator = page.locator(
-    ".pairing-leg-key"
+            ".fc-event"
         ).filter(
-    has_text=flight_no
+            has_text=flight_no
         ).first
 
-        event_locator.wait_for(timeout=10000)
+        event_locator.wait_for(
+            timeout=10000
+        )
 
         event_locator.scroll_into_view_if_needed()
 
         page.wait_for_timeout(500)
+
+        # ==========================================
+        # CLICK + INTERCEPT crewApi
+        # ==========================================
 
         with page.expect_response(
             lambda r:
@@ -210,6 +216,10 @@ def get_crew_for_flight(page, flight_no):
         response = response_info.value
 
         xml_text = response.text()
+
+        # ==========================================
+        # PARSE XML
+        # ==========================================
 
         root = ET.fromstring(xml_text)
 
@@ -254,7 +264,10 @@ def get_crew_for_flight(page, flight_no):
 
         print("👨‍✈️ CREW FOUND:", crew)
 
-        # close popup if exists
+        # ==========================================
+        # CLOSE MODAL
+        # ==========================================
+
         try:
             page.keyboard.press("Escape")
         except:
