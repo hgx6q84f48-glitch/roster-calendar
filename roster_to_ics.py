@@ -4,12 +4,9 @@ import requests
 import urllib3
 import xml.etree.ElementTree as ET
 
-from datetime import datetime, timezone
-
+from datetime import datetime
 from icalendar import Calendar, Event
-
 from playwright.sync_api import sync_playwright
-
 
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning
@@ -27,8 +24,6 @@ if not USERNAME or not PASSWORD:
 
 LOGIN_URL = "https://saacrewconnect.cocre8.africa/html/home.html"
 ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
-CREW_API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
-
 
 # =====================================================
 # HELPERS
@@ -43,19 +38,12 @@ def fmt_time(dt_str):
         ).strftime("%H:%M")
 
     except:
-        return None
+        return ""
 
 
 def fmt_full(dt):
 
     return dt.strftime("%d %b %Y %H:%M")
-
-
-def fmt_utc(dt):
-
-    utc = dt.astimezone(timezone.utc)
-
-    return utc.strftime("%H:%MZ")
 
 
 def clean(s):
@@ -102,23 +90,19 @@ def login():
     )
 
     try:
-
         page.press(
             'input[type="password"]',
             'Enter'
         )
-
     except:
         pass
 
     page.wait_for_timeout(3000)
 
     try:
-
         page.locator(
             "button:visible"
         ).first.click(timeout=3000)
-
     except:
         pass
 
@@ -127,26 +111,6 @@ def login():
     print("✅ Logged in")
 
     return playwright, browser, context, page
-
-
-# =====================================================
-# BUILD SESSION
-# =====================================================
-
-def build_session(context):
-
-    session = requests.Session()
-
-    cookies = context.cookies()
-
-    for c in cookies:
-
-        session.cookies.set(
-            c["name"],
-            c["value"]
-        )
-
-    return session
 
 
 # =====================================================
@@ -207,189 +171,10 @@ def fetch_roster_xml(page):
 
 
 # =====================================================
-# FETCH TOKEN
-# =====================================================
-
-def fetch_token(page):
-
-    responses = []
-
-    page.on(
-        "response",
-        lambda response: responses.append(response)
-    )
-
-    page.reload()
-
-    page.wait_for_load_state("networkidle")
-
-    page.wait_for_timeout(5000)
-
-    for response in responses:
-
-        try:
-
-            if "crewApi" not in response.url:
-                continue
-
-            request = response.request
-
-            post_data = request.post_data or ""
-
-            if "<Token>" not in post_data:
-                continue
-
-            token = (
-                post_data
-                .split("<Token>")[1]
-                .split("</Token>")[0]
-                .strip()
-            )
-
-            print("✅ Session token extracted")
-
-            return token
-
-        except:
-            pass
-
-    raise Exception(
-        "❌ Could not extract token"
-    )
-
-
-# =====================================================
-# DIRECT CREW API
-# =====================================================
-
-def get_crew_for_flight(
-    session,
-    token,
-    flight_no,
-    flight_date,
-    carrier,
-    number,
-    from_airport
-):
-
-    print(f"🔎 Crew lookup {flight_no}")
-
-    try:
-
-        xml_payload = f"""
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-            <Token>{token}</Token>
-            <Data>
-                <Flight>
-                    <Date>{flight_date}</Date>
-                    <CarrierCode>{carrier}</CarrierCode>
-                    <Number>{number}</Number>
-                    <OperationalSuffix></OperationalSuffix>
-                    <FromAirport>{from_airport}</FromAirport>
-                    <Status>S</Status>
-                </Flight>
-            </Data>
-        </FlightCrewListRequest>
-    </soapenv:Body>
-</soapenv:Envelope>
-"""
-
-        headers = {
-
-            "Accept":
-                "application/xml, text/xml, */*; q=0.01",
-
-            "Content-Type":
-                "application/x-www-form-urlencoded; charset=UTF-8",
-
-            "Origin":
-                "https://saacrewconnect.cocre8.africa",
-
-            "Referer":
-                "https://saacrewconnect.cocre8.africa/php/roster.php",
-
-            "X-Requested-With":
-                "XMLHttpRequest",
-        }
-
-        response = session.post(
-            CREW_API_URL,
-            data=xml_payload,
-            headers=headers,
-            timeout=30,
-            verify=False
-        )
-
-        print(
-            f"📡 crewApi status: "
-            f"{response.status_code}"
-        )
-
-        if response.status_code != 200:
-            return []
-
-        crew = []
-
-        root = ET.fromstring(response.text)
-
-        for crew_member in root.iter():
-
-            tag = crew_member.tag.split('}')[-1]
-
-            if tag != "Crew":
-                continue
-
-            first_name = ""
-            surname = ""
-            rank_code = ""
-            position_code = ""
-
-            for x in crew_member:
-
-                xt = x.tag.split('}')[-1]
-
-                if xt == "FirstName":
-                    first_name = x.text or ""
-
-                elif xt == "Surname":
-                    surname = x.text or ""
-
-                elif xt == "RankCode":
-                    rank_code = x.text or ""
-
-                elif xt == "PositionCode":
-                    position_code = x.text or ""
-
-            if not first_name and not surname:
-                continue
-
-            crew.append(
-                f"{rank_code} "
-                f"{first_name} {surname} "
-                f"({position_code})"
-            )
-
-        crew = list(dict.fromkeys(crew))
-
-        print("👨‍✈️ CREW FOUND:", crew)
-
-        return crew
-
-    except Exception as e:
-
-        print("⚠️ Crew lookup failed:", e)
-
-        return []
-
-
-# =====================================================
 # PARSE ROSTER XML
 # =====================================================
 
-def parse(xml_data, session, token):
+def parse(xml_data):
 
     root = ET.fromstring(xml_data)
 
@@ -437,9 +222,9 @@ def parse(xml_data, session, token):
 
         description_lines = []
 
-        # =================================================
+        # =============================================
         # REPORT
-        # =================================================
+        # =============================================
 
         if report:
 
@@ -448,18 +233,15 @@ def parse(xml_data, session, token):
                 "%Y-%m-%d %H:%M"
             )
 
-            description_lines.append("Report:")
-
             description_lines.append(
-                f"{fmt_full(report_dt)} "
-                f"({fmt_utc(report_dt)})"
+                f"Report: {fmt_full(report_dt)}"
             )
 
             description_lines.append("")
 
-        # =================================================
+        # =============================================
         # PAIRING
-        # =================================================
+        # =============================================
 
         pairing = None
 
@@ -471,9 +253,7 @@ def parse(xml_data, session, token):
 
         if pairing is not None:
 
-            description_lines.append("Flights:")
-
-            all_crew = []
+            flight_lines = []
 
             for leg in pairing.iter():
 
@@ -557,47 +337,15 @@ def parse(xml_data, session, token):
                 if duration:
                     line += f"  ({duration})"
 
-                description_lines.append(line)
+                flight_lines.append(line)
 
-                # =================================================
-                # CREW LOOKUP
-                # =================================================
+            if flight_lines:
 
-                try:
+                description_lines.append("Flights")
+                description_lines.append("────────")
 
-                    crew = get_crew_for_flight(
-                        session=session,
-                        token=token,
-                        flight_no=flight_no,
-                        flight_date=dep_time.split(" ")[0],
-                        carrier=carrier,
-                        number=number,
-                        from_airport=dep
-                    )
-
-                    if crew:
-                        all_crew.extend(crew)
-
-                except Exception as e:
-
-                    print(
-                        "⚠️ Crew lookup failed:",
-                        e
-                    )
-
-            # =================================================
-            # CREW SECTION
-            # =================================================
-
-            all_crew = list(dict.fromkeys(all_crew))
-
-            if all_crew:
-
-                description_lines.append("")
-                description_lines.append("Crew:")
-
-                for c in all_crew:
-                    description_lines.append(c)
+                for line in flight_lines:
+                    description_lines.append(line)
 
         description = (
             "\n".join(description_lines)
@@ -630,6 +378,10 @@ def build_ics(activities):
 
         t = title.upper()
 
+        # =============================================
+        # SPECIAL DAYS
+        # =============================================
+
         if t == "OPEN DAY":
             summary = "🟡 OPEN"
 
@@ -641,44 +393,45 @@ def build_ics(activities):
 
         else:
 
-            duty_routes = []
+            routes = []
 
             if description:
 
                 for line in description.split("\n"):
 
-                    if "→" in line:
+                    if "→" not in line:
+                        continue
 
-                        try:
+                    try:
 
-                            route_section = line.split("  ")[1]
+                        route_section = line.split("  ")[1]
 
-                            dep = (
-                                route_section
-                                .split("→")[0]
-                                .strip()
-                            )
+                        dep = (
+                            route_section
+                            .split("→")[0]
+                            .strip()
+                        )
 
-                            arr = (
-                                route_section
-                                .split("→")[1]
-                                .strip()
-                                .split(" ")[0]
-                            )
+                        arr = (
+                            route_section
+                            .split("→")[1]
+                            .strip()
+                            .split(" ")[0]
+                        )
 
-                            if not duty_routes:
-                                duty_routes.append(dep)
+                        if not routes:
+                            routes.append(dep)
 
-                            duty_routes.append(arr)
+                        routes.append(arr)
 
-                        except:
-                            pass
+                    except:
+                        pass
 
-            if len(duty_routes) >= 2:
+            if len(routes) >= 2:
 
-                route_text = "-".join(duty_routes)
-
-                summary = f"✈️ {route_text}"
+                summary = (
+                    f"✈️ {'-'.join(routes)}"
+                )
 
             else:
                 summary = "✈️ DUTY"
@@ -720,19 +473,11 @@ if __name__ == "__main__":
 
         playwright, browser, context, page = login()
 
-        session = build_session(context)
-
         open_roster(page)
 
         xml_data = fetch_roster_xml(page)
 
-        token = fetch_token(page)
-
-        activities = parse(
-            xml_data,
-            session,
-            token
-        )
+        activities = parse(xml_data)
 
         cal = build_ics(activities)
 
