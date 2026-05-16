@@ -587,10 +587,7 @@ def save(cal):
     print("📅 roster.ics saved")
 
 
-# =====================================================
-# MAIN
-# =====================================================
-
+# ===== MAIN =====
 if __name__ == "__main__":
 
     playwright = None
@@ -601,19 +598,52 @@ if __name__ == "__main__":
         playwright, browser, page = login()
 
         open_roster(page)
-        
-        print("🔍 Checking frames...")
 
-        for i, frame in enumerate(page.frames):
-            print(f"\nFRAME {i}")
-            print("URL:", frame.url)
+        # ==========================================
+        # DEBUG: DUMP ALL CLASSES
+        # ==========================================
 
-            try:
-                count = frame.locator(".pairing-leg-key").count()
-                print("pairing-leg-key count:", count)
-            except Exception as e:
-                print("ERROR:", e)
-        
+        print("🔍 Dumping ALL classes on page...")
+
+        classes = page.evaluate("""
+        () => {
+
+            const all = [...document.querySelectorAll('*')];
+
+            const classSet = new Set();
+
+            all.forEach(el => {
+
+                if (
+                    el.className &&
+                    typeof el.className === 'string'
+                ) {
+
+                    el.className
+                        .split(' ')
+                        .forEach(c => {
+
+                            if (c.trim()) {
+                                classSet.add(c.trim());
+                            }
+
+                        });
+                }
+
+            });
+
+            return [...classSet].sort();
+
+        }
+        """)
+
+        for c in classes:
+            print(c)
+
+        # ==========================================
+        # NORMAL FLOW
+        # ==========================================
+
         xml_data = fetch_roster_xml(page)
 
         activities = parse(
