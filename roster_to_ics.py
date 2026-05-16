@@ -261,7 +261,8 @@ def get_crew_for_flight(
             CREW_API_URL,
             data=xml_payload,
             headers=headers,
-            timeout=30
+            timeout=30,
+            verify=False
         )
 
         print(
