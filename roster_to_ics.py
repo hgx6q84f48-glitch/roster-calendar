@@ -183,7 +183,7 @@ def get_crew_for_flight(page, flight_no):
     try:
 
         # ==========================================
-        # LOOP THROUGH ALL CALENDAR EVENTS
+        # STEP 1: OPEN DUTY MODAL
         # ==========================================
 
         events = page.locator(".fc-event")
@@ -192,123 +192,52 @@ def get_crew_for_flight(page, flight_no):
 
         print(f"📦 Found {count} calendar events")
 
+        modal_opened = False
+
         for i in range(count):
 
             event = events.nth(i)
 
             try:
 
-                with page.expect_response(
-                    lambda r:
-                        "crewApi" in r.url
-                        and r.request.method == "POST",
-                    timeout=5000
-                ) as response_info:
+                event.click()
 
-                    event.click()
+                page.wait_for_timeout(1000)
 
-                response = response_info.value
+                pairing_count = page.locator(
+                    ".pairing-leg-key"
+                ).count()
 
-                request = response.request
+                if pairing_count > 0:
 
-                post_data = request.post_data or ""
+                    print("✅ Duty modal opened")
 
-                # ======================================
-                # MATCH CORRECT FLIGHT
-                # ======================================
-
-                if flight_no not in post_data:
-                    continue
-
-                print(f"✅ Matched crewApi for {flight_no}")
-
-                xml_text = response.text()
-
-                root = ET.fromstring(xml_text)
-
-                for crew_member in root.iter():
-
-                    tag = crew_member.tag.split('}')[-1]
-
-                    if tag != "Crew":
-                        continue
-
-                    first_name = ""
-                    surname = ""
-                    rank_code = ""
-                    position_code = ""
-
-                    for x in crew_member:
-
-                        xt = x.tag.split('}')[-1]
-
-                        if xt == "FirstName":
-                            first_name = x.text or ""
-
-                        elif xt == "Surname":
-                            surname = x.text or ""
-
-                        elif xt == "RankCode":
-                            rank_code = x.text or ""
-
-                        elif xt == "PositionCode":
-                            position_code = x.text or ""
-
-                    if not first_name and not surname:
-                        continue
-
-                    crew.append(
-                        f"{rank_code} "
-                        f"{first_name} {surname} "
-                        f"({position_code})"
-                    )
-
-                crew = list(dict.fromkeys(crew))
-
-                print("👨‍✈️ CREW FOUND:", crew)
-
-                try:
-                    page.keyboard.press("Escape")
-                except:
-                    pass
-
-                page.wait_for_timeout(500)
-
-                return crew
+                    modal_opened = True
+                    break
 
             except:
                 pass
 
-        print(f"⚠️ No matching crewApi found for {flight_no}")
+        if not modal_opened:
 
-        return []
+            print("⚠️ Could not open duty modal")
 
-    except Exception as e:
-
-        print("⚠️ Crew lookup failed:", e)
-
-        return []
+            return []
 
         # ==========================================
-        # FIND REAL FULLCALENDAR EVENT
+        # STEP 2: FIND CORRECT PAIRING
         # ==========================================
 
-        event_locator = page.locator(
-            ".fc-event"
+        pairing = page.locator(
+            ".pairing-leg-key"
         ).filter(
             has_text=flight_no
         ).first
 
-        event_locator.wait_for(
-            timeout=10000
-        )
-
-        event_locator.scroll_into_view_if_needed()
-
-        page.wait_for_timeout(500)
+        pairing.wait_for(timeout=10000)
 
         # ==========================================
-        # CLICK + INTERCEPT crewApi
+        # STEP 3: CLICK + INTERCEPT crewApi
         # ==========================================
 
         with page.expect_response(
@@ -318,14 +247,16 @@ def get_crew_for_flight(page, flight_no):
             timeout=15000
         ) as response_info:
 
-            event_locator.click()
+            pairing.click()
 
         response = response_info.value
 
         xml_text = response.text()
 
+        print(f"✅ crewApi intercepted for {flight_no}")
+
         # ==========================================
-        # PARSE XML
+        # STEP 4: PARSE XML
         # ==========================================
 
         root = ET.fromstring(xml_text)
@@ -443,9 +374,9 @@ def parse(xml_data, page):
 
         description_lines = []
 
-        # =================================================
+        # ==========================================
         # REPORT
-        # =================================================
+        # ==========================================
 
         if report:
 
@@ -457,14 +388,14 @@ def parse(xml_data, page):
             description_lines.append("Report:")
             description_lines.append(
                 f"{fmt_full(report_dt)} "
-                f"({fmt_utc(report_dt)})"
+                f" ({fmt_utc(report_dt)})"
             )
 
             description_lines.append("")
 
-        # =================================================
-        # PAIRING
-        # =================================================
+        # ==========================================
+        # FLIGHTS
+        # ==========================================
 
         pairing = None
 
@@ -564,9 +495,9 @@ def parse(xml_data, page):
 
                 description_lines.append(line)
 
-                # =============================================
+                # ======================================
                 # CREW LOOKUP
-                # =============================================
+                # ======================================
 
                 try:
 
@@ -585,9 +516,9 @@ def parse(xml_data, page):
                         e
                     )
 
-            # =================================================
+            # ==========================================
             # CREW SECTION
-            # =================================================
+            # ==========================================
 
             all_crew = list(dict.fromkeys(all_crew))
 
@@ -707,7 +638,10 @@ def save(cal):
     print("📅 roster.ics saved")
 
 
-# ===== MAIN =====
+# =====================================================
+# MAIN
+# =====================================================
+
 if __name__ == "__main__":
 
     playwright = None
@@ -718,51 +652,6 @@ if __name__ == "__main__":
         playwright, browser, page = login()
 
         open_roster(page)
-
-        # ==========================================
-        # DEBUG: DUMP ALL CLASSES
-        # ==========================================
-
-        print("🔍 Dumping ALL classes on page...")
-
-        classes = page.evaluate("""
-        () => {
-
-            const all = [...document.querySelectorAll('*')];
-
-            const classSet = new Set();
-
-            all.forEach(el => {
-
-                if (
-                    el.className &&
-                    typeof el.className === 'string'
-                ) {
-
-                    el.className
-                        .split(' ')
-                        .forEach(c => {
-
-                            if (c.trim()) {
-                                classSet.add(c.trim());
-                            }
-
-                        });
-                }
-
-            });
-
-            return [...classSet].sort();
-
-        }
-        """)
-
-        for c in classes:
-            print(c)
-
-        # ==========================================
-        # NORMAL FLOW
-        # ==========================================
 
         xml_data = fetch_roster_xml(page)
 
