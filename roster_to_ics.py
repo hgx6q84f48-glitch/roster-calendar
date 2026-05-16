@@ -1,5 +1,4 @@
 import os
-import re
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
@@ -73,8 +72,8 @@ def login():
     return playwright, browser, page
 
 
-# ===== LOAD ROSTER PAGE =====
-def load_roster_page(page):
+# ===== OPEN ROSTER =====
+def open_roster(page):
 
     print("📡 Opening roster...")
 
@@ -86,10 +85,44 @@ def load_roster_page(page):
 
     page.wait_for_timeout(5000)
 
-    return page.content()
+
+# ===== FETCH ROSTER XML =====
+def fetch_roster_xml(page):
+
+    responses = []
+
+    page.on(
+        "response",
+        lambda response: responses.append(response)
+    )
+
+    page.reload()
+
+    page.wait_for_load_state("networkidle")
+
+    page.wait_for_timeout(5000)
+
+    for response in responses:
+
+        try:
+
+            if "crewApi" not in response.url:
+                continue
+
+            text = response.text()
+
+            if "RosterResponse" in text:
+                return text
+
+        except:
+            pass
+
+    raise Exception(
+        "❌ Could not find roster response"
+    )
 
 
-# ===== GET CREW VIA UI CLICK =====
+# ===== GET CREW FROM UI =====
 def get_crew_from_ui(page, flight_no):
 
     print(f"🔎 Crew lookup {flight_no}")
@@ -105,9 +138,14 @@ def get_crew_from_ui(page, flight_no):
             timeout=15000
         ) as response_info:
 
-            page.locator(
-                f"text={flight_no}"
-            ).first.click()
+            locator = page.get_by_text(
+                flight_no,
+                exact=False
+            ).first
+
+            locator.wait_for(timeout=10000)
+
+            locator.click()
 
         response = response_info.value
 
@@ -157,7 +195,10 @@ def get_crew_from_ui(page, flight_no):
         print("👨‍✈️ CREW FOUND:", crew)
 
         try:
-            page.locator("text=Close").click(timeout=3000)
+            page.get_by_text(
+                "Close",
+                exact=False
+            ).click(timeout=3000)
         except:
             pass
 
@@ -192,43 +233,6 @@ def fmt_utc(dt):
     utc = dt.astimezone(timezone.utc)
 
     return utc.strftime("%H:%MZ")
-
-
-# ===== FETCH ROSTER XML =====
-def fetch_roster_xml(page):
-
-    responses = []
-
-    page.on(
-        "response",
-        lambda response: responses.append(response)
-    )
-
-    page.reload()
-
-    page.wait_for_load_state("networkidle")
-
-    page.wait_for_timeout(5000)
-
-    for response in responses:
-
-        try:
-
-            if "crewApi" not in response.url:
-                continue
-
-            text = response.text()
-
-            if "RosterResponse" in text:
-
-                return text
-
-        except:
-            pass
-
-    raise Exception(
-        "❌ Could not find roster response"
-    )
 
 
 # ===== PARSE =====
@@ -536,7 +540,7 @@ if __name__ == "__main__":
 
         playwright, browser, page = login()
 
-        load_roster_page(page)
+        open_roster(page)
 
         xml_data = fetch_roster_xml(page)
 
