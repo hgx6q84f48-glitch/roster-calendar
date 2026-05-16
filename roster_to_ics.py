@@ -63,15 +63,15 @@ def get_token():
             }
         """, timeout=20000)
 
-        token = page.evaluate(
-            "JSON.parse(localStorage.getItem('jStorage')).crew_token"
-        )
+token = page.evaluate(
+    "JSON.parse(localStorage.getItem('jStorage')).crew_token"
+)
 
-        browser.close()
+browser.close()
 
-        print("✅ Token acquired")
+print("✅ Token acquired")
 
-        return token
+return token
 
 
 # ===== FETCH ROSTER =====
