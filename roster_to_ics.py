@@ -10,6 +10,7 @@ from icalendar import Calendar, Event
 
 from playwright.sync_api import sync_playwright
 
+
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning
 )
@@ -21,13 +22,11 @@ urllib3.disable_warnings(
 USERNAME = os.environ.get("CREW_USER")
 PASSWORD = os.environ.get("CREW_PASS")
 
-# TEMPORARY:
-# paste token from Safari network request
-TOKEN = "VFxFl5JveayIr/E7EEs8yh4ASIdH/WzOHc3MuPFYiKc="
+# PASTE REAL TOKEN HERE
+TOKEN = "PASTE_REAL_TOKEN_HERE"
 
 if not USERNAME or not PASSWORD:
     raise Exception("❌ Missing CREW_USER / CREW_PASS")
-
 
 LOGIN_URL = "https://saacrewconnect.cocre8.africa/html/home.html"
 ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
@@ -45,6 +44,7 @@ def fmt_time(dt_str):
             dt_str,
             "%Y-%m-%d %H:%M"
         ).strftime("%H:%M")
+
     except:
         return None
 
@@ -105,19 +105,23 @@ def login():
     )
 
     try:
+
         page.press(
             'input[type="password"]',
             'Enter'
         )
+
     except:
         pass
 
     page.wait_for_timeout(3000)
 
     try:
+
         page.locator(
             "button:visible"
         ).first.click(timeout=3000)
+
     except:
         pass
 
@@ -129,7 +133,7 @@ def login():
 
 
 # =====================================================
-# BUILD REQUESTS SESSION
+# BUILD SESSION
 # =====================================================
 
 def build_session(context):
@@ -243,6 +247,11 @@ def get_crew_for_flight(
 </soapenv:Envelope>
 """
 
+        print("===================================")
+        print("SOAP REQUEST")
+        print("===================================")
+        print(xml_payload)
+
         headers = {
 
             "Accept":
@@ -260,7 +269,7 @@ def get_crew_for_flight(
             "X-Requested-With":
                 "XMLHttpRequest",
         }
-    print(xml_payload)
+
         response = session.post(
             CREW_API_URL,
             data=xml_payload,
@@ -274,12 +283,14 @@ def get_crew_for_flight(
             f"{response.status_code}"
         )
 
-        if response.status_code != 200:
+        print("===================================")
+        print("SOAP RESPONSE")
+        print("===================================")
+        print(response.text[:3000])
 
+        if response.status_code != 200:
             return []
-        
-        print(response.text[:2000])
-        
+
         crew = []
 
         root = ET.fromstring(response.text)
@@ -509,7 +520,7 @@ def parse(xml_data, session):
                 description_lines.append(line)
 
                 # =================================================
-                # DIRECT CREW LOOKUP
+                # CREW LOOKUP
                 # =================================================
 
                 try:
