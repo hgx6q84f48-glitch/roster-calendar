@@ -1,10 +1,11 @@
 import os
 import re
-import requests
 import urllib3
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 from icalendar import Calendar, Event
 from playwright.sync_api import sync_playwright
 
@@ -25,6 +26,8 @@ if not USERNAME or not PASSWORD:
 LOGIN_URL = "https://saacrewconnect.cocre8.africa/html/home.html"
 ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
 
+SA_TZ = ZoneInfo("Africa/Johannesburg")
+
 # =====================================================
 # HELPERS
 # =====================================================
@@ -36,9 +39,15 @@ def fmt_local(dt):
 
 def fmt_zulu(dt):
 
-    utc = dt.astimezone(timezone.utc)
+    local_dt = dt.replace(
+        tzinfo=SA_TZ
+    )
 
-    return utc.strftime("%H:%MZ")
+    utc_dt = local_dt.astimezone(
+        timezone.utc
+    )
+
+    return utc_dt.strftime("%H:%MZ")
 
 
 def fmt_block(duration):
@@ -249,8 +258,9 @@ def parse(xml_data):
             )
 
             description_lines.append("Report")
+
             description_lines.append(
-                f"{fmt_local(report_dt)} "
+                f"{report_dt.strftime('%d %b %H:%M')}L "
                 f"({fmt_zulu(report_dt)})"
             )
 
@@ -381,7 +391,7 @@ def parse(xml_data):
                     )
 
                 # =========================================
-                # LAYOVER INFO
+                # LAYOVER
                 # =========================================
 
                 hotel_name = None
