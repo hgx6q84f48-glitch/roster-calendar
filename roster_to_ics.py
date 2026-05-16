@@ -173,6 +173,12 @@ def get_flight_crew(
 
     print("STATUS CODE:", response.status_code)
 
+    # DEBUG SAVE
+    with open("crew_response.xml", "w", encoding="utf-8") as f:
+        f.write(response.text)
+
+    print("📝 crew_response.xml saved")
+
     if response.status_code != 200:
         return []
 
@@ -180,63 +186,30 @@ def get_flight_crew(
 
         root = ET.fromstring(response.text)
 
+        print("\n===== XML TAGS FOUND =====")
+
+        found_tags = set()
+
+        for elem in root.iter():
+
+            tag = elem.tag.split('}')[-1]
+
+            if tag not in found_tags:
+                found_tags.add(tag)
+                print(tag)
+
+        print("===== END TAGS =====\n")
+
         crew = []
 
-        for crew_member in root.iter():
+        for elem in root.iter():
 
-            tag = crew_member.tag.split('}')[-1]
+            tag = elem.tag.split('}')[-1]
 
-            if tag != "CrewMember":
-                continue
+            text = elem.text.strip() if elem.text else ""
 
-            first_name = ""
-            last_name = ""
-            position = ""
-            position_code = ""
-
-            for x in crew_member.iter():
-
-                xt = x.tag.split('}')[-1]
-
-                if xt == "FirstName":
-                    first_name = x.text or ""
-
-                elif xt == "LastName":
-                    last_name = x.text or ""
-
-                elif xt == "Position":
-                    position = x.text or ""
-
-                elif xt == "PositionCode":
-                    position_code = x.text or ""
-
-            if not first_name and not last_name:
-                continue
-
-            short_position = position
-
-            if "Captain" in position:
-                short_position = "CPT"
-
-            elif "First Officer" in position:
-                short_position = "FO"
-
-            elif "Senior Cabin Crew" in position:
-                short_position = "SCCM"
-
-            elif "Cabin Crew" in position:
-                short_position = "CCM"
-
-            crew.append(
-                f"{short_position} "
-                f"{first_name} {last_name} "
-                f"({position_code})"
-            )
-
-        # REMOVE DUPLICATES
-        crew = list(dict.fromkeys(crew))
-
-        print("CREW FOUND:", crew)
+            if text:
+                print(f"{tag}: {text}")
 
         return crew
 
