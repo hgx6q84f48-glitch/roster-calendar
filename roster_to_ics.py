@@ -202,14 +202,9 @@ def get_flight_crew(
 
         crew = []
 
-        for elem in root.iter():
-
-            tag = elem.tag.split('}')[-1]
-
-            text = elem.text.strip() if elem.text else ""
-
-            if text:
-                print(f"{tag}: {text}")
+        print("\n===== FULL XML =====\n")
+        print(response.text)
+        print("\n===== END XML =====\n")
 
         return crew
 
