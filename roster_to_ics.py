@@ -601,7 +601,19 @@ if __name__ == "__main__":
         playwright, browser, page = login()
 
         open_roster(page)
+        
+        print("🔍 Checking frames...")
 
+        for i, frame in enumerate(page.frames):
+            print(f"\nFRAME {i}")
+            print("URL:", frame.url)
+
+            try:
+                count = frame.locator(".pairing-leg-key").count()
+                print("pairing-leg-key count:", count)
+            except Exception as e:
+                print("ERROR:", e)
+        
         xml_data = fetch_roster_xml(page)
 
         activities = parse(
