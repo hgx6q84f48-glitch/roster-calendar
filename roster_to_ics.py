@@ -522,8 +522,6 @@ def build_ics(activities):
             summary = f"✈️ {route_text}"
         else:
             summary = "✈️ DUTY"
-```
-
 
         event.add('summary', summary)
         event.add('dtstart', start)
