@@ -187,9 +187,9 @@ def get_crew_for_flight(page, flight_no):
         # instead of generic page text search
 
         event_locator = page.locator(
-            ".fc-event, .event, .roster-event"
+    ".pairing-leg-key"
         ).filter(
-            has_text=flight_no
+    has_text=flight_no
         ).first
 
         event_locator.wait_for(timeout=10000)
@@ -205,7 +205,7 @@ def get_crew_for_flight(page, flight_no):
             timeout=15000
         ) as response_info:
 
-            event_locator.click(force=True)
+            event_locator.click()
 
         response = response_info.value
 
