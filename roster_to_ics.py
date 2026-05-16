@@ -137,82 +137,106 @@ def get_flight_crew(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <Flight>
-              <Date>{date}</Date>
-              <CarrierCode>{carrier}</CarrierCode>
-              <Number>{number}</Number>
-              <OperationalSuffix></OperationalSuffix>
-              <FromAirport>{from_airport}</FromAirport>
-              <Status></Status>
-            </Flight>
-          </Data>
-        </FlightCrewListRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
+    statuses = ["S", "A", "P", "F", "C", "L"]
 
-    print("\n----- CREW REQUEST -----")
-    print("DATE:", date)
-    print("CARRIER:", carrier)
-    print("NUMBER:", number)
-    print("FROM:", from_airport)
+    for status in statuses:
 
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
+        print("\n----- CREW REQUEST -----")
+        print("DATE:", date)
+        print("CARRIER:", carrier)
+        print("NUMBER:", number)
+        print("FROM:", from_airport)
+        print("TRYING STATUS:", status)
 
-    print("STATUS CODE:", response.status_code)
+        soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <FlightCrewListRequest Version="1.0">
+              <Token>{token}</Token>
+              <Data>
+                <Flight>
+                  <Date>{date}</Date>
+                  <CarrierCode>{carrier}</CarrierCode>
+                  <Number>{number}</Number>
+                  <OperationalSuffix></OperationalSuffix>
+                  <FromAirport>{from_airport}</FromAirport>
+                  <Status>{status}</Status>
+                </Flight>
+              </Data>
+            </FlightCrewListRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
+        """
 
-    # DEBUG SAVE
-    with open("crew_response.xml", "w", encoding="utf-8") as f:
-        f.write(response.text)
+        response = requests.post(
+            API_URL,
+            data=soap_body,
+            headers=headers,
+            verify=False
+        )
 
-    print("📝 crew_response.xml saved")
+        print("STATUS CODE:", response.status_code)
 
-    if response.status_code != 200:
-        return []
+        with open(
+            f"crew_response_{status}.xml",
+            "w",
+            encoding="utf-8"
+        ) as f:
+            f.write(response.text)
 
-    try:
+        print(f"📝 crew_response_{status}.xml saved")
 
-        root = ET.fromstring(response.text)
+        try:
 
-        print("\n===== XML TAGS FOUND =====")
+            root = ET.fromstring(response.text)
 
-        found_tags = set()
+            code = None
+            description = None
 
-        for elem in root.iter():
+            for elem in root.iter():
 
-            tag = elem.tag.split('}')[-1]
+                tag = elem.tag.split('}')[-1]
 
-            if tag not in found_tags:
-                found_tags.add(tag)
-                print(tag)
+                if tag == "Code":
+                    code = elem.text
 
-        print("===== END TAGS =====\n")
+                elif tag == "Description":
+                    description = elem.text
 
-        crew = []
+            print("API CODE:", code)
+            print("API DESCRIPTION:", description)
 
-        print("\n===== FULL XML =====\n")
-        print(response.text)
-        print("\n===== END XML =====\n")
+            # LOOK FOR NON-EMPTY CREW LIST
+            if "<FlightCrewList/>" not in response.text:
 
-        return crew
+                print(f"✅ POSSIBLE CREW MATCH WITH STATUS {status}")
 
-    except Exception as e:
+                print("\n===== FULL XML =====\n")
+                print(response.text)
+                print("\n===== END XML =====\n")
 
-        print("CREW PARSE ERROR:", e)
+                crew = []
 
-        return []
+                for elem in root.iter():
+
+                    text = (
+                        elem.text.strip()
+                        if elem.text else ""
+                    )
+
+                    if text:
+                        print(
+                            f"{elem.tag.split('}')[-1]}: {text}"
+                        )
+
+                return crew
+
+        except Exception as e:
+
+            print("CREW PARSE ERROR:", e)
+
+    return []
 
 
 # ===== HELPERS =====
