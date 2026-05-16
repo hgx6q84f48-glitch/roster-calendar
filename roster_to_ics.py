@@ -473,27 +473,28 @@ def parse(xml_data, token):
 
 
 # ===== ICS =====
+
 def build_ics(activities):
-    cal = Calendar()
+cal = Calendar()
 
-    for title, start, end, description in activities:
-        event = Event()
+```
+for title, start, end, description in activities:
+    event = Event()
 
-        t = title.upper()
+    t = title.upper()
 
-        if t == "OPEN DAY":
-            summary = "🟡 OPEN"
+    if t == "OPEN DAY":
+        summary = "🟡 OPEN"
 
-        elif "OFF" in t:
-            summary = "🟢 DAY OFF"
+    elif "OFF" in t:
+        summary = "🟢 DAY OFF"
 
-        elif "LEAVE" in t:
-            summary = "🎉 LEAVE"
+    elif "LEAVE" in t:
+        summary = "🎉 LEAVE"
 
-        elif description and "Course:" in description:
-            summary = "📘 TRAINING"
+    elif description and "Course:" in description:
+        summary = "📘 TRAINING"
 
-        ```
     else:
         duty_routes = []
 
@@ -506,6 +507,7 @@ def build_ics(activities):
 
                     try:
                         route = line.split("  ")[1]
+
                         dep = route.split("→")[0].strip()
                         arr = route.split("→")[1].strip()
 
@@ -523,17 +525,16 @@ def build_ics(activities):
         else:
             summary = "✈️ DUTY"
 
-        event.add('summary', summary)
-        event.add('dtstart', start)
-        event.add('dtend', end)
+    event.add('summary', summary)
+    event.add('dtstart', start)
+    event.add('dtend', end)
 
-        if description:
-            event.add('description', description)
+    if description:
+        event.add('description', description)
 
-        cal.add_component(event)
+    cal.add_component(event)
 
-    return cal
-
+return cal
 
 # ===== SAVE =====
 def save(cal):
