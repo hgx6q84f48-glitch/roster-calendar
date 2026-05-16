@@ -105,7 +105,109 @@ def fetch_roster(token):
         raise Exception("❌ API failed")
 
     return response.text
+    
+# ===== FETCH FLIGHT CREW =====
+def get_flight_crew(
+    token,
+    date,
+    carrier,
+    number,
+    from_airport
+):
 
+    import urllib3
+    urllib3.disable_warnings()
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+
+    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <FlightCrewListRequest Version="1.0">
+          <Token>{token}</Token>
+          <Data>
+            <Flight>
+              <Date>{date}</Date>
+              <CarrierCode>{carrier}</CarrierCode>
+              <Number>{number}</Number>
+              <OperationalSuffix></OperationalSuffix>
+              <FromAirport>{from_airport}</FromAirport>
+              <Status>S</Status>
+            </Flight>
+          </Data>
+        </FlightCrewListRequest>
+      </soapenv:Body>
+    </soapenv:Envelope>
+    """
+
+    response = requests.post(
+        API_URL,
+        data=soap_body,
+        headers=headers,
+        verify=False
+    )
+
+    if response.status_code != 200:
+        return []
+
+    try:
+
+        root = ET.fromstring(response.text)
+
+        crew = []
+
+        for crew_member in root.iter():
+
+            tag = crew_member.tag.split('}')[-1]
+
+            if tag != "CrewMember":
+                continue
+
+            first_name = ""
+            last_name = ""
+            position = ""
+            position_code = ""
+
+            for x in crew_member.iter():
+
+                xt = x.tag.split('}')[-1]
+
+                if xt == "FirstName":
+                    first_name = x.text or ""
+
+                elif xt == "LastName":
+                    last_name = x.text or ""
+
+                elif xt == "Position":
+                    position = x.text or ""
+
+                elif xt == "PositionCode":
+                    position_code = x.text or ""
+
+            if not first_name and not last_name:
+                continue
+
+            short_position = position
+
+            if "Captain" in position:
+                short_position = "CPT"
+
+            elif "First Officer" in position:
+                short_position = "FO"
+
+            crew.append(
+                f"{short_position} "
+                f"{first_name} {last_name} "
+                f"({position_code})"
+            )
+
+        return crew
+
+    except:
+        return []
 
 # ===== HELPERS =====
 def fmt_time(dt_str):
@@ -128,7 +230,7 @@ def fmt_utc(dt):
 
 
 # ===== PARSE =====
-def parse(xml_data):
+def parse(xml_data, token):
 
     root = ET.fromstring(xml_data)
     activities = []
@@ -266,7 +368,7 @@ def parse(xml_data):
 
             for _, line in modules:
                 description_lines.append(line)
-
+                        
         # =====================================================
         # PAIRINGS / DUTIES
         # =====================================================
@@ -386,6 +488,30 @@ def parse(xml_data):
 
                     description_lines.append(line)
 
+                    flight_date = ""
+
+                    for f in flight_elem.iter():
+
+                        ft = f.tag.split('}')[-1]
+
+                        if ft == "Date":
+                            flight_date = f.text or ""
+
+                    crew = get_flight_crew(
+                        token,
+                        flight_date,
+                        carrier,
+                        number,
+                        dep
+                    )
+
+                    if crew:
+
+                        description_lines.append("")
+                        description_lines.append("Crew")
+
+                        for c in crew:
+                            description_lines.append(c)
             description = (
                 "\n".join(description_lines)
                 if description_lines else None
@@ -496,7 +622,7 @@ if __name__ == "__main__":
 
     xml_data = fetch_roster(token)
 
-    activities = parse(xml_data)
+    activities = parse(xml_data, token)
 
     cal = build_ics(activities)
 
