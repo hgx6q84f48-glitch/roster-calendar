@@ -22,9 +22,6 @@ urllib3.disable_warnings(
 USERNAME = os.environ.get("CREW_USER")
 PASSWORD = os.environ.get("CREW_PASS")
 
-# PASTE REAL TOKEN HERE
-TOKEN = "PASTE_REAL_TOKEN_HERE"
-
 if not USERNAME or not PASSWORD:
     raise Exception("❌ Missing CREW_USER / CREW_PASS")
 
@@ -210,11 +207,64 @@ def fetch_roster_xml(page):
 
 
 # =====================================================
+# FETCH TOKEN
+# =====================================================
+
+def fetch_token(page):
+
+    responses = []
+
+    page.on(
+        "response",
+        lambda response: responses.append(response)
+    )
+
+    page.reload()
+
+    page.wait_for_load_state("networkidle")
+
+    page.wait_for_timeout(5000)
+
+    for response in responses:
+
+        try:
+
+            if "crewApi" not in response.url:
+                continue
+
+            request = response.request
+
+            post_data = request.post_data or ""
+
+            if "<Token>" not in post_data:
+                continue
+
+            token = (
+                post_data
+                .split("<Token>")[1]
+                .split("</Token>")[0]
+                .strip()
+            )
+
+            print("✅ Session token extracted")
+
+            return token
+
+        except:
+            pass
+
+    raise Exception(
+        "❌ Could not extract token"
+    )
+
+
+# =====================================================
 # DIRECT CREW API
 # =====================================================
 
 def get_crew_for_flight(
     session,
+    token,
     flight_no,
     flight_date,
     carrier,
@@ -231,7 +281,7 @@ def get_crew_for_flight(
     <soapenv:Header/>
     <soapenv:Body>
         <FlightCrewListRequest Version="1.0">
-            <Token>{TOKEN}</Token>
+            <Token>{token}</Token>
             <Data>
                 <Flight>
                     <Date>{flight_date}</Date>
@@ -246,11 +296,6 @@ def get_crew_for_flight(
     </soapenv:Body>
 </soapenv:Envelope>
 """
-
-        print("===================================")
-        print("SOAP REQUEST")
-        print("===================================")
-        print(xml_payload)
 
         headers = {
 
@@ -282,11 +327,6 @@ def get_crew_for_flight(
             f"📡 crewApi status: "
             f"{response.status_code}"
         )
-
-        print("===================================")
-        print("SOAP RESPONSE")
-        print("===================================")
-        print(response.text[:3000])
 
         if response.status_code != 200:
             return []
@@ -349,7 +389,7 @@ def get_crew_for_flight(
 # PARSE ROSTER XML
 # =====================================================
 
-def parse(xml_data, session):
+def parse(xml_data, session, token):
 
     root = ET.fromstring(xml_data)
 
@@ -527,6 +567,7 @@ def parse(xml_data, session):
 
                     crew = get_crew_for_flight(
                         session=session,
+                        token=token,
                         flight_no=flight_no,
                         flight_date=dep_time.split(" ")[0],
                         carrier=carrier,
@@ -685,9 +726,12 @@ if __name__ == "__main__":
 
         xml_data = fetch_roster_xml(page)
 
+        token = fetch_token(page)
+
         activities = parse(
             xml_data,
-            session
+            session,
+            token
         )
 
         cal = build_ics(activities)
