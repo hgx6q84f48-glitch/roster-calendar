@@ -183,6 +183,113 @@ def get_crew_for_flight(page, flight_no):
     try:
 
         # ==========================================
+        # LOOP THROUGH ALL CALENDAR EVENTS
+        # ==========================================
+
+        events = page.locator(".fc-event")
+
+        count = events.count()
+
+        print(f"📦 Found {count} calendar events")
+
+        for i in range(count):
+
+            event = events.nth(i)
+
+            try:
+
+                with page.expect_response(
+                    lambda r:
+                        "crewApi" in r.url
+                        and r.request.method == "POST",
+                    timeout=5000
+                ) as response_info:
+
+                    event.click()
+
+                response = response_info.value
+
+                request = response.request
+
+                post_data = request.post_data or ""
+
+                # ======================================
+                # MATCH CORRECT FLIGHT
+                # ======================================
+
+                if flight_no not in post_data:
+                    continue
+
+                print(f"✅ Matched crewApi for {flight_no}")
+
+                xml_text = response.text()
+
+                root = ET.fromstring(xml_text)
+
+                for crew_member in root.iter():
+
+                    tag = crew_member.tag.split('}')[-1]
+
+                    if tag != "Crew":
+                        continue
+
+                    first_name = ""
+                    surname = ""
+                    rank_code = ""
+                    position_code = ""
+
+                    for x in crew_member:
+
+                        xt = x.tag.split('}')[-1]
+
+                        if xt == "FirstName":
+                            first_name = x.text or ""
+
+                        elif xt == "Surname":
+                            surname = x.text or ""
+
+                        elif xt == "RankCode":
+                            rank_code = x.text or ""
+
+                        elif xt == "PositionCode":
+                            position_code = x.text or ""
+
+                    if not first_name and not surname:
+                        continue
+
+                    crew.append(
+                        f"{rank_code} "
+                        f"{first_name} {surname} "
+                        f"({position_code})"
+                    )
+
+                crew = list(dict.fromkeys(crew))
+
+                print("👨‍✈️ CREW FOUND:", crew)
+
+                try:
+                    page.keyboard.press("Escape")
+                except:
+                    pass
+
+                page.wait_for_timeout(500)
+
+                return crew
+
+            except:
+                pass
+
+        print(f"⚠️ No matching crewApi found for {flight_no}")
+
+        return []
+
+    except Exception as e:
+
+        print("⚠️ Crew lookup failed:", e)
+
+        return []
+
+        # ==========================================
         # FIND REAL FULLCALENDAR EVENT
         # ==========================================
 
