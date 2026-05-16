@@ -114,10 +114,10 @@ def fetch_roster_xml(page):
 
 def discover_crew_api(page):
     print("\n" + "="*60)
-    print("🔍 CREW API DISCOVERY — clicking roster rows...")
+    print("🔍 CREW API DISCOVERY — phase 2")
     print("="*60)
 
-    # Dismiss any popup modal that might be blocking clicks
+    # Dismiss the first modal (notifyModal)
     print("🔔 Checking for blocking modal...")
     try:
         modal_close = page.locator(
@@ -135,62 +135,98 @@ def discover_crew_api(page):
     except:
         print("   ℹ️ No modal to dismiss")
 
-    captured = []
+    # Find roster rows
+    rows = page.locator("table tbody tr")
+    count = rows.count()
+    print(f"✅ Found {count} rows")
 
-    def on_response(response):
-        if "crewApi" not in response.url:
-            return
-        try:
-            text = response.text()
-            if "RosterResponse" in text:
-                return
-            captured.append((response.url, text))
-        except:
-            pass
-
-    page.on("response", on_response)
-
-    row_selectors = [
-        "tr.activity-row",
-        "tr[class*='activity']",
-        "tr[class*='duty']",
-        "tr[class*='flight']",
-        "tr[class*='pairing']",
-        "table tbody tr",
-    ]
-
-    rows = None
-    for selector in row_selectors:
-        found = page.locator(selector)
-        if found.count() > 0:
-            rows = found
-            print(f"✅ Found {found.count()} rows with selector: {selector}")
-            break
-
-    if rows is None:
-        print("❌ No clickable rows found. Printing page HTML for inspection:")
-        print(page.content()[:3000])
-        return
-
-    max_clicks = min(3, rows.count())
+    # Only try the first 2 rows
+    max_clicks = min(2, count)
     for i in range(max_clicks):
-        captured.clear()
         print(f"\n🖱  Clicking row {i+1}...")
+
+        captured = []
+
+        def on_response(response):
+            if "crewApi" not in response.url:
+                return
+            try:
+                text = response.text()
+                if "RosterResponse" in text:
+                    return
+                captured.append((response.url, text))
+            except:
+                pass
+
+        page.on("response", on_response)
+
         try:
             rows.nth(i).click()
             page.wait_for_timeout(3000)
         except Exception as e:
-            print(f"   ⚠️ Could not click row {i+1}: {e}")
+            print(f"   ⚠️ Could not click row: {e}")
             continue
 
-        if captured:
-            url, text = captured[0]
-            print(f"   📡 URL: {url}")
-            print(f"   📄 Response (first 2000 chars):")
-            print(text[:2000])
-            print("   ...")
-        else:
-            print("   ⚠️ No crew API response captured for this row")
+        # Check if activityModal appeared
+        try:
+            modal = page.locator("#activityModal")
+            if modal.is_visible(timeout=3000):
+                print("   ✅ activityModal opened!")
+
+                # Print all the text/buttons inside it
+                modal_html = modal.inner_html()
+                print("   📄 Modal inner HTML (first 3000 chars):")
+                print(modal_html[:3000])
+
+                # Look for buttons or tabs inside the modal
+                buttons = modal.locator("button, a, [role='tab'], li")
+                btn_count = buttons.count()
+                print(f"\n   🔘 Found {btn_count} buttons/tabs/links inside modal:")
+                for b in range(min(btn_count, 20)):
+                    try:
+                        txt = buttons.nth(b).inner_text().strip()
+                        if txt:
+                            print(f"      [{b}] {txt}")
+                    except:
+                        pass
+
+                # Try clicking anything that looks like "crew"
+                crew_btn = modal.locator(
+                    "button:has-text('Crew'), "
+                    "a:has-text('Crew'), "
+                    "[role='tab']:has-text('Crew'), "
+                    "li:has-text('Crew')"
+                )
+                if crew_btn.count() > 0:
+                    print("\n   ✈️ Found a Crew button/tab — clicking it...")
+                    crew_btn.first.click()
+                    page.wait_for_timeout(3000)
+
+                    if captured:
+                        url, text = captured[0]
+                        print(f"   📡 Crew API URL: {url}")
+                        print(f"   📄 Crew API Response (first 2000 chars):")
+                        print(text[:2000])
+                    else:
+                        print("   ⚠️ No crew API response after clicking Crew button")
+                else:
+                    print("\n   ⚠️ No obvious 'Crew' button found in modal")
+
+                # Close the modal before next row
+                close_btn = modal.locator(
+                    "button.close, "
+                    "button[data-dismiss='modal'], "
+                    ".modal-footer button"
+                ).first
+                if close_btn.is_visible(timeout=2000):
+                    close_btn.click()
+                    page.wait_for_timeout(1500)
+                    print("   🚪 Modal closed")
+
+        except Exception as e:
+            print(f"   ⚠️ Modal interaction failed: {e}")
+
+        page.remove_listener("response", on_response)
 
     print("\n" + "="*60)
     print("🔍 DISCOVERY COMPLETE")
