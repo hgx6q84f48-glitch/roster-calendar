@@ -137,11 +137,9 @@ def get_flight_crew(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
-    padded_number = str(number).zfill(4)
-
     print(
         f"🔎 Crew lookup "
-        f"{carrier}{padded_number} "
+        f"{carrier}{number} "
         f"{date} "
         f"{from_airport}"
     )
@@ -156,9 +154,10 @@ def get_flight_crew(
             <Flight>
               <Date>{date}</Date>
               <CarrierCode>{carrier}</CarrierCode>
-              <Number>{padded_number}</Number>
+              <Number>{number}</Number>
               <OperationalSuffix></OperationalSuffix>
               <FromAirport>{from_airport}</FromAirport>
+              <Status>S</Status>
             </Flight>
           </Data>
         </FlightCrewListRequest>
@@ -408,14 +407,6 @@ def parse(xml_data, token):
                             flight_date = raw_date.split("T")[0]
                         except:
                             flight_date = raw_date
-
-                print(
-                    "FLIGHT DEBUG:",
-                    carrier,
-                    number,
-                    dep,
-                    flight_date
-                )
 
                 for child in leg:
 
