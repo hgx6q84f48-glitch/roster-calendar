@@ -109,19 +109,31 @@ def fetch_roster_xml(page):
     raise Exception("❌ Could not find roster response")
 
 # =====================================================
-# DISCOVER CREW API  ← new, temporary
+# DISCOVER CREW API  ← temporary, remove after one run
 # =====================================================
 
 def discover_crew_api(page):
-    """
-    Click each visible row on the roster page and print any
-    crewApi response that isn't the main roster. This helps us
-    see the XML structure for crew names/roles.
-    Only runs the first 3 rows to keep the log readable.
-    """
     print("\n" + "="*60)
     print("🔍 CREW API DISCOVERY — clicking roster rows...")
     print("="*60)
+
+    # Dismiss any popup modal that might be blocking clicks
+    print("🔔 Checking for blocking modal...")
+    try:
+        modal_close = page.locator(
+            "#notifyModal button, "
+            "#notifyModal [data-dismiss='modal'], "
+            "#notifyModal .close, "
+            "#notifyModal .btn"
+        ).first
+        if modal_close.is_visible(timeout=3000):
+            print("   ✅ Modal found — dismissing it...")
+            modal_close.click()
+            page.wait_for_timeout(2000)
+        else:
+            print("   ℹ️ No modal visible")
+    except:
+        print("   ℹ️ No modal to dismiss")
 
     captured = []
 
@@ -131,14 +143,13 @@ def discover_crew_api(page):
         try:
             text = response.text()
             if "RosterResponse" in text:
-                return  # skip the main roster response
+                return
             captured.append((response.url, text))
         except:
             pass
 
     page.on("response", on_response)
 
-    # Try common row selectors
     row_selectors = [
         "tr.activity-row",
         "tr[class*='activity']",
@@ -149,12 +160,10 @@ def discover_crew_api(page):
     ]
 
     rows = None
-    used_selector = None
     for selector in row_selectors:
         found = page.locator(selector)
         if found.count() > 0:
             rows = found
-            used_selector = selector
             print(f"✅ Found {found.count()} rows with selector: {selector}")
             break
 
@@ -163,7 +172,6 @@ def discover_crew_api(page):
         print(page.content()[:3000])
         return
 
-    # Click up to 3 rows
     max_clicks = min(3, rows.count())
     for i in range(max_clicks):
         captured.clear()
@@ -209,7 +217,7 @@ def parse(xml_data):
 
         title = get("TypeDescription") or "Duty"
         start = get("LCLStart")
-        end = get("LCLEnd")
+        end   = get("LCLEnd")
         report = get("LCLExpectedSignOn")
 
         if not start or not end:
@@ -254,165 +262,4 @@ def parse(xml_data):
                 flight_elem = None
                 for child in leg:
                     if child.tag.split('}')[-1] == "Flight":
-                        flight_elem = child
-
-                if flight_elem is None:
-                    continue
-
-                carrier = number = dep = arr = ""
-                dep_time = arr_time = duration = ""
-
-                for f in flight_elem.iter():
-                    ft = f.tag.split('}')[-1]
-                    if ft == "CarrierCode":   carrier  = f.text or ""
-                    elif ft == "Number":      number   = f.text or ""
-                    elif ft == "FromAirport": dep      = f.text or ""
-                    elif ft == "ToAirport":   arr      = f.text or ""
-                    elif ft == "LCLLTD":      dep_time = f.text or ""
-                    elif ft == "LCLLTA":      arr_time = f.text or ""
-
-                for child in leg:
-                    if child.tag.split('}')[-1] == "Duration":
-                        duration = child.text or ""
-
-                try:
-                    dep_dt = datetime.strptime(dep_time, "%Y-%m-%d %H:%M")
-                    arr_dt = datetime.strptime(arr_time, "%Y-%m-%d %H:%M")
-                except:
-                    continue
-
-                flight_no = f"{carrier}{number}"
-                description_lines.append(dep_dt.strftime("%d %b"))
-                description_lines.append(f"{flight_no}  {dep} → {arr}")
-                description_lines.append(
-                    f"Dep {dep_dt.strftime('%H:%M')}L ({fmt_zulu(dep_dt)})"
-                )
-                description_lines.append(
-                    f"Arr {arr_dt.strftime('%d %b %H:%M')}L ({fmt_zulu(arr_dt)})"
-                )
-                if duration:
-                    description_lines.append(f"Block {fmt_block(duration)}")
-
-                # Layover
-                hotel_name = hotel_arr = hotel_dep = None
-                for elem in leg.iter():
-                    et  = elem.tag.split('}')[-1]
-                    txt = elem.text
-                    if not txt:
-                        continue
-                    txt = txt.strip()
-                    if "Hotel" in et and not hotel_name:
-                        hotel_name = txt
-                    if "HotelArrival" in et:
-                        hotel_arr = txt
-                    if "HotelDeparture" in et:
-                        hotel_dep = txt
-
-                if hotel_name:
-                    description_lines.append("")
-                    description_lines.append("Layover")
-                    description_lines.append(hotel_name)
-                    try:
-                        if hotel_arr:
-                            ha = datetime.strptime(hotel_arr, "%Y-%m-%d %H:%M")
-                            description_lines.append(
-                                f"{ha.strftime('%d %b %H:%M')}L ({fmt_zulu(ha)})"
-                            )
-                        if hotel_dep:
-                            hd = datetime.strptime(hotel_dep, "%Y-%m-%d %H:%M")
-                            description_lines.append(
-                                f"{hd.strftime('%d %b %H:%M')}L ({fmt_zulu(hd)})"
-                            )
-                    except:
-                        pass
-
-                description_lines.append("")
-
-        description = (
-            "\n".join(description_lines).strip()
-            if description_lines else None
-        )
-
-        activities.append((title, start_dt, end_dt, description))
-
-    print(f"🔍 Found {len(activities)} activities")
-    return activities
-
-# =====================================================
-# BUILD ICS
-# =====================================================
-
-def build_ics(activities):
-    cal = Calendar()
-    for title, start, end, description in activities:
-        event = Event()
-        t = title.upper()
-
-        if t == "OPEN DAY":
-            summary = "🟡 OPEN"
-        elif "OFF" in t:
-            summary = "🟢 DAY OFF"
-        elif "LEAVE" in t:
-            summary = "🎉 LEAVE"
-        else:
-            routes = []
-            if description:
-                for line in description.split("\n"):
-                    if "→" not in line:
-                        continue
-                    try:
-                        route = line.split("  ")[1]
-                        dep   = route.split("→")[0].strip()
-                        arr   = route.split("→")[1].strip()
-                        if not routes:
-                            routes.append(dep)
-                        routes.append(arr)
-                    except:
-                        pass
-            summary = f"✈️ {'-'.join(routes)}" if len(routes) >= 2 else "✈️ DUTY"
-
-        event.add("summary", summary)
-        event.add("dtstart", start)
-        event.add("dtend", end)
-        if description:
-            event.add("description", description)
-        cal.add_component(event)
-    return cal
-
-# =====================================================
-# SAVE
-# =====================================================
-
-def save(cal):
-    with open("roster.ics", "wb") as f:
-        f.write(cal.to_ical())
-    print("📅 roster.ics saved")
-
-# =====================================================
-# MAIN
-# =====================================================
-
-if __name__ == "__main__":
-    playwright = None
-    browser = None
-    try:
-        playwright, browser, context, page = login()
-        open_roster(page)
-        xml_data = fetch_roster_xml(page)
-
-        # ── DISCOVERY: remove this block once we've seen the crew API ──
-        discover_crew_api(page)
-        # ──────────────────────────────────────────────────────────────
-
-        activities = parse(xml_data)
-        cal = build_ics(activities)
-        save(cal)
-    finally:
-        try:
-            browser.close()
-        except:
-            pass
-        try:
-            playwright.stop()
-        except:
-            pass
+                        flig
