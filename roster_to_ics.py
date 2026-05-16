@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
@@ -16,12 +17,17 @@ from playwright.sync_api import sync_playwright
 USERNAME = os.environ.get("CREW_USER")
 PASSWORD = os.environ.get("CREW_PASS")
 
+# TEMPORARY:
+# paste token from Safari network request
+TOKEN = "PASTE_TOKEN_HERE"
+
 if not USERNAME or not PASSWORD:
     raise Exception("❌ Missing CREW_USER / CREW_PASS")
 
 
 LOGIN_URL = "https://saacrewconnect.cocre8.africa/html/home.html"
 ROSTER_URL = "https://saacrewconnect.cocre8.africa/php/roster.php"
+CREW_API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
 
 
 # =====================================================
@@ -73,7 +79,9 @@ def login():
         headless=True
     )
 
-    page = browser.new_page()
+    context = browser.new_context()
+
+    page = context.new_page()
 
     page.goto(LOGIN_URL)
 
@@ -113,7 +121,27 @@ def login():
 
     print("✅ Logged in")
 
-    return playwright, browser, page
+    return playwright, browser, context, page
+
+
+# =====================================================
+# BUILD REQUESTS SESSION
+# =====================================================
+
+def build_session(context):
+
+    session = requests.Session()
+
+    cookies = context.cookies()
+
+    for c in cookies:
+
+        session.cookies.set(
+            c["name"],
+            c["value"]
+        )
+
+    return session
 
 
 # =====================================================
@@ -160,6 +188,9 @@ def fetch_roster_xml(page):
             text = response.text()
 
             if "RosterResponse" in text:
+
+                print("✅ Roster XML found")
+
                 return text
 
         except:
@@ -171,95 +202,80 @@ def fetch_roster_xml(page):
 
 
 # =====================================================
-# GET CREW
+# DIRECT CREW API
 # =====================================================
 
-def get_crew_for_flight(page, flight_no):
+def get_crew_for_flight(
+    session,
+    flight_no,
+    flight_date,
+    carrier,
+    number,
+    from_airport
+):
 
     print(f"🔎 Crew lookup {flight_no}")
 
-    crew = []
-
     try:
 
-        # ==========================================
-        # STEP 1: OPEN DUTY MODAL
-        # ==========================================
+        xml_payload = f"""
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <FlightCrewListRequest Version="1.0">
+            <Token>{TOKEN}</Token>
+            <Data>
+                <Flight>
+                    <Date>{flight_date}</Date>
+                    <CarrierCode>{carrier}</CarrierCode>
+                    <Number>{number}</Number>
+                    <OperationalSuffix></OperationalSuffix>
+                    <FromAirport>{from_airport}</FromAirport>
+                    <Status>S</Status>
+                </Flight>
+            </Data>
+        </FlightCrewListRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
+"""
 
-        events = page.locator(".fc-event")
+        headers = {
 
-        count = events.count()
+            "Accept":
+                "application/xml, text/xml, */*; q=0.01",
 
-        print(f"📦 Found {count} calendar events")
+            "Content-Type":
+                "application/x-www-form-urlencoded; charset=UTF-8",
 
-        modal_opened = False
+            "Origin":
+                "https://saacrewconnect.cocre8.africa",
 
-        for i in range(count):
+            "Referer":
+                "https://saacrewconnect.cocre8.africa/php/roster.php",
 
-            event = events.nth(i)
+            "X-Requested-With":
+                "XMLHttpRequest",
+        }
 
-            try:
+        response = session.post(
+            CREW_API_URL,
+            data=xml_payload,
+            headers=headers,
+            timeout=30
+        )
 
-                event.click()
+        print(
+            f"📡 crewApi status: "
+            f"{response.status_code}"
+        )
 
-                page.wait_for_timeout(1000)
-
-                pairing_count = page.locator(
-                    ".pairing-leg-key"
-                ).count()
-
-                if pairing_count > 0:
-
-                    print("✅ Duty modal opened")
-
-                    modal_opened = True
-                    break
-
-            except:
-                pass
-
-        if not modal_opened:
-
-            print("⚠️ Could not open duty modal")
+        if response.status_code != 200:
 
             return []
 
-        # ==========================================
-        # STEP 2: FIND CORRECT PAIRING
-        # ==========================================
+        crew = []
 
-        pairing = page.locator(
-            ".pairing-leg-key"
-        ).filter(
-            has_text=flight_no
-        ).first
-
-        pairing.wait_for(timeout=10000)
-
-        # ==========================================
-        # STEP 3: CLICK + INTERCEPT crewApi
-        # ==========================================
-
-        with page.expect_response(
-            lambda r:
-                "crewApi" in r.url
-                and r.request.method == "POST",
-            timeout=15000
-        ) as response_info:
-
-            pairing.click()
-
-        response = response_info.value
-
-        xml_text = response.text()
-
-        print(f"✅ crewApi intercepted for {flight_no}")
-
-        # ==========================================
-        # STEP 4: PARSE XML
-        # ==========================================
-
-        root = ET.fromstring(xml_text)
+        root = ET.fromstring(response.text)
 
         for crew_member in root.iter():
 
@@ -302,17 +318,6 @@ def get_crew_for_flight(page, flight_no):
 
         print("👨‍✈️ CREW FOUND:", crew)
 
-        # ==========================================
-        # CLOSE MODAL
-        # ==========================================
-
-        try:
-            page.keyboard.press("Escape")
-        except:
-            pass
-
-        page.wait_for_timeout(500)
-
         return crew
 
     except Exception as e:
@@ -326,7 +331,7 @@ def get_crew_for_flight(page, flight_no):
 # PARSE ROSTER XML
 # =====================================================
 
-def parse(xml_data, page):
+def parse(xml_data, session):
 
     root = ET.fromstring(xml_data)
 
@@ -374,9 +379,9 @@ def parse(xml_data, page):
 
         description_lines = []
 
-        # ==========================================
+        # =================================================
         # REPORT
-        # ==========================================
+        # =================================================
 
         if report:
 
@@ -386,16 +391,17 @@ def parse(xml_data, page):
             )
 
             description_lines.append("Report:")
+
             description_lines.append(
                 f"{fmt_full(report_dt)} "
-                f" ({fmt_utc(report_dt)})"
+                f"({fmt_utc(report_dt)})"
             )
 
             description_lines.append("")
 
-        # ==========================================
-        # FLIGHTS
-        # ==========================================
+        # =================================================
+        # PAIRING
+        # =================================================
 
         pairing = None
 
@@ -495,15 +501,19 @@ def parse(xml_data, page):
 
                 description_lines.append(line)
 
-                # ======================================
-                # CREW LOOKUP
-                # ======================================
+                # =================================================
+                # DIRECT CREW LOOKUP
+                # =================================================
 
                 try:
 
                     crew = get_crew_for_flight(
-                        page,
-                        flight_no
+                        session=session,
+                        flight_no=flight_no,
+                        flight_date=start_dt.strftime("%Y-%m-%d"),
+                        carrier=carrier,
+                        number=number,
+                        from_airport=dep
                     )
 
                     if crew:
@@ -516,9 +526,9 @@ def parse(xml_data, page):
                         e
                     )
 
-            # ==========================================
+            # =================================================
             # CREW SECTION
-            # ==========================================
+            # =================================================
 
             all_crew = list(dict.fromkeys(all_crew))
 
@@ -649,7 +659,9 @@ if __name__ == "__main__":
 
     try:
 
-        playwright, browser, page = login()
+        playwright, browser, context, page = login()
+
+        session = build_session(context)
 
         open_roster(page)
 
@@ -657,7 +669,7 @@ if __name__ == "__main__":
 
         activities = parse(
             xml_data,
-            page
+            session
         )
 
         cal = build_ics(activities)
