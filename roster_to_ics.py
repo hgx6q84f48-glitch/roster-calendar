@@ -277,7 +277,9 @@ def get_crew_for_flight(
         if response.status_code != 200:
 
             return []
-
+        
+        print(response.text[:2000])
+        
         crew = []
 
         root = ET.fromstring(response.text)
