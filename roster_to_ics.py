@@ -1,6 +1,5 @@
 import os
-import json
-import requests
+import re
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
@@ -16,8 +15,6 @@ PASSWORD = os.environ.get("CREW_PASS")
 
 if not USERNAME or not PASSWORD:
     raise Exception("❌ Missing credentials")
-
-API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
 
 
 # ===== LOGIN =====
@@ -71,131 +68,52 @@ def login():
 
     page.wait_for_load_state("networkidle")
 
-    page.wait_for_function("""
-        () => {
-            const data = localStorage.getItem('jStorage');
+    print("✅ Logged in")
 
-            if (!data) return false;
+    return playwright, browser, page
 
-            try {
-                return JSON.parse(data).crew_token !== undefined;
-            } catch {
-                return false;
-            }
-        }
-    """, timeout=20000)
 
-    token = page.evaluate(
-        "JSON.parse(localStorage.getItem('jStorage')).crew_token"
+# ===== LOAD ROSTER PAGE =====
+def load_roster_page(page):
+
+    print("📡 Opening roster...")
+
+    page.goto(
+        "https://saacrewconnect.cocre8.africa/php/roster.php"
     )
 
-    print("✅ Token acquired")
+    page.wait_for_load_state("networkidle")
 
-    return playwright, browser, page, token
+    page.wait_for_timeout(5000)
 
-
-# ===== API POST USING PLAYWRIGHT SESSION =====
-def api_post(page, xml_body):
-
-    response_text = page.evaluate(
-        """
-        async ({ url, body }) => {
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded; charset=UTF-8",
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: body
-            });
-
-            return await response.text();
-        }
-        """,
-        {
-            "url": API_URL,
-            "body": xml_body
-        }
-    )
-
-    return response_text
+    return page.content()
 
 
-# ===== FETCH ROSTER =====
-def fetch_roster(page, token):
+# ===== GET CREW VIA UI CLICK =====
+def get_crew_from_ui(page, flight_no):
 
-    print("📡 Fetching roster...")
+    print(f"🔎 Crew lookup {flight_no}")
 
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <RosterRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <startDate>2025-10-10</startDate>
-            <endDate>2026-10-05</endDate>
-            <emplNbr>{USERNAME}</emplNbr>
-            <rstrHist>0</rstrHist>
-          </Data>
-        </RosterRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
-
-    return api_post(page, soap_body)
-
-
-# ===== FETCH CREW =====
-def get_flight_crew(
-    page,
-    token,
-    date,
-    carrier,
-    number,
-    from_airport
-):
-
-    print(
-        f"🔎 Crew lookup "
-        f"{carrier}{number} "
-        f"{date} "
-        f"{from_airport}"
-    )
-
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <Flight>
-              <Date>{date}</Date>
-              <CarrierCode>{carrier}</CarrierCode>
-              <Number>{number}</Number>
-              <OperationalSuffix></OperationalSuffix>
-              <FromAirport>{from_airport}</FromAirport>
-              <Status>S</Status>
-            </Flight>
-          </Data>
-        </FlightCrewListRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
+    crew = []
 
     try:
 
-        response_text = api_post(
-            page,
-            soap_body
-        )
+        with page.expect_response(
+            lambda r:
+                "crewApi" in r.url
+                and r.request.method == "POST",
+            timeout=15000
+        ) as response_info:
 
-        root = ET.fromstring(response_text)
+            page.locator(
+                f"text={flight_no}"
+            ).first.click()
 
-        crew = []
+        response = response_info.value
+
+        xml_text = response.text()
+
+        root = ET.fromstring(xml_text)
 
         for crew_member in root.iter():
 
@@ -238,11 +156,16 @@ def get_flight_crew(
 
         print("👨‍✈️ CREW FOUND:", crew)
 
+        try:
+            page.locator("text=Close").click(timeout=3000)
+        except:
+            pass
+
         return crew
 
     except Exception as e:
 
-        print("⚠️ CREW LOOKUP ERROR:", e)
+        print("⚠️ Crew lookup failed:", e)
 
         return []
 
@@ -271,8 +194,45 @@ def fmt_utc(dt):
     return utc.strftime("%H:%MZ")
 
 
+# ===== FETCH ROSTER XML =====
+def fetch_roster_xml(page):
+
+    responses = []
+
+    page.on(
+        "response",
+        lambda response: responses.append(response)
+    )
+
+    page.reload()
+
+    page.wait_for_load_state("networkidle")
+
+    page.wait_for_timeout(5000)
+
+    for response in responses:
+
+        try:
+
+            if "crewApi" not in response.url:
+                continue
+
+            text = response.text()
+
+            if "RosterResponse" in text:
+
+                return text
+
+        except:
+            pass
+
+    raise Exception(
+        "❌ Could not find roster response"
+    )
+
+
 # ===== PARSE =====
-def parse(xml_data, page, token):
+def parse(xml_data, page):
 
     root = ET.fromstring(xml_data)
 
@@ -389,7 +349,6 @@ def parse(xml_data, page, token):
                 dep_time = ""
                 arr_time = ""
                 duration = ""
-                flight_date = ""
 
                 for f in flight_elem.iter():
 
@@ -412,15 +371,6 @@ def parse(xml_data, page, token):
 
                     elif ft == "LCLLTA":
                         arr_time = f.text or ""
-
-                    elif ft == "Date":
-
-                        raw_date = f.text or ""
-
-                        try:
-                            flight_date = raw_date.split("T")[0]
-                        except:
-                            flight_date = raw_date
 
                 for child in leg:
 
@@ -448,13 +398,9 @@ def parse(xml_data, page, token):
                 # ===== CREW LOOKUP =====
                 try:
 
-                    crew = get_flight_crew(
+                    crew = get_crew_from_ui(
                         page,
-                        token,
-                        flight_date,
-                        carrier,
-                        number,
-                        dep
+                        flight_no
                     )
 
                     if crew:
@@ -588,17 +534,15 @@ if __name__ == "__main__":
 
     try:
 
-        playwright, browser, page, token = login()
+        playwright, browser, page = login()
 
-        xml_data = fetch_roster(
-            page,
-            token
-        )
+        load_roster_page(page)
+
+        xml_data = fetch_roster_xml(page)
 
         activities = parse(
             xml_data,
-            page,
-            token
+            page
         )
 
         cal = build_ics(activities)
