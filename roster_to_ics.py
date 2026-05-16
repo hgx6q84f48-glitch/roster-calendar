@@ -107,87 +107,6 @@ def fetch_roster(token):
     return response.text
 
 
-# ===== FETCH CREW =====
-def fetch_crew(token, flight_date, carrier, flight_number, from_airport):
-    import urllib3
-    urllib3.disable_warnings()
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
-
-    soap_body = f"""<?xml version="1.0" encoding="UTF-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <Flight>
-              <Date>{flight_date}</Date>
-              <CarrierCode>{carrier}</CarrierCode>
-              <Number>{flight_number}</Number>
-              <OperationalSuffix></OperationalSuffix>
-              <FromAirport>{from_airport}</FromAirport>
-              <Status>S</Status>
-            </Flight>
-          </Data>
-        </FlightCrewListRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
-
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
-
-    if response.status_code != 200:
-        return []
-
-    try:
-        root = ET.fromstring(response.text)
-    except:
-        return []
-
-    pilots = []
-
-    for crew in root.iter():
-        tag = crew.tag.split('}')[-1]
-
-        if tag != "Crew":
-            continue
-
-        def get(node_tag):
-            for elem in crew.iter():
-                if node_tag in elem.tag:
-                    return elem.text
-            return None
-
-        crew_group = get("CrewGroupCode")
-
-        # Flight crew only
-        if crew_group != "1":
-            continue
-
-        rank_code = get("RankCode")
-        position_code = get("PositionCode")
-        first_name = get("FirstName")
-        surname = get("Surname")
-
-        full_name = f"{first_name} {surname}"
-
-        if rank_code == "CAPT":
-            pilots.append(f"CPT {full_name} ({position_code})")
-
-        elif rank_code == "FO":
-            pilots.append(f"FO {full_name} ({position_code})")
-
-    return pilots
-
-
 # ===== HELPERS =====
 def fmt_time(dt_str):
     try:
@@ -208,32 +127,26 @@ def fmt_utc(dt):
     return utc.strftime("%H:%MZ")
 
 
-def fmt_block(start, end):
-    diff = end - start
-    mins = int(diff.total_seconds() / 60)
-    h = mins // 60
-    m = mins % 60
-    return f"{h}h {m}m"
-
-
 # ===== PARSE =====
-def parse(xml_data, token):
+def parse(xml_data):
     root = ET.fromstring(xml_data)
     activities = []
 
     for activity in root.iter():
+
         tag = activity.tag.split('}')[-1]
 
         if 'Activity' not in tag:
             continue
 
-        def get(tag):
+        def get(tag_name):
             for elem in activity.iter():
-                if tag in elem.tag:
+                if tag_name in elem.tag:
                     return elem.text
             return None
 
         title = get('TypeDescription') or "Duty"
+
         start = get('LCLStart')
         end = get('LCLEnd')
         report = get('LCLExpectedSignOn')
@@ -242,16 +155,24 @@ def parse(xml_data, token):
             continue
 
         try:
-            start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M")
-            end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M")
+            start_dt = datetime.strptime(
+                start,
+                "%Y-%m-%d %H:%M"
+            )
+
+            end_dt = datetime.strptime(
+                end,
+                "%Y-%m-%d %H:%M"
+            )
+
         except:
             continue
 
         description_lines = []
 
-        # =========================================================
-        # TRAINING (UNCHANGED)
-        # =========================================================
+        # =====================================================
+        # TRAINING
+        # =====================================================
         course_elem = None
 
         for elem in activity:
@@ -260,10 +181,12 @@ def parse(xml_data, token):
                 break
 
         if course_elem is not None:
+
             course_name = None
             base = None
 
             for c in course_elem:
+
                 if 'Description' in c.tag:
                     course_name = c.text
 
@@ -290,6 +213,7 @@ def parse(xml_data, token):
             modules = []
 
             for m in course_elem.iter():
+
                 if 'Module' not in m.tag:
                     continue
 
@@ -299,6 +223,7 @@ def parse(xml_data, token):
                 m_type = None
 
                 for x in m:
+
                     if 'Description' in x.tag:
                         m_desc = x.text
 
@@ -319,6 +244,7 @@ def parse(xml_data, token):
                 label = "EVENT"
 
                 if m_type:
+
                     mt = m_type.lower()
 
                     if "brief" in mt:
@@ -340,16 +266,17 @@ def parse(xml_data, token):
             for _, line in modules:
                 description_lines.append(line)
 
-        # =========================================================
-        # DUTY ENHANCEMENT
-        # =========================================================
-       else:
-           
-            print("\n================ DUTY XML ================\n")
+        # =====================================================
+        # EVERYTHING ELSE (DEBUG)
+        # =====================================================
+        else:
+
+            print("\n================ ACTIVITY XML ================\n")
             print(ET.tostring(activity, encoding='unicode'))
-            print("\n==========================================\n")
+            print("\n==============================================\n")
 
             if report:
+
                 report_dt = datetime.strptime(
                     report,
                     "%Y-%m-%d %H:%M"
@@ -383,9 +310,11 @@ def parse(xml_data, token):
 
 # ===== ICS =====
 def build_ics(activities):
+
     cal = Calendar()
 
     for title, start, end, description in activities:
+
         event = Event()
 
         t = title.upper()
@@ -403,34 +332,7 @@ def build_ics(activities):
             summary = "📘 TRAINING"
 
         else:
-            duty_routes = []
-
-            if description:
-                for line in description.split("\n"):
-
-                    # Match lines like:
-                    # SA280  JNB → PER
-                    if "→" in line and "SA" in line:
-
-                        try:
-                            route = line.split("  ")[1]
-
-                            dep = route.split("→")[0].strip()
-                            arr = route.split("→")[1].strip()
-
-                            if not duty_routes:
-                                duty_routes.append(dep)
-
-                            duty_routes.append(arr)
-
-                        except:
-                            pass
-
-            if len(duty_routes) >= 2:
-                route_text = "-".join(duty_routes)
-                summary = f"✈️ {route_text}"
-            else:
-                summary = "✈️ DUTY"
+            summary = "✈️ DUTY"
 
         event.add('summary', summary)
         event.add('dtstart', start)
@@ -443,8 +345,10 @@ def build_ics(activities):
 
     return cal
 
+
 # ===== SAVE =====
 def save(cal):
+
     with open("roster.ics", "wb") as f:
         f.write(cal.to_ical())
 
@@ -453,8 +357,13 @@ def save(cal):
 
 # ===== MAIN =====
 if __name__ == "__main__":
+
     token = get_token()
+
     xml_data = fetch_roster(token)
-    activities = parse(xml_data, token)
+
+    activities = parse(xml_data)
+
     cal = build_ics(activities)
+
     save(cal)
