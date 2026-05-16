@@ -150,7 +150,7 @@ def get_flight_crew(
               <Number>{number}</Number>
               <OperationalSuffix></OperationalSuffix>
               <FromAirport>{from_airport}</FromAirport>
-              <Status>S</Status>
+              <Status></Status>
             </Flight>
           </Data>
         </FlightCrewListRequest>
