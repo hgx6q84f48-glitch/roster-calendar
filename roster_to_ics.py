@@ -517,7 +517,7 @@ def parse(xml_data, session):
                     crew = get_crew_for_flight(
                         session=session,
                         flight_no=flight_no,
-                        flight_date=start_dt.strftime("%Y-%m-%d"),
+                        flight_date=dep_time.split(" ")[0],
                         carrier=carrier,
                         number=number,
                         from_airport=dep
