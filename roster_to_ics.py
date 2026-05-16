@@ -137,14 +137,17 @@ def get_flight_crew(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
+    padded_number = str(number).zfill(4)
+
     statuses = ["S", "A", "P", "F", "C", "L"]
 
     for status in statuses:
 
         print(
             f"🔎 Crew lookup "
-            f"{carrier}{number} "
+            f"{carrier}{padded_number} "
             f"{date} "
+            f"{from_airport} "
             f"status={status}"
         )
 
@@ -158,7 +161,7 @@ def get_flight_crew(
                 <Flight>
                   <Date>{date}</Date>
                   <CarrierCode>{carrier}</CarrierCode>
-                  <Number>{number}</Number>
+                  <Number>{padded_number}</Number>
                   <OperationalSuffix></OperationalSuffix>
                   <FromAirport>{from_airport}</FromAirport>
                   <Status>{status}</Status>
@@ -235,6 +238,7 @@ def get_flight_crew(
             print("⚠️ CREW PARSE ERROR:", e)
 
     return []
+
 
 # ===== HELPERS =====
 def fmt_time(dt_str):
@@ -409,6 +413,14 @@ def parse(xml_data, token):
                             flight_date = raw_date.split("T")[0]
                         except:
                             flight_date = raw_date
+
+                print(
+                    "FLIGHT DEBUG:",
+                    carrier,
+                    number,
+                    dep,
+                    flight_date
+                )
 
                 for child in leg:
 
