@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import urllib3
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timezone
@@ -9,6 +10,9 @@ from icalendar import Calendar, Event
 
 from playwright.sync_api import sync_playwright
 
+urllib3.disable_warnings(
+    urllib3.exceptions.InsecureRequestWarning
+)
 
 # =====================================================
 # CONFIG
@@ -19,7 +23,7 @@ PASSWORD = os.environ.get("CREW_PASS")
 
 # TEMPORARY:
 # paste token from Safari network request
-TOKEN = "PASTE_TOKEN_HERE"
+TOKEN = "VFxFl5JveayIr/E7EEs8yh4ASIdH/WzOHc3MuPFYiKc="
 
 if not USERNAME or not PASSWORD:
     raise Exception("❌ Missing CREW_USER / CREW_PASS")
