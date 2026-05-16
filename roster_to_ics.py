@@ -137,92 +137,104 @@ def get_flight_crew(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <Flight>
-              <Date>{date}</Date>
-              <CarrierCode>{carrier}</CarrierCode>
-              <Number>{number}</Number>
-              <OperationalSuffix></OperationalSuffix>
-              <FromAirport>{from_airport}</FromAirport>
-              <Status>S</Status>
-            </Flight>
-          </Data>
-        </FlightCrewListRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
+    statuses = ["S", "A", "P", "F", "C", "L"]
 
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
+    for status in statuses:
 
-    if response.status_code != 200:
-        return []
+        print(
+            f"🔎 Crew lookup "
+            f"{carrier}{number} "
+            f"{date} "
+            f"status={status}"
+        )
 
-    try:
+        soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <FlightCrewListRequest Version="1.0">
+              <Token>{token}</Token>
+              <Data>
+                <Flight>
+                  <Date>{date}</Date>
+                  <CarrierCode>{carrier}</CarrierCode>
+                  <Number>{number}</Number>
+                  <OperationalSuffix></OperationalSuffix>
+                  <FromAirport>{from_airport}</FromAirport>
+                  <Status>{status}</Status>
+                </Flight>
+              </Data>
+            </FlightCrewListRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
+        """
 
-        root = ET.fromstring(response.text)
+        response = requests.post(
+            API_URL,
+            data=soap_body,
+            headers=headers,
+            verify=False
+        )
 
-        crew = []
+        if response.status_code != 200:
+            continue
 
-        for crew_member in root.iter():
+        try:
 
-            tag = crew_member.tag.split('}')[-1]
+            root = ET.fromstring(response.text)
 
-            if tag != "Crew":
-                continue
+            crew = []
 
-            first_name = ""
-            surname = ""
-            rank_code = ""
-            position_code = ""
+            for crew_member in root.iter():
 
-            for x in crew_member:
+                tag = crew_member.tag.split('}')[-1]
 
-                xt = x.tag.split('}')[-1]
+                if tag != "Crew":
+                    continue
 
-                if xt == "FirstName":
-                    first_name = x.text or ""
+                first_name = ""
+                surname = ""
+                rank_code = ""
+                position_code = ""
 
-                elif xt == "Surname":
-                    surname = x.text or ""
+                for x in crew_member:
 
-                elif xt == "RankCode":
-                    rank_code = x.text or ""
+                    xt = x.tag.split('}')[-1]
 
-                elif xt == "PositionCode":
-                    position_code = x.text or ""
+                    if xt == "FirstName":
+                        first_name = x.text or ""
 
-            if not first_name and not surname:
-                continue
+                    elif xt == "Surname":
+                        surname = x.text or ""
 
-            crew.append(
-                f"{rank_code} "
-                f"{first_name} {surname} "
-                f"({position_code})"
-            )
+                    elif xt == "RankCode":
+                        rank_code = x.text or ""
 
-        crew = list(dict.fromkeys(crew))
+                    elif xt == "PositionCode":
+                        position_code = x.text or ""
 
-        print("👨‍✈️ CREW FOUND:", crew)
+                if not first_name and not surname:
+                    continue
 
-        return crew
+                crew.append(
+                    f"{rank_code} "
+                    f"{first_name} {surname} "
+                    f"({position_code})"
+                )
 
-    except Exception as e:
+            crew = list(dict.fromkeys(crew))
 
-        print("⚠️ CREW PARSE ERROR:", e)
+            if crew:
 
-        return []
+                print("👨‍✈️ CREW FOUND:", crew)
 
+                return crew
+
+        except Exception as e:
+
+            print("⚠️ CREW PARSE ERROR:", e)
+
+    return []
 
 # ===== HELPERS =====
 def fmt_time(dt_str):
