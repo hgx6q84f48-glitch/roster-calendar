@@ -3,7 +3,6 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from icalendar import Calendar, Event
-
 from playwright.sync_api import sync_playwright
 
 # ===== CONFIG =====
@@ -18,14 +17,20 @@ API_URL = "https://saacrewconnect.cocre8.africa/crewApi"
 
 # ===== GET TOKEN =====
 def get_token():
+
     print("🔐 Logging in...")
 
     with sync_playwright() as p:
+
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
         page.goto("https://saacrewconnect.cocre8.africa/html/home.html")
-        page.wait_for_selector('input[type="password"]', timeout=15000)
+
+        page.wait_for_selector(
+            'input[type="password"]',
+            timeout=15000
+        )
 
         page.fill('input[type="text"]', USERNAME)
         page.fill('input[type="password"]', PASSWORD)
@@ -48,6 +53,7 @@ def get_token():
             () => {
                 const data = localStorage.getItem('jStorage');
                 if (!data) return false;
+
                 try {
                     return JSON.parse(data).crew_token !== undefined;
                 } catch {
@@ -63,11 +69,13 @@ def get_token():
         browser.close()
 
         print("✅ Token acquired")
+
         return token
 
 
 # ===== FETCH ROSTER =====
 def fetch_roster(token):
+
     print("📡 Fetching roster...")
 
     import urllib3
@@ -107,7 +115,7 @@ def fetch_roster(token):
     return response.text
 
 
-# ===== FETCH FLIGHT CREW =====
+# ===== FETCH CREW =====
 def get_flight_crew(
     token,
     date,
@@ -216,6 +224,7 @@ def get_flight_crew(
 
 # ===== HELPERS =====
 def fmt_time(dt_str):
+
     try:
         return datetime.strptime(
             dt_str,
@@ -230,7 +239,9 @@ def fmt_full(dt):
 
 
 def fmt_utc(dt):
+
     utc = dt.astimezone(timezone.utc)
+
     return utc.strftime("%H:%MZ")
 
 
@@ -238,31 +249,36 @@ def fmt_utc(dt):
 def parse(xml_data, token):
 
     root = ET.fromstring(xml_data)
+
     activities = []
 
     for activity in root.iter():
 
         tag = activity.tag.split('}')[-1]
 
-        if 'Activity' not in tag:
+        if "Activity" not in tag:
             continue
 
         def get(tag_name):
+
             for elem in activity.iter():
+
                 if tag_name in elem.tag:
                     return elem.text
+
             return None
 
-        title = get('TypeDescription') or "Duty"
+        title = get("TypeDescription") or "Duty"
 
-        start = get('LCLStart')
-        end = get('LCLEnd')
-        report = get('LCLExpectedSignOn')
+        start = get("LCLStart")
+        end = get("LCLEnd")
+        report = get("LCLExpectedSignOn")
 
         if not start or not end:
             continue
 
         try:
+
             start_dt = datetime.strptime(
                 start,
                 "%Y-%m-%d %H:%M"
@@ -278,253 +294,152 @@ def parse(xml_data, token):
 
         description_lines = []
 
-        # =====================================================
-        # TRAINING
-        # =====================================================
-        course_elem = None
+        # ===== REPORT =====
+        if report:
 
-        for elem in activity:
-            if 'Course' in elem.tag:
-                course_elem = elem
-                break
+            report_dt = datetime.strptime(
+                report,
+                "%Y-%m-%d %H:%M"
+            )
 
-        if course_elem is not None:
-
-            course_name = None
-            base = None
-
-            for c in course_elem:
-
-                if 'Description' in c.tag:
-                    course_name = c.text
-
-                if 'Base' in c.tag:
-                    base = c.text
-
-            if report:
-                description_lines.append(
-                    f"Report: {fmt_time(report)}"
-                )
-
-            if course_name:
-                description_lines.append(
-                    f"Course: {course_name}"
-                )
-
-            if base:
-                description_lines.append(
-                    f"Location: {base}"
-                )
+            description_lines.append("Report:")
+            description_lines.append(
+                f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
+            )
 
             description_lines.append("")
 
-            modules = []
+        # ===== FLIGHTS =====
+        pairing = None
 
-            for m in course_elem.iter():
+        for elem in activity:
 
-                if 'Module' not in m.tag:
+            if "Pairing" in elem.tag:
+                pairing = elem
+                break
+
+        if pairing is not None:
+
+            description_lines.append("Flights:")
+
+            all_crew = []
+
+            for leg in pairing.iter():
+
+                tag_name = leg.tag.split('}')[-1]
+
+                if tag_name != "Leg":
                     continue
 
-                m_desc = None
-                m_start = None
-                m_end = None
-                m_type = None
+                leg_type = None
 
-                for x in m:
+                for child in leg:
 
-                    if 'Description' in x.tag:
-                        m_desc = x.text
+                    child_tag = child.tag.split('}')[-1]
 
-                    if 'LCLStart' in x.tag:
-                        m_start = x.text
+                    if child_tag == "Type":
+                        leg_type = child.text
 
-                    if 'LCLEnd' in x.tag:
-                        m_end = x.text
-
-                    if 'Type' in x.tag:
-                        for t in x:
-                            if 'Description' in t.tag:
-                                m_type = t.text
-
-                if not m_start or not m_end:
+                if leg_type != "Flight":
                     continue
 
-                label = "EVENT"
+                flight_elem = None
 
-                if m_type:
+                for child in leg:
 
-                    mt = m_type.lower()
+                    child_tag = child.tag.split('}')[-1]
 
-                    if "brief" in mt:
-                        label = "BRIEF"
+                    if child_tag == "Flight":
+                        flight_elem = child
 
-                    elif "sim" in mt:
-                        label = "SIM"
+                if flight_elem is None:
+                    continue
 
-                    elif "debrief" in mt:
-                        label = "DEBRIEF"
+                carrier = ""
+                number = ""
+                dep = ""
+                arr = ""
+                dep_time = ""
+                arr_time = ""
+                duration = ""
+                flight_date = ""
 
-                modules.append((
-                    m_start,
-                    f"{fmt_time(m_start)}–{fmt_time(m_end)}  {label} — {m_desc}"
-                ))
+                for f in flight_elem.iter():
 
-            modules.sort(key=lambda x: x[0])
+                    ft = f.tag.split('}')[-1]
 
-            for _, line in modules:
+                    if ft == "CarrierCode":
+                        carrier = f.text or ""
+
+                    elif ft == "Number":
+                        number = f.text or ""
+
+                    elif ft == "FromAirport":
+                        dep = f.text or ""
+
+                    elif ft == "ToAirport":
+                        arr = f.text or ""
+
+                    elif ft == "LCLLTD":
+                        dep_time = f.text or ""
+
+                    elif ft == "LCLLTA":
+                        arr_time = f.text or ""
+
+                    elif ft == "Date":
+
+                        raw_date = f.text or ""
+
+                        try:
+                            flight_date = raw_date.split("T")[0]
+                        except:
+                            flight_date = raw_date
+
+                for child in leg:
+
+                    child_tag = child.tag.split('}')[-1]
+
+                    if child_tag == "Duration":
+                        duration = child.text or ""
+
+                dep_fmt = fmt_time(dep_time)
+                arr_fmt = fmt_time(arr_time)
+
+                flight_no = f"{carrier}{number}"
+
+                line = (
+                    f"{flight_no}  "
+                    f"{dep} → {arr}  "
+                    f"{dep_fmt}-{arr_fmt}"
+                )
+
+                if duration:
+                    line += f"  ({duration})"
+
                 description_lines.append(line)
 
-        # =====================================================
-        # PAIRINGS / DUTIES
-        # =====================================================
-        else:
-
-            if report:
-
-                report_dt = datetime.strptime(
-                    report,
-                    "%Y-%m-%d %H:%M"
+                # ===== CREW LOOKUP =====
+                crew = get_flight_crew(
+                    token,
+                    flight_date,
+                    carrier,
+                    number,
+                    dep
                 )
 
-                description_lines.append("Report:")
-                description_lines.append(
-                    f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
-                )
+                if crew:
+                    all_crew.extend(crew)
+
+            # ===== CREW SECTION =====
+            all_crew = list(dict.fromkeys(all_crew))
+
+            if all_crew:
+
                 description_lines.append("")
+                description_lines.append("Crew:")
 
-            duty_routes = []
-
-            pairing = None
-
-            for elem in activity:
-                if 'Pairing' in elem.tag:
-                    pairing = elem
-                    break
-
-            if pairing is not None:
-
-                description_lines.append("Flights:")
-
-                all_crew = []
-
-                for leg in pairing.iter():
-
-                    tag_name = leg.tag.split('}')[-1]
-
-                    if tag_name != "Leg":
-                        continue
-
-                    leg_type = None
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Type":
-                            leg_type = child.text
-
-                    if leg_type != "Flight":
-                        continue
-
-                    flight_elem = None
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Flight":
-                            flight_elem = child
-
-                    if flight_elem is None:
-                        continue
-
-                    carrier = ""
-                    number = ""
-                    dep = ""
-                    arr = ""
-                    dep_time = ""
-                    arr_time = ""
-                    duration = ""
-
-                    for f in flight_elem.iter():
-
-                        ft = f.tag.split('}')[-1]
-
-                        if ft == "CarrierCode":
-                            carrier = f.text or ""
-
-                        elif ft == "Number":
-                            number = f.text or ""
-
-                        elif ft == "FromAirport":
-                            dep = f.text or ""
-
-                        elif ft == "ToAirport":
-                            arr = f.text or ""
-
-                        elif ft == "LCLLTD":
-                            dep_time = f.text or ""
-
-                        elif ft == "LCLLTA":
-                            arr_time = f.text or ""
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Duration":
-                            duration = child.text or ""
-
-                    if dep and arr:
-
-                        if not duty_routes:
-                            duty_routes.append(dep)
-
-                        duty_routes.append(arr)
-
-                    dep_fmt = fmt_time(dep_time)
-                    arr_fmt = fmt_time(arr_time)
-
-                    flight_no = f"{carrier}{number}"
-
-                    line = (
-                        f"{flight_no}  "
-                        f"{dep} → {arr}  "
-                        f"{dep_fmt}-{arr_fmt}"
-                    )
-
-                    if duration:
-                        line += f"  ({duration})"
-
-                    description_lines.append(line)
-
-                    flight_date = ""
-
-                    for f in flight_elem.iter():
-
-                        ft = f.tag.split('}')[-1]
-
-                        if ft == "Date":
-                            flight_date = f.text or ""
-
-                    crew = get_flight_crew(
-                        token,
-                        flight_date,
-                        carrier,
-                        number,
-                        dep
-                    )
-
-                    if crew:
-                        all_crew.extend(crew)
-
-                # ===== CREW SECTION =====
-                all_crew = list(dict.fromkeys(all_crew))
-
-                if all_crew:
-
-                    description_lines.append("")
-                    description_lines.append("Crew:")
-
-                    for c in all_crew:
-                        description_lines.append(c)
+                for c in all_crew:
+                    description_lines.append(c)
 
         description = (
             "\n".join(description_lines)
@@ -540,13 +455,10 @@ def parse(xml_data, token):
 
     print(f"🔍 Found {len(activities)} activities")
 
-    if not activities:
-        raise Exception("❌ No activities")
-
     return activities
 
 
-# ===== ICS =====
+# ===== BUILD ICS =====
 def build_ics(activities):
 
     cal = Calendar()
@@ -565,9 +477,6 @@ def build_ics(activities):
 
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
-
-        elif description and "Course:" in description:
-            summary = "📘 TRAINING"
 
         else:
 
@@ -609,12 +518,12 @@ def build_ics(activities):
             else:
                 summary = "✈️ DUTY"
 
-        event.add('summary', summary)
-        event.add('dtstart', start)
-        event.add('dtend', end)
+        event.add("summary", summary)
+        event.add("dtstart", start)
+        event.add("dtend", end)
 
         if description:
-            event.add('description', description)
+            event.add("description", description)
 
         cal.add_component(event)
 
@@ -627,578 +536,7 @@ def save(cal):
     with open("roster.ics", "wb") as f:
         f.write(cal.to_ical())
 
-    print("📅 File saved")
-
-
-# ===== MAIN =====
-if __name__ == "__main__":
-
-    token = get_token()
-
-    xml_data = fetch_roster(token)
-
-    activities = parse(xml_data, token)
-
-    cal = build_ics(activities)
-
-    save(cal)
-# ===== FETCH ROSTER =====
-def fetch_roster(token):
-    print("📡 Fetching roster...")
-
-    import urllib3
-    urllib3.disable_warnings()
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
-
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <RosterRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <startDate>2025-10-10</startDate>
-            <endDate>2026-10-05</endDate>
-            <emplNbr>{USERNAME}</emplNbr>
-            <rstrHist>0</rstrHist>
-          </Data>
-        </RosterRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
-
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
-
-    if response.status_code != 200:
-        raise Exception("❌ API failed")
-
-    return response.text
-
-
-# ===== FETCH FLIGHT CREW =====
-def get_flight_crew(
-    token,
-    date,
-    carrier,
-    number,
-    from_airport
-):
-
-    import urllib3
-    urllib3.disable_warnings()
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
-
-    soap_body = f"""<?xml version="1.0" encoding="utf-8"?>
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <FlightCrewListRequest Version="1.0">
-          <Token>{token}</Token>
-          <Data>
-            <Flight>
-              <Date>{date}</Date>
-              <CarrierCode>{carrier}</CarrierCode>
-              <Number>{number}</Number>
-              <OperationalSuffix></OperationalSuffix>
-              <FromAirport>{from_airport}</FromAirport>
-              <Status>S</Status>
-            </Flight>
-          </Data>
-        </FlightCrewListRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """
-
-    response = requests.post(
-        API_URL,
-        data=soap_body,
-        headers=headers,
-        verify=False
-    )
-
-    if response.status_code != 200:
-        return []
-
-    try:
-
-        root = ET.fromstring(response.text)
-
-        crew = []
-
-        for crew_member in root.iter():
-
-            tag = crew_member.tag.split('}')[-1]
-
-            if tag != "CrewMember":
-                continue
-
-            first_name = ""
-            last_name = ""
-            position = ""
-            position_code = ""
-
-            for x in crew_member.iter():
-
-                xt = x.tag.split('}')[-1]
-
-                if xt == "FirstName":
-                    first_name = x.text or ""
-
-                elif xt == "LastName":
-                    last_name = x.text or ""
-
-                elif xt == "Position":
-                    position = x.text or ""
-
-                elif xt == "PositionCode":
-                    position_code = x.text or ""
-
-            if not first_name and not last_name:
-                continue
-
-            short_position = position
-
-            if "Captain" in position:
-                short_position = "CPT"
-
-            elif "First Officer" in position:
-                short_position = "FO"
-
-            crew.append(
-                f"{short_position} "
-                f"{first_name} {last_name} "
-                f"({position_code})"
-            )
-
-        # Remove duplicates while keeping order
-        crew = list(dict.fromkeys(crew))
-
-        return crew
-
-    except:
-        return []
-
-
-# ===== HELPERS =====
-def fmt_time(dt_str):
-    try:
-        return datetime.strptime(
-            dt_str,
-            "%Y-%m-%d %H:%M"
-        ).strftime("%H:%M")
-    except:
-        return None
-
-
-def fmt_full(dt):
-    return dt.strftime("%d %b %Y %H:%M")
-
-
-def fmt_utc(dt):
-    utc = dt.astimezone(timezone.utc)
-    return utc.strftime("%H:%MZ")
-
-
-# ===== PARSE =====
-def parse(xml_data, token):
-
-    root = ET.fromstring(xml_data)
-    activities = []
-
-    for activity in root.iter():
-
-        tag = activity.tag.split('}')[-1]
-
-        if 'Activity' not in tag:
-            continue
-
-        def get(tag_name):
-            for elem in activity.iter():
-                if tag_name in elem.tag:
-                    return elem.text
-            return None
-
-        title = get('TypeDescription') or "Duty"
-
-        start = get('LCLStart')
-        end = get('LCLEnd')
-        report = get('LCLExpectedSignOn')
-
-        if not start or not end:
-            continue
-
-        try:
-            start_dt = datetime.strptime(
-                start,
-                "%Y-%m-%d %H:%M"
-            )
-
-            end_dt = datetime.strptime(
-                end,
-                "%Y-%m-%d %H:%M"
-            )
-
-        except:
-            continue
-
-        description_lines = []
-
-        # =====================================================
-        # TRAINING
-        # =====================================================
-        course_elem = None
-
-        for elem in activity:
-            if 'Course' in elem.tag:
-                course_elem = elem
-                break
-
-        if course_elem is not None:
-
-            course_name = None
-            base = None
-
-            for c in course_elem:
-
-                if 'Description' in c.tag:
-                    course_name = c.text
-
-                if 'Base' in c.tag:
-                    base = c.text
-
-            if report:
-                description_lines.append(
-                    f"Report: {fmt_time(report)}"
-                )
-
-            if course_name:
-                description_lines.append(
-                    f"Course: {course_name}"
-                )
-
-            if base:
-                description_lines.append(
-                    f"Location: {base}"
-                )
-
-            description_lines.append("")
-
-            modules = []
-
-            for m in course_elem.iter():
-
-                if 'Module' not in m.tag:
-                    continue
-
-                m_desc = None
-                m_start = None
-                m_end = None
-                m_type = None
-
-                for x in m:
-
-                    if 'Description' in x.tag:
-                        m_desc = x.text
-
-                    if 'LCLStart' in x.tag:
-                        m_start = x.text
-
-                    if 'LCLEnd' in x.tag:
-                        m_end = x.text
-
-                    if 'Type' in x.tag:
-                        for t in x:
-                            if 'Description' in t.tag:
-                                m_type = t.text
-
-                if not m_start or not m_end:
-                    continue
-
-                label = "EVENT"
-
-                if m_type:
-
-                    mt = m_type.lower()
-
-                    if "brief" in mt:
-                        label = "BRIEF"
-
-                    elif "sim" in mt:
-                        label = "SIM"
-
-                    elif "debrief" in mt:
-                        label = "DEBRIEF"
-
-                modules.append((
-                    m_start,
-                    f"{fmt_time(m_start)}–{fmt_time(m_end)}  {label} — {m_desc}"
-                ))
-
-            modules.sort(key=lambda x: x[0])
-
-            for _, line in modules:
-                description_lines.append(line)
-
-        # =====================================================
-        # PAIRINGS / DUTIES
-        # =====================================================
-        else:
-
-            if report:
-
-                report_dt = datetime.strptime(
-                    report,
-                    "%Y-%m-%d %H:%M"
-                )
-
-                description_lines.append("Report:")
-                description_lines.append(
-                    f"{fmt_full(report_dt)} ({fmt_utc(report_dt)})"
-                )
-                description_lines.append("")
-
-            duty_routes = []
-
-            pairing = None
-
-            for elem in activity:
-                if 'Pairing' in elem.tag:
-                    pairing = elem
-                    break
-
-            if pairing is not None:
-
-                description_lines.append("Flights:")
-
-                for leg in pairing.iter():
-
-                    tag_name = leg.tag.split('}')[-1]
-
-                    if tag_name != "Leg":
-                        continue
-
-                    leg_type = None
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Type":
-                            leg_type = child.text
-
-                    if leg_type != "Flight":
-                        continue
-
-                    flight_elem = None
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Flight":
-                            flight_elem = child
-
-                    if flight_elem is None:
-                        continue
-
-                    carrier = ""
-                    number = ""
-                    dep = ""
-                    arr = ""
-                    dep_time = ""
-                    arr_time = ""
-                    duration = ""
-
-                    for f in flight_elem.iter():
-
-                        ft = f.tag.split('}')[-1]
-
-                        if ft == "CarrierCode":
-                            carrier = f.text or ""
-
-                        elif ft == "Number":
-                            number = f.text or ""
-
-                        elif ft == "FromAirport":
-                            dep = f.text or ""
-
-                        elif ft == "ToAirport":
-                            arr = f.text or ""
-
-                        elif ft == "LCLLTD":
-                            dep_time = f.text or ""
-
-                        elif ft == "LCLLTA":
-                            arr_time = f.text or ""
-
-                    for child in leg:
-                        child_tag = child.tag.split('}')[-1]
-
-                        if child_tag == "Duration":
-                            duration = child.text or ""
-
-                    if dep and arr:
-
-                        if not duty_routes:
-                            duty_routes.append(dep)
-
-                        duty_routes.append(arr)
-
-                    dep_fmt = fmt_time(dep_time)
-                    arr_fmt = fmt_time(arr_time)
-
-                    flight_no = f"{carrier}{number}"
-
-                    line = (
-                        f"{flight_no}  "
-                        f"{dep} → {arr}  "
-                        f"{dep_fmt}-{arr_fmt}"
-                    )
-
-                    if duration:
-                        line += f"  ({duration})"
-
-                    description_lines.append(line)
-
-                    flight_date = ""
-
-                    for f in flight_elem.iter():
-
-                        ft = f.tag.split('}')[-1]
-
-                        if ft == "Date":
-                            flight_date = f.text or ""
-
-                    crew = get_flight_crew(
-                        token,
-                        flight_date,
-                        carrier,
-                        number,
-                        dep
-                    )
-
-                    if crew:
-
-                        description_lines.append("")
-                        description_lines.append("Crew")
-
-                        for c in crew:
-                            description_lines.append(c)
-
-                        description_lines.append("")
-
-        description = (
-            "\n".join(description_lines)
-            if description_lines else None
-        )
-
-        activities.append((
-            title,
-            start_dt,
-            end_dt,
-            description
-        ))
-
-    print(f"🔍 Found {len(activities)} activities")
-
-    if not activities:
-        raise Exception("❌ No activities")
-
-    return activities
-
-
-# ===== ICS =====
-def build_ics(activities):
-
-    cal = Calendar()
-
-    for title, start, end, description in activities:
-
-        event = Event()
-
-        t = title.upper()
-
-        if t == "OPEN DAY":
-            summary = "🟡 OPEN"
-
-        elif "OFF" in t:
-            summary = "🟢 DAY OFF"
-
-        elif "LEAVE" in t:
-            summary = "🎉 LEAVE"
-
-        elif description and "Course:" in description:
-            summary = "📘 TRAINING"
-
-        else:
-
-            duty_routes = []
-
-            if description:
-
-                for line in description.split("\n"):
-
-                    # Detect ANY flight line
-                    if "→" in line:
-
-                        try:
-
-                            route_section = line.split("  ")[1]
-
-                            dep = route_section.split("→")[0].strip()
-
-                            arr = (
-                                route_section
-                                .split("→")[1]
-                                .strip()
-                                .split(" ")[0]
-                            )
-
-                            if not duty_routes:
-                                duty_routes.append(dep)
-
-                            duty_routes.append(arr)
-
-                        except:
-                            pass
-
-            if len(duty_routes) >= 2:
-
-                route_text = "-".join(duty_routes)
-
-                summary = f"✈️ {route_text}"
-
-            else:
-                summary = "✈️ DUTY"
-
-        event.add('summary', summary)
-        event.add('dtstart', start)
-        event.add('dtend', end)
-
-        if description:
-            event.add('description', description)
-
-        cal.add_component(event)
-
-    return cal
-
-
-# ===== SAVE =====
-def save(cal):
-
-    with open("roster.ics", "wb") as f:
-        f.write(cal.to_ical())
-
-    print("📅 File saved")
+    print("📅 roster.ics saved")
 
 
 # ===== MAIN =====
