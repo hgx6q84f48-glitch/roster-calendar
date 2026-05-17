@@ -704,7 +704,7 @@ def build_ics(activities):
         elif "RESERVE" in t:
             summary = "🟠 RESERVE"
         elif "GROUND" in t:
-            summary = f"🕹️ {subtitle}" if subtitle else f"🕹️ {title}"
+            summary = "🕹️ GROUND DUTY"
         elif "TRAINING" in t:
             summary = f"📘 {subtitle}" if subtitle else "📘 TRAINING"
         elif "PAIRING" in t:
