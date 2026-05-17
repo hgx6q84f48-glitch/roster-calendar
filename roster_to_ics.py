@@ -167,7 +167,6 @@ def parse_crew_response(text):
                 continue
 
             name = f"{first} {surname}"
-
             pos = position.strip()
             pos = re.sub(r'CABIN CREW AB-INITIO', 'AB-INITIO', pos, flags=re.IGNORECASE)
             pos = re.sub(r'CABIN CREW MEMBER', '', pos, flags=re.IGNORECASE).strip()
@@ -334,8 +333,6 @@ def fetch_all_crew(page):
 
 def parse(xml_data, crew_by_pairing):
     root = ET.fromstring(xml_data)
-    # activities now store: (title, start_dt, end_dt, description, subtitle)
-    # subtitle is used to override the calendar title (e.g. course code)
     activities = []
 
     for activity in root.iter():
@@ -366,7 +363,7 @@ def parse(xml_data, crew_by_pairing):
 
         description_lines = []
         t = title.upper()
-        subtitle = ""  # used for training/ground duty code
+        subtitle = ""
 
         # =====================================================
         # TRAINING
@@ -385,19 +382,14 @@ def parse(xml_data, crew_by_pairing):
                 et = elem.tag.split('}')[-1]
                 if et == "Course":
                     for child in elem:
-                        ct = child.tag.split('}')[-1]
-                        if ct == "Code":
-                            course_code = (child.text or "").strip()
-                        elif ct == "Description":
-                            course_desc = (child.text or "").strip()
-                        elif ct == "LCLStart":
-                            course_lcl_start = (child.text or "").strip()
-                        elif ct == "LCLEnd":
-                            course_lcl_end = (child.text or "").strip()
-                        elif ct == "UTCStart":
-                            course_utc_start = (child.text or "").strip()
-                        elif ct == "UTCEnd":
-                            course_utc_end = (child.text or "").strip()
+                        ct  = child.tag.split('}')[-1]
+                        val = (child.text or "").strip()
+                        if ct == "Code":           course_code      = val
+                        elif ct == "Description":  course_desc      = val
+                        elif ct == "LCLStart":     course_lcl_start = val
+                        elif ct == "LCLEnd":       course_lcl_end   = val
+                        elif ct == "UTCStart":     course_utc_start = val
+                        elif ct == "UTCEnd":       course_utc_end   = val
                         elif ct == "Type":
                             for tc in child:
                                 if tc.tag.split('}')[-1] == "Description":
@@ -409,16 +401,12 @@ def parse(xml_data, crew_by_pairing):
                                 mod = {}
                                 for mc in module:
                                     mt = mc.tag.split('}')[-1]
-                                    if mt == "Description":
-                                        mod["desc"]  = (mc.text or "").strip()
-                                    elif mt == "LCLStart":
-                                        mod["start"] = (mc.text or "").strip()
-                                    elif mt == "LCLEnd":
-                                        mod["end"]   = (mc.text or "").strip()
+                                    if mt == "Description": mod["desc"]  = (mc.text or "").strip()
+                                    elif mt == "LCLStart":  mod["start"] = (mc.text or "").strip()
+                                    elif mt == "LCLEnd":    mod["end"]   = (mc.text or "").strip()
                                 if mod:
                                     modules.append(mod)
 
-            # Use course code as subtitle for calendar title
             subtitle = course_code
 
             if course_desc:
@@ -469,8 +457,61 @@ def parse(xml_data, crew_by_pairing):
             continue
 
         # =====================================================
-        # REPORT TIME
+        # RESERVE
         # =====================================================
+        if "RESERVE" in t:
+            res_code    = ""
+            res_airport = ""
+            res_lcl_s   = ""
+            res_lcl_e   = ""
+            res_utc_s   = ""
+            res_utc_e   = ""
+
+            for elem in activity.iter():
+                et = elem.tag.split('}')[-1]
+                if et == "Reserve":
+                    for child in elem:
+                        ct  = child.tag.split('}')[-1]
+                        val = (child.text or "").strip()
+                        if ct == "Code":      res_code    = val
+                        elif ct == "Airport": res_airport = val
+                        elif ct == "LCLStart": res_lcl_s  = val
+                        elif ct == "LCLEnd":   res_lcl_e  = val
+                        elif ct == "UTCStart": res_utc_s  = val
+                        elif ct == "UTCEnd":   res_utc_e  = val
+
+            lcl_s = parse_dt(res_lcl_s)
+            lcl_e = parse_dt(res_lcl_e)
+            utc_s = parse_dt(res_utc_s)
+            utc_e = parse_dt(res_utc_e)
+
+            description_lines.append("Reserve Window")
+            if lcl_s and lcl_e:
+                s_str = fmt_local_time(lcl_s)
+                if utc_s:
+                    s_str += f" ({fmt_utc(utc_s)})"
+                e_str = fmt_local_time(lcl_e)
+                if utc_e:
+                    e_str += f" ({fmt_utc(utc_e)})"
+                description_lines.append(f"{s_str} - {e_str}")
+            description_lines.append("")
+            if res_code:
+                description_lines.append(f"Type: {res_code}")
+            if res_airport:
+                description_lines.append(f"Base: {res_airport}")
+
+            activities.append((
+                title, start_dt, end_dt,
+                "\n".join(description_lines).strip(),
+                subtitle
+            ))
+            continue
+
+        # =====================================================
+        # REPORT TIME (pairing + other duties)
+        # =====================================================
+        report_airport = ""
+
         if report_lcl and report_utc:
             r_lcl = parse_dt(report_lcl)
             r_utc = parse_dt(report_utc)
@@ -479,6 +520,8 @@ def parse(xml_data, crew_by_pairing):
                 description_lines.append(
                     f"{fmt_local(r_lcl)} ({fmt_utc(r_utc)})"
                 )
+                # Airport added after we find the first flight leg
+                description_lines.append("__AIRPORT__")
                 description_lines.append("")
 
         # =====================================================
@@ -495,6 +538,7 @@ def parse(xml_data, crew_by_pairing):
                 break
 
         if pairing is not None:
+            first_flight = True
             for leg_container in pairing:
                 if leg_container.tag.split('}')[-1] != "Legs":
                     continue
@@ -521,17 +565,23 @@ def parse(xml_data, crew_by_pairing):
 
                         carrier = number = dep = arr = ""
                         lcl_dep = lcl_arr = utc_dep = utc_arr = ""
+                        dep_airport_name = ""
 
                         for f in flight_elem.iter():
                             ft = f.tag.split('}')[-1]
-                            if ft == "CarrierCode":   carrier  = f.text or ""
-                            elif ft == "Number":      number   = f.text or ""
-                            elif ft == "FromAirport": dep      = f.text or ""
-                            elif ft == "ToAirport":   arr      = f.text or ""
-                            elif ft == "LCLLTD":      lcl_dep  = f.text or ""
-                            elif ft == "LCLLTA":      lcl_arr  = f.text or ""
-                            elif ft == "UTCLTD":      utc_dep  = f.text or ""
-                            elif ft == "UTCLTA":      utc_arr  = f.text or ""
+                            if ft == "CarrierCode":   carrier          = f.text or ""
+                            elif ft == "Number":      number           = f.text or ""
+                            elif ft == "FromAirport": dep              = f.text or ""
+                            elif ft == "ToAirport":   arr              = f.text or ""
+                            elif ft == "LCLLTD":      lcl_dep          = f.text or ""
+                            elif ft == "LCLLTA":      lcl_arr          = f.text or ""
+                            elif ft == "UTCLTD":      utc_dep          = f.text or ""
+                            elif ft == "UTCLTA":      utc_arr          = f.text or ""
+
+                        # Use first flight's departure airport for report
+                        if first_flight and dep:
+                            report_airport = dep
+                            first_flight = False
 
                         dep_lcl = parse_dt(lcl_dep)
                         arr_lcl = parse_dt(lcl_arr)
@@ -610,6 +660,20 @@ def parse(xml_data, crew_by_pairing):
                 description_lines.extend(cabin_crew)
                 description_lines.append("")
 
+        # Replace airport placeholder
+        # We need to look up the full airport name from the XML
+        # For now use the IATA code — we'll use what we have
+        description_lines = [
+            report_airport if line == "__AIRPORT__" else line
+            for line in description_lines
+        ]
+
+        # Remove blank airport placeholder if nothing found
+        description_lines = [
+            line for line in description_lines
+            if line != "__AIRPORT__"
+        ]
+
         description = (
             "\n".join(description_lines).strip()
             if description_lines else None
@@ -633,22 +697,16 @@ def build_ics(activities):
 
         if "OFF" in t:
             summary = "🟢 DAY OFF"
-
         elif "OPEN" in t:
             summary = "🟡 OPEN"
-
         elif "LEAVE" in t:
             summary = "🎉 LEAVE"
-
         elif "RESERVE" in t:
             summary = "🟠 RESERVE"
-
         elif "GROUND" in t:
             summary = f"🕹️ {subtitle}" if subtitle else f"🕹️ {title}"
-
         elif "TRAINING" in t:
             summary = f"📘 {subtitle}" if subtitle else "📘 TRAINING"
-
         elif "PAIRING" in t:
             routes = []
             if description:
@@ -665,7 +723,6 @@ def build_ics(activities):
                     except:
                         pass
             summary = f"✈️ {'-'.join(routes)}" if len(routes) >= 2 else "✈️ DUTY"
-
         else:
             summary = f"📋 {title}"
 
