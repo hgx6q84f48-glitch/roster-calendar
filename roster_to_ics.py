@@ -33,6 +33,9 @@ SA_TZ = ZoneInfo("Africa/Johannesburg")
 def fmt_local(dt):
     return dt.strftime("%d %b %H:%M") + "L"
 
+def fmt_local_time(dt):
+    return dt.strftime("%H:%M") + "L"
+
 def fmt_utc(dt):
     return dt.strftime("%H:%M") + "Z"
 
@@ -56,6 +59,16 @@ def parse_dt(s):
         return None
     try:
         return datetime.strptime(s.strip(), "%Y-%m-%d %H:%M")
+    except:
+        return None
+
+def parse_time(s, base_date):
+    """Parse a time-only string like '09:15' using base_date for the date."""
+    if not s:
+        return None
+    try:
+        t = datetime.strptime(s.strip(), "%H:%M")
+        return base_date.replace(hour=t.hour, minute=t.minute)
     except:
         return None
 
@@ -165,25 +178,19 @@ def parse_crew_response(text):
 
             name = f"{first} {surname}"
 
-            # Clean up position text
+            # Clean up position
             pos = position.strip()
             pos = re.sub(r'CABIN CREW AB-INITIO', 'AB-INITIO', pos, flags=re.IGNORECASE)
             pos = re.sub(r'CABIN CREW MEMBER', '', pos, flags=re.IGNORECASE).strip()
             pos = re.sub(r'PURSER', '', pos, flags=re.IGNORECASE).strip()
 
-            # Build the line
             if rank_code in ("CAPT", "FO"):
-                # Flight crew
                 line = f"{rank}: {name}"
                 if pos and pos.upper() != rank.upper():
                     line += f" ({pos})"
                 flight_crew.append(line)
             else:
-                # Cabin crew — use friendly rank name
-                if rank_code == "PUR":
-                    role = "Purser"
-                else:
-                    role = "Cabin Crew"
+                role = "Purser" if rank_code == "PUR" else "Cabin Crew"
                 line = f"{role}: {name}"
                 if pos:
                     line += f" ({pos})"
@@ -351,9 +358,9 @@ def parse(xml_data, crew_by_pairing):
                     return elem.text
             return None
 
-        title  = clean(get("TypeDescription") or "Duty")
-        start  = get("LCLStart")
-        end    = get("LCLEnd")
+        title      = clean(get("TypeDescription") or "Duty")
+        start      = get("LCLStart")
+        end        = get("LCLEnd")
         report_lcl = get("LCLExpectedSignOn")
         report_utc = get("UTCExpectedSignOn")
 
@@ -367,8 +374,98 @@ def parse(xml_data, crew_by_pairing):
             continue
 
         description_lines = []
+        t = title.upper()
 
-        # Report time
+        # =====================================================
+        # TRAINING
+        # =====================================================
+        if "TRAINING" in t:
+            course_code = ""
+            course_desc = ""
+            course_type = ""
+            course_lcl_start = ""
+            course_lcl_end   = ""
+            course_utc_start = ""
+            course_utc_end   = ""
+            modules = []
+
+            for elem in activity.iter():
+                et = elem.tag.split('}')[-1]
+                if et == "Course":
+                    for child in elem:
+                        ct = child.tag.split('}')[-1]
+                        if ct == "Code":        course_code = (child.text or "").strip()
+                        elif ct == "Description": course_desc = (child.text or "").strip()
+                        elif ct == "LCLStart":  course_lcl_start = (child.text or "").strip()
+                        elif ct == "LCLEnd":    course_lcl_end   = (child.text or "").strip()
+                        elif ct == "UTCStart":  course_utc_start = (child.text or "").strip()
+                        elif ct == "UTCEnd":    course_utc_end   = (child.text or "").strip()
+                        elif ct == "Type":
+                            for tc in child:
+                                if tc.tag.split('}')[-1] == "Description":
+                                    course_type = (tc.text or "").strip()
+                        elif ct == "Modules":
+                            for module in child:
+                                if module.tag.split('}')[-1] != "Module":
+                                    continue
+                                mod = {}
+                                for mc in module:
+                                    mt = mc.tag.split('}')[-1]
+                                    if mt == "Description": mod["desc"]  = (mc.text or "").strip()
+                                    elif mt == "LCLStart":  mod["start"] = (mc.text or "").strip()
+                                    elif mt == "LCLEnd":    mod["end"]   = (mc.text or "").strip()
+                                modules.append(mod)
+
+            if course_desc:
+                description_lines.append(course_desc)
+            if course_type:
+                description_lines.append(course_type)
+            description_lines.append("")
+
+            # Overall time
+            cs = parse_dt(course_lcl_start)
+            ce = parse_dt(course_lcl_end)
+            cu_s = parse_dt(course_utc_start)
+            cu_e = parse_dt(course_utc_end)
+
+            if cs and ce:
+                start_str = fmt_local_time(cs)
+                if cu_s:
+                    start_str += f" ({fmt_utc(cu_s)})"
+                end_str = fmt_local_time(ce)
+                if cu_e:
+                    end_str += f" ({fmt_utc(cu_e)})"
+                description_lines.append(f"{start_str} - {end_str}")
+                description_lines.append("")
+
+            # Modules in chronological order
+            if modules:
+                # Sort by start time
+                def mod_sort_key(m):
+                    try:
+                        return datetime.strptime(m.get("start", "00:00"), "%H:%M")
+                    except:
+                        return datetime.min
+
+                modules.sort(key=mod_sort_key)
+
+                description_lines.append("── Modules ──")
+                for mod in modules:
+                    ms = mod.get("start", "")
+                    me = mod.get("end", "")
+                    md = mod.get("desc", "")
+                    if ms and me:
+                        description_lines.append(f"{ms}L - {me}L")
+                    if md:
+                        description_lines.append(md)
+                    description_lines.append("")
+
+            activities.append((title, start_dt, end_dt, "\n".join(description_lines).strip()))
+            continue
+
+        # =====================================================
+        # REPORT TIME (for all other duty types)
+        # =====================================================
         if report_lcl and report_utc:
             r_lcl = parse_dt(report_lcl)
             r_utc = parse_dt(report_utc)
@@ -379,7 +476,9 @@ def parse(xml_data, crew_by_pairing):
                 )
                 description_lines.append("")
 
-        # Find pairing code
+        # =====================================================
+        # PAIRING
+        # =====================================================
         pairing_code = ""
         pairing = None
         for elem in activity:
@@ -391,49 +490,43 @@ def parse(xml_data, crew_by_pairing):
                 break
 
         if pairing is not None:
-            for leg in pairing.iter():
-                leg_tag = leg.tag.split('}')[-1]
+            for leg in pairing:
+                if leg.tag.split('}')[-1] != "Legs":
+                    continue
+                for leg_elem in leg:
+                    if leg_elem.tag.split('}')[-1] != "Leg":
+                        continue
 
-                # ── Flight leg ──
-                if leg_tag == "Leg":
-                    leg_type = None
-                    for child in leg:
+                    leg_type = ""
+                    for child in leg_elem:
                         if child.tag.split('}')[-1] == "Type":
-                            leg_type = child.text
+                            leg_type = child.text or ""
 
+                    # ── Flight ──
                     if leg_type == "Flight":
                         flight_elem = None
-                        for child in leg:
-                            if child.tag.split('}')[-1] == "Flight":
-                                flight_elem = child
+                        duration    = ""
+                        for child in leg_elem:
+                            ct = child.tag.split('}')[-1]
+                            if ct == "Flight":  flight_elem = child
+                            elif ct == "Duration": duration = child.text or ""
 
                         if flight_elem is None:
                             continue
 
-                        carrier  = ""
-                        number   = ""
-                        dep      = ""
-                        arr      = ""
-                        lcl_dep  = ""
-                        lcl_arr  = ""
-                        utc_dep  = ""
-                        utc_arr  = ""
-                        duration = ""
+                        carrier = number = dep = arr = ""
+                        lcl_dep = lcl_arr = utc_dep = utc_arr = ""
 
                         for f in flight_elem.iter():
                             ft = f.tag.split('}')[-1]
-                            if ft == "CarrierCode":  carrier  = f.text or ""
-                            elif ft == "Number":     number   = f.text or ""
-                            elif ft == "FromAirport":dep      = f.text or ""
-                            elif ft == "ToAirport":  arr      = f.text or ""
-                            elif ft == "LCLLTD":     lcl_dep  = f.text or ""
-                            elif ft == "LCLLTA":     lcl_arr  = f.text or ""
-                            elif ft == "UTCLTD":     utc_dep  = f.text or ""
-                            elif ft == "UTCLTA":     utc_arr  = f.text or ""
-
-                        for child in leg:
-                            if child.tag.split('}')[-1] == "Duration":
-                                duration = child.text or ""
+                            if ft == "CarrierCode":   carrier  = f.text or ""
+                            elif ft == "Number":      number   = f.text or ""
+                            elif ft == "FromAirport": dep      = f.text or ""
+                            elif ft == "ToAirport":   arr      = f.text or ""
+                            elif ft == "LCLLTD":      lcl_dep  = f.text or ""
+                            elif ft == "LCLLTA":      lcl_arr  = f.text or ""
+                            elif ft == "UTCLTD":      utc_dep  = f.text or ""
+                            elif ft == "UTCLTA":      utc_arr  = f.text or ""
 
                         dep_lcl = parse_dt(lcl_dep)
                         arr_lcl = parse_dt(lcl_arr)
@@ -458,32 +551,23 @@ def parse(xml_data, crew_by_pairing):
                             description_lines.append(f"Block {fmt_block(duration)}")
                         description_lines.append("")
 
-                    # ── Layover leg ──
+                    # ── Layover ──
                     elif leg_type == "Layover":
-                        for child in leg:
-                            if child.tag.split('}')[-1] == "Layover":
-                                layover_elem = child
-                                hotel   = ""
-                                tel     = ""
-                                email   = ""
-                                lcl_s   = ""
-                                lcl_e   = ""
-                                utc_s   = ""
-                                utc_e   = ""
-
-                                for lc in layover_elem.iter():
+                        utc_s = ""
+                        utc_e = ""
+                        for child in leg_elem:
+                            ct = child.tag.split('}')[-1]
+                            if ct == "UTCStart": utc_s = child.text or ""
+                            elif ct == "UTCEnd": utc_e = child.text or ""
+                            elif ct == "Layover":
+                                hotel = tel = email = lcl_s = lcl_e = ""
+                                for lc in child.iter():
                                     lt = lc.tag.split('}')[-1]
-                                    if lt == "LocationName":   hotel = lc.text or ""
+                                    if lt == "LocationName":    hotel = lc.text or ""
                                     elif lt == "LCLStart":     lcl_s = lc.text or ""
                                     elif lt == "LCLEnd":       lcl_e = lc.text or ""
-                                    elif lt == "WorkTelephone":tel   = lc.text or ""
+                                    elif lt == "WorkTelephone": tel   = lc.text or ""
                                     elif lt == "Email":        email = lc.text or ""
-
-                                # Get UTC times from parent leg
-                                for lc in leg:
-                                    lt = lc.tag.split('}')[-1]
-                                    if lt == "UTCStart": utc_s = lc.text or ""
-                                    elif lt == "UTCEnd": utc_e = lc.text or ""
 
                                 arr_lcl = parse_dt(lcl_s)
                                 dep_lcl = parse_dt(lcl_e)
@@ -509,7 +593,7 @@ def parse(xml_data, crew_by_pairing):
                                     )
                                 description_lines.append("")
 
-        # Add crew
+        # ── Crew ──
         if pairing_code and pairing_code in crew_by_pairing:
             flight_crew, cabin_crew = crew_by_pairing[pairing_code]
             if flight_crew:
@@ -542,7 +626,6 @@ def build_ics(activities):
         event = Event()
         t = title.upper()
 
-        # ── Determine summary/emoji ──
         if "OFF" in t:
             summary = "🟢 DAY OFF"
 
@@ -556,19 +639,17 @@ def build_ics(activities):
             summary = "🟠 RESERVE"
 
         elif "GROUND" in t:
-            # Extract the duty description after "Ground Duty: " or similar
             match = re.search(r':\s*(.+)', title)
             duty  = match.group(1).strip() if match else title
             summary = f"🕹️ {duty}"
 
         elif "TRAINING" in t:
-            # Extract training type e.g. "Training: A340APT" → "A340APT"
+            # Get course code from description first line or title
             match = re.search(r':\s*(.+)', title)
             ttype = match.group(1).strip() if match else title
             summary = f"📘 {ttype}"
 
         elif "PAIRING" in t:
-            # Build route from description
             routes = []
             if description:
                 for line in description.split("\n"):
