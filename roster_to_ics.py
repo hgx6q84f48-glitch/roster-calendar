@@ -50,6 +50,24 @@ def clean(s):
     return re.sub(r"\s+", " ", s).strip()
 
 # =====================================================
+# FORCE CLOSE ALL MODALS
+# =====================================================
+
+def force_close_modals(page):
+    try:
+        page.evaluate("""
+            document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+            document.querySelectorAll('.modal.show').forEach(e => {
+                e.classList.remove('show');
+                e.style.display = 'none';
+            });
+            document.body.classList.remove('modal-open');
+        """)
+        page.wait_for_timeout(800)
+    except:
+        pass
+
+# =====================================================
 # LOGIN
 # =====================================================
 
@@ -109,7 +127,37 @@ def fetch_roster_xml(page):
     raise Exception("❌ Could not find roster response")
 
 # =====================================================
-# FETCH CREW FOR A PAIRING
+# PARSE CREW FROM XML
+# =====================================================
+
+def parse_crew_response(text):
+    crew_lines = []
+    try:
+        root = ET.fromstring(text)
+        for crew_elem in root.iter("Crew"):
+            first    = ""
+            surname  = ""
+            rank     = ""
+            position = ""
+            for child in crew_elem:
+                tag = child.tag.split('}')[-1]
+                val = (child.text or "").strip()
+                if tag == "FirstName":  first    = val
+                elif tag == "Surname":  surname  = val
+                elif tag == "Rank":     rank     = val
+                elif tag == "Position": position = val
+            if first and surname and rank:
+                name = f"{first} {surname}"
+                line = f"{rank}: {name}"
+                if position and position.upper() != rank.upper():
+                    line += f" ({position})"
+                crew_lines.append(line)
+    except Exception as e:
+        print(f"   ⚠️ Crew parse error: {e}")
+    return crew_lines
+
+# =====================================================
+# FETCH CREW FOR ONE PAIRING
 # =====================================================
 
 def fetch_crew_for_pairing(page, row):
@@ -150,70 +198,21 @@ def fetch_crew_for_pairing(page, row):
 
                 if captured:
                     print(f"   📡 Got crew API response!")
-                    # Print more of the response so we can see tag names
-                    print(f"   📄 Raw response (3000 chars):")
-                    print(captured[0][:3000])
-                    crew = parse_crew_response(captured[0])
-                    crew_lines.extend(crew)
+                    crew_lines = parse_crew_response(captured[0])
+                    if crew_lines:
+                        print(f"   ✅ Parsed {len(crew_lines)} crew members")
                     break
             except Exception as e:
                 print(f"   ⚠️ Could not click leg {j+1}: {e}")
                 continue
 
-        # Close crewListModal if it opened
-        try:
-            crew_modal = page.locator("#crewListModal")
-            if crew_modal.is_visible(timeout=2000):
-                crew_modal.locator("button").first.click()
-                page.wait_for_timeout(1500)
-                print("   🚪 crewListModal closed")
-        except:
-            pass
-
-        # Close pairingModal
-        try:
-            modal.locator("button[data-dismiss='modal'], .btn").first.click()
-            page.wait_for_timeout(1500)
-            print("   🚪 pairingModal closed")
-        except:
-            pass
-
-        # Make sure backdrop is gone before moving on
-        page.wait_for_selector(
-            ".modal-backdrop",
-            state="hidden",
-            timeout=5000
-        )
-
     except Exception as e:
         print(f"   ⚠️ Could not fetch crew: {e}")
-        try:
-            page.evaluate("document.querySelectorAll('.modal-backdrop').forEach(e => e.remove())")
-            page.evaluate("document.querySelectorAll('.modal.show').forEach(e => e.classList.remove('show'))")
-            page.wait_for_timeout(1000)
-        except:
-            pass
 
     finally:
         page.remove_listener("response", on_response)
+        force_close_modals(page)
 
-    return crew_lines
-
-# =====================================================
-# PARSE CREW RESPONSE
-# =====================================================
-
-def parse_crew_response(text):
-    crew_lines = []
-    try:
-        root = ET.fromstring(text)
-        # Print ALL tags to see the structure
-        for elem in root.iter():
-            tag = elem.tag.split('}')[-1]
-            if elem.text and elem.text.strip():
-                print(f"   🏷  {tag} = {elem.text.strip()[:80]}")
-    except Exception as e:
-        print(f"   ⚠️ XML parse error: {e}")
     return crew_lines
 
 # =====================================================
@@ -223,6 +222,7 @@ def parse_crew_response(text):
 def fetch_all_crew(page):
     print("\n🧑‍✈️ Fetching crew data for all pairings...")
 
+    # Dismiss notify modal
     try:
         notify = page.locator("#notifyModal")
         if notify.is_visible(timeout=3000):
@@ -238,6 +238,7 @@ def fetch_all_crew(page):
 
         if month_offset > 0:
             print(f"\n   ➡️  Navigating to next month...")
+            force_close_modals(page)
             try:
                 next_btn = page.locator("button.fc-next-button").first
                 next_btn.click(timeout=10000)
@@ -256,37 +257,47 @@ def fetch_all_crew(page):
         count = pairing_elems.count()
         print(f"   ✈️  Found {count} pairing elements")
 
+        seen_codes = set()
+
         for i in range(count):
             try:
                 elem = pairing_elems.nth(i)
-                label = elem.inner_text().strip()[:60]
+                label = elem.inner_text().strip()
 
-                if label in crew_by_pairing:
-                    print(f"   ⏭  Already have: {label}")
+                match = re.search(r'Pairing:\s*(\S+)', label)
+                if not match:
+                    continue
+                pairing_code = match.group(1)
+
+                if pairing_code in crew_by_pairing or pairing_code in seen_codes:
+                    print(f"   ⏭  Already have: {pairing_code}")
                     continue
 
-                print(f"\n   🖱  Clicking: {label}")
+                seen_codes.add(pairing_code)
+                print(f"\n   🖱  Clicking: {pairing_code}")
                 crew = fetch_crew_for_pairing(page, elem)
 
-                crew_by_pairing[label] = crew
+                crew_by_pairing[pairing_code] = crew
+
                 if crew:
-                    print(f"   ✅ Got {len(crew)} crew members:")
+                    print(f"   ✅ {len(crew)} crew members:")
                     for c in crew:
                         print(f"      {c}")
                 else:
                     print(f"   ⚠️  No crew found")
 
-                page.wait_for_timeout(1000)
+                page.wait_for_timeout(500)
 
             except Exception as e:
-                print(f"   ⚠️  Error: {e}")
+                print(f"   ⚠️  Error on pairing {i+1}: {e}")
+                force_close_modals(page)
                 continue
 
-    print(f"\n✅ Done — {len(crew_by_pairing)} pairings processed")
+    print(f"\n✅ Done — {len(crew_by_pairing)} pairings with data")
     return crew_by_pairing
 
 # =====================================================
-# PARSE XML
+# PARSE ROSTER XML
 # =====================================================
 
 def parse(xml_data, crew_by_pairing):
@@ -329,9 +340,17 @@ def parse(xml_data, crew_by_pairing):
             description_lines.append("")
 
         pairing = None
+        pairing_code = ""
         for elem in activity:
             if "Pairing" in elem.tag:
                 pairing = elem
+                pairing_code = elem.get("Code") or elem.get("Id") or ""
+                if not pairing_code:
+                    for child in elem:
+                        ct = child.tag.split('}')[-1]
+                        if ct in ("Code", "PairingCode", "Id"):
+                            pairing_code = (child.text or "").strip()
+                            break
                 break
 
         if pairing is not None:
@@ -425,16 +444,19 @@ def parse(xml_data, crew_by_pairing):
 
                 description_lines.append("")
 
-        # Match crew to this activity by date
+        # Match crew — try pairing code first, then date
         crew = []
-        date_str = start_dt.strftime("%Y-%m-%d")
-        for key, val in crew_by_pairing.items():
-            if date_str in key:
-                crew = val
-                break
+        if pairing_code and pairing_code in crew_by_pairing:
+            crew = crew_by_pairing[pairing_code]
+        else:
+            date_str = start_dt.strftime("%Y-%m-%d")
+            for key, val in crew_by_pairing.items():
+                if date_str in key:
+                    crew = val
+                    break
 
         if crew:
-            description_lines.append("Crew")
+            description_lines.append("── Crew ──")
             description_lines.extend(crew)
             description_lines.append("")
 
