@@ -268,6 +268,7 @@ def fetch_all_crew(page):
         pass
 
     crew_by_pairing = {}
+    seen_codes = set()  # outside month loop so we don't retry same pairing
 
     for month_offset in range(3):
 
@@ -288,35 +289,21 @@ def fetch_all_crew(page):
         except:
             print(f"\n   📅 Scanning month {month_offset + 1}")
 
-        # Print all theme classes to find pairing theme
-        themes = page.evaluate("""
-            () => Array.from(new Set(
-                Array.from(document.querySelectorAll('.fc-event'))
-                .map(e => Array.from(e.classList).find(c => c.startsWith('cma-generic-theme')))
-                .filter(Boolean)
-            ))
-        """)
-        print(f"   🎨 Themes found: {themes}")
-
-        # Try pairing theme first, then fall back to checking all events
+        # Find pairing elements by class
         pairing_elems = page.locator(".fc-event.cma-generic-theme-pairing")
         count = pairing_elems.count()
 
         if count == 0:
-            # Try alternative theme name
             pairing_elems = page.locator(".fc-event[class*='pairing']")
             count = pairing_elems.count()
 
         print(f"   ✈️  Found {count} pairing elements")
-
-        seen_codes = set()
 
         for i in range(count):
             try:
                 elem = pairing_elems.nth(i)
                 label = elem.inner_text().strip()[:60]
 
-                # Extract pairing code from text
                 match = re.search(r'([A-Z0-9]+-[A-Z0-9]+[A-Z])', label)
                 pairing_code = match.group(1) if match else label[:20]
 
