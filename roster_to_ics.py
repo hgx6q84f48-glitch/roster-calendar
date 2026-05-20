@@ -126,7 +126,7 @@ def fetch_roster_xml(page):
     page.on("response", lambda r: responses.append(r))
     page.reload()
     page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(5000)
+    page.wait_for_timeout(10000)
     for response in responses:
         try:
             if "crewApi" not in response.url:
