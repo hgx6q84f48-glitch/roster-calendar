@@ -129,7 +129,7 @@ def fetch_roster_xml(page):
     page.wait_for_timeout(10000)
     for response in responses:
         try:
-            if "crewApi" not in response.url:
+            if "ws_proxy.php" not in response.url:
                 continue
             text = response.text()
             if "RosterResponse" in text:
@@ -199,7 +199,7 @@ def fetch_crew_for_pairing(page, row):
     captured    = []
 
     def on_response(response):
-        if "crewApi" not in response.url:
+        if "ws_proxy.php" not in response.url:
             return
         try:
             text = response.text()
@@ -473,12 +473,12 @@ def parse(xml_data, crew_by_pairing):
                     for child in elem:
                         ct  = child.tag.split('}')[-1]
                         val = (child.text or "").strip()
-                        if ct == "Code":      res_code    = val
-                        elif ct == "Airport": res_airport = val
-                        elif ct == "LCLStart": res_lcl_s  = val
-                        elif ct == "LCLEnd":   res_lcl_e  = val
-                        elif ct == "UTCStart": res_utc_s  = val
-                        elif ct == "UTCEnd":   res_utc_e  = val
+                        if ct == "Code":       res_code    = val
+                        elif ct == "Airport":  res_airport = val
+                        elif ct == "LCLStart": res_lcl_s   = val
+                        elif ct == "LCLEnd":   res_lcl_e   = val
+                        elif ct == "UTCStart": res_utc_s   = val
+                        elif ct == "UTCEnd":   res_utc_e   = val
 
             lcl_s = parse_dt(res_lcl_s)
             lcl_e = parse_dt(res_lcl_e)
@@ -508,7 +508,7 @@ def parse(xml_data, crew_by_pairing):
             continue
 
         # =====================================================
-        # REPORT TIME (pairing + other duties)
+        # REPORT TIME
         # =====================================================
         report_airport = ""
 
@@ -520,7 +520,6 @@ def parse(xml_data, crew_by_pairing):
                 description_lines.append(
                     f"{fmt_local(r_lcl)} ({fmt_utc(r_utc)})"
                 )
-                # Airport added after we find the first flight leg
                 description_lines.append("__AIRPORT__")
                 description_lines.append("")
 
@@ -551,7 +550,6 @@ def parse(xml_data, crew_by_pairing):
                         if child.tag.split('}')[-1] == "Type":
                             leg_type = child.text or ""
 
-                    # ── Flight ──
                     if leg_type == "Flight":
                         flight_elem = None
                         duration    = ""
@@ -565,20 +563,18 @@ def parse(xml_data, crew_by_pairing):
 
                         carrier = number = dep = arr = ""
                         lcl_dep = lcl_arr = utc_dep = utc_arr = ""
-                        dep_airport_name = ""
 
                         for f in flight_elem.iter():
                             ft = f.tag.split('}')[-1]
-                            if ft == "CarrierCode":   carrier          = f.text or ""
-                            elif ft == "Number":      number           = f.text or ""
-                            elif ft == "FromAirport": dep              = f.text or ""
-                            elif ft == "ToAirport":   arr              = f.text or ""
-                            elif ft == "LCLLTD":      lcl_dep          = f.text or ""
-                            elif ft == "LCLLTA":      lcl_arr          = f.text or ""
-                            elif ft == "UTCLTD":      utc_dep          = f.text or ""
-                            elif ft == "UTCLTA":      utc_arr          = f.text or ""
+                            if ft == "CarrierCode":   carrier  = f.text or ""
+                            elif ft == "Number":      number   = f.text or ""
+                            elif ft == "FromAirport": dep      = f.text or ""
+                            elif ft == "ToAirport":   arr      = f.text or ""
+                            elif ft == "LCLLTD":      lcl_dep  = f.text or ""
+                            elif ft == "LCLLTA":      lcl_arr  = f.text or ""
+                            elif ft == "UTCLTD":      utc_dep  = f.text or ""
+                            elif ft == "UTCLTA":      utc_arr  = f.text or ""
 
-                        # Use first flight's departure airport for report
                         if first_flight and dep:
                             report_airport = dep
                             first_flight = False
@@ -606,7 +602,6 @@ def parse(xml_data, crew_by_pairing):
                             description_lines.append(f"Block {fmt_block(duration)}")
                         description_lines.append("")
 
-                    # ── Layover ──
                     elif leg_type == "Layover":
                         utc_s = ""
                         utc_e = ""
@@ -648,7 +643,6 @@ def parse(xml_data, crew_by_pairing):
                                     )
                                 description_lines.append("")
 
-        # ── Crew ──
         if pairing_code and pairing_code in crew_by_pairing:
             flight_crew, cabin_crew = crew_by_pairing[pairing_code]
             if flight_crew:
@@ -660,15 +654,10 @@ def parse(xml_data, crew_by_pairing):
                 description_lines.extend(cabin_crew)
                 description_lines.append("")
 
-        # Replace airport placeholder
-        # We need to look up the full airport name from the XML
-        # For now use the IATA code — we'll use what we have
         description_lines = [
             report_airport if line == "__AIRPORT__" else line
             for line in description_lines
         ]
-
-        # Remove blank airport placeholder if nothing found
         description_lines = [
             line for line in description_lines
             if line != "__AIRPORT__"
