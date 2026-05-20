@@ -288,26 +288,25 @@ def fetch_all_crew(page):
         except:
             print(f"\n   📅 Scanning month {month_offset + 1}")
 
-        # Find all elements with onclick containing display_activity_details
-        # and text containing Pairing
-        all_clickable = page.locator("[onclick*='display_activity_details']")
-        total = all_clickable.count()
-        print(f"   🔍 Total clickable activities: {total}")
+        # Print all theme classes to find pairing theme
+        themes = page.evaluate("""
+            () => Array.from(new Set(
+                Array.from(document.querySelectorAll('.fc-event'))
+                .map(e => Array.from(e.classList).find(c => c.startsWith('cma-generic-theme')))
+                .filter(Boolean)
+            ))
+        """)
+        print(f"   🎨 Themes found: {themes}")
 
-        # Print first few to see what they look like
-        for i in range(min(5, total)):
-            try:
-                txt = all_clickable.nth(i).inner_text().strip()[:60]
-                onclick = all_clickable.nth(i).get_attribute("onclick") or ""
-                print(f"      [{i}] {txt} | onclick: {onclick[:40]}")
-            except:
-                pass
-
-        # Filter to pairings only
-        pairing_elems = page.locator(
-            "[onclick*='display_activity_details']:has-text('Pairing')"
-        )
+        # Try pairing theme first, then fall back to checking all events
+        pairing_elems = page.locator(".fc-event.cma-generic-theme-pairing")
         count = pairing_elems.count()
+
+        if count == 0:
+            # Try alternative theme name
+            pairing_elems = page.locator(".fc-event[class*='pairing']")
+            count = pairing_elems.count()
+
         print(f"   ✈️  Found {count} pairing elements")
 
         seen_codes = set()
@@ -315,12 +314,11 @@ def fetch_all_crew(page):
         for i in range(count):
             try:
                 elem = pairing_elems.nth(i)
-                label = elem.inner_text().strip()
+                label = elem.inner_text().strip()[:60]
 
-                match = re.search(r'Pairing:\s*(\S+)', label)
-                if not match:
-                    continue
-                pairing_code = match.group(1)
+                # Extract pairing code from text
+                match = re.search(r'([A-Z0-9]+-[A-Z0-9]+[A-Z])', label)
+                pairing_code = match.group(1) if match else label[:20]
 
                 if pairing_code in seen_codes:
                     print(f"   ⏭  Already have: {pairing_code}")
