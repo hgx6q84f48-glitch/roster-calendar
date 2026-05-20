@@ -191,11 +191,9 @@ def parse_crew_response(text):
 
 # =====================================================
 # FETCH CREW FOR ONE PAIRING
-# Uses JavaScript to call display_activity_details()
-# directly, then intercepts the crew API response
 # =====================================================
 
-def fetch_crew_for_pairing(page, activity_id):
+def fetch_crew_for_pairing(page, elem):
     flight_crew = []
     cabin_crew  = []
     captured    = []
@@ -215,8 +213,7 @@ def fetch_crew_for_pairing(page, activity_id):
     page.on("response", on_response)
 
     try:
-        # Click the activity using JavaScript to trigger display_activity_details
-        page.evaluate(f"display_activity_details({activity_id})")
+        elem.click(timeout=10000)
         page.wait_for_timeout(2000)
 
         modal = page.locator("#pairingModal")
@@ -255,11 +252,9 @@ def fetch_crew_for_pairing(page, activity_id):
 
 # =====================================================
 # FETCH ALL CREW
-# Gets activity IDs from the roster XML and uses
-# JavaScript to trigger the pairing modal directly
 # =====================================================
 
-def fetch_all_crew(page, xml_data):
+def fetch_all_crew(page):
     print("\n🧑‍✈️ Fetching crew data for all pairings...")
 
     # Dismiss notify modal
@@ -272,64 +267,82 @@ def fetch_all_crew(page, xml_data):
     except:
         pass
 
-    # Get all activity IDs from JavaScript
-    try:
-        activities_js = page.evaluate("""
-            () => {
-                if (typeof cma_getActivities === 'function') {
-                    return cma_getActivities();
-                }
-                if (typeof window.activities !== 'undefined') {
-                    return window.activities;
-                }
-                return [];
-            }
-        """)
-        print(f"   Found {len(activities_js)} activities in JS")
-    except Exception as e:
-        print(f"   ⚠️ Could not get activities from JS: {e}")
-        activities_js = []
-
     crew_by_pairing = {}
 
-    # Filter to only pairing activities (type 0)
-    pairing_activities = [a for a in activities_js if isinstance(a, dict) and a.get('type') == 0]
-    print(f"   ✈️  Found {len(pairing_activities)} pairing activities")
+    for month_offset in range(3):
 
-    seen_codes = set()
-
-    for activity in pairing_activities:
-        try:
-            activity_id = activity.get('id') or activity.get('activityId')
-            pairing_list = activity.get('pairing', [])
-            pairing_code = ""
-            if pairing_list and len(pairing_list) > 0:
-                pairing_code = pairing_list[0].get('code', '')
-
-            if not activity_id:
-                continue
-
-            if pairing_code in seen_codes:
-                print(f"   ⏭  Already have: {pairing_code}")
-                continue
-
-            print(f"\n   🖱  Fetching crew for pairing: {pairing_code} (id: {activity_id})")
-            seen_codes.add(pairing_code)
-
-            flight_crew, cabin_crew = fetch_crew_for_pairing(page, activity_id)
-            crew_by_pairing[pairing_code] = (flight_crew, cabin_crew)
-
-            if flight_crew or cabin_crew:
-                print(f"   ✅ {len(flight_crew)} flight crew, {len(cabin_crew)} cabin crew")
-            else:
-                print(f"   ⚠️  No crew found")
-
-            page.wait_for_timeout(500)
-
-        except Exception as e:
-            print(f"   ⚠️  Error: {e}")
+        if month_offset > 0:
+            print(f"\n   ➡️  Navigating to next month...")
             force_close_modals(page)
-            continue
+            try:
+                next_btn = page.locator("button.fc-next-button").first
+                next_btn.click(timeout=10000)
+                page.wait_for_timeout(3000)
+            except Exception as e:
+                print(f"   ⚠️ Could not navigate: {e}")
+                break
+
+        try:
+            month_label = page.locator("h2, .fc-toolbar-title").first.inner_text()
+            print(f"\n   📅 Scanning: {month_label}")
+        except:
+            print(f"\n   📅 Scanning month {month_offset + 1}")
+
+        # Find all elements with onclick containing display_activity_details
+        # and text containing Pairing
+        all_clickable = page.locator("[onclick*='display_activity_details']")
+        total = all_clickable.count()
+        print(f"   🔍 Total clickable activities: {total}")
+
+        # Print first few to see what they look like
+        for i in range(min(5, total)):
+            try:
+                txt = all_clickable.nth(i).inner_text().strip()[:60]
+                onclick = all_clickable.nth(i).get_attribute("onclick") or ""
+                print(f"      [{i}] {txt} | onclick: {onclick[:40]}")
+            except:
+                pass
+
+        # Filter to pairings only
+        pairing_elems = page.locator(
+            "[onclick*='display_activity_details']:has-text('Pairing')"
+        )
+        count = pairing_elems.count()
+        print(f"   ✈️  Found {count} pairing elements")
+
+        seen_codes = set()
+
+        for i in range(count):
+            try:
+                elem = pairing_elems.nth(i)
+                label = elem.inner_text().strip()
+
+                match = re.search(r'Pairing:\s*(\S+)', label)
+                if not match:
+                    continue
+                pairing_code = match.group(1)
+
+                if pairing_code in seen_codes:
+                    print(f"   ⏭  Already have: {pairing_code}")
+                    continue
+
+                seen_codes.add(pairing_code)
+                print(f"\n   🖱  Clicking: {pairing_code}")
+                flight_crew, cabin_crew = fetch_crew_for_pairing(page, elem)
+
+                crew_by_pairing[pairing_code] = (flight_crew, cabin_crew)
+
+                if flight_crew or cabin_crew:
+                    print(f"   ✅ {len(flight_crew)} flight crew, {len(cabin_crew)} cabin crew")
+                else:
+                    print(f"   ⚠️  No crew found")
+
+                page.wait_for_timeout(500)
+
+            except Exception as e:
+                print(f"   ⚠️  Error on pairing {i+1}: {e}")
+                force_close_modals(page)
+                continue
 
     print(f"\n✅ Done — {len(crew_by_pairing)} pairings with crew data")
     return crew_by_pairing
@@ -744,7 +757,7 @@ if __name__ == "__main__":
         playwright, browser, context, page = login()
         open_roster(page)
         xml_data = fetch_roster_xml(page)
-        crew_by_pairing = fetch_all_crew(page, xml_data)
+        crew_by_pairing = fetch_all_crew(page)
         activities = parse(xml_data, crew_by_pairing)
         cal = build_ics(activities)
         save(cal)
