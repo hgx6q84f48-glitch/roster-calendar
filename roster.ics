@@ -23,14 +23,7 @@ DESCRIPTION:Report\n12 Jul 19:25L (17:25Z)\nJNB\n\n12 Jul\nSA280  JNB →
  PER\nDep 20:55L (18:55Z)\nArr 13 Jul 12:20L (04:20Z)\nBlock 09h25\n\nLayov
  er\nRendevous Hotel\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\n
  Arr 13 Jul 12:20L (04:20Z)\nDep 14 Jul 23:50L (15:50Z)\n\n14 Jul\nSA281  P
- ER → JNB\nDep 23:50L (15:50Z)\nArr 15 Jul 05:15L (03:15Z)\nBlock 11h25\n
- \n── Flight Crew ──\nCaptain: Ian Jackson (Training Captain)\nFirs
- t Officer: Giovanni Titus (Co-Pilot)\nFirst Officer: Vaughan Chapman (Pilo
- t under Supervision)\n\n── Cabin Crew ──\nCabin Crew: Helena Vande
- keere\nPurser: Samantha Skosana\nCabin Crew: Talia Odendaal (AB-INITIO)\nC
- abin Crew: Dimakatso Mathibe\nCabin Crew: Darrel Lourie\nCabin Crew: Thape
- lo Malaka (AB-INITIO)\nCabin Crew: Ayanda Phahlane\nCabin Crew: Simpiwe Na
- ko\nCabin Crew: Thandisizwe Hashe\nCabin Crew: Nombuso Ngobeni
+ ER → JNB\nDep 23:50L (15:50Z)\nArr 15 Jul 05:15L (03:15Z)\nBlock 11h25
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -98,14 +91,7 @@ DESCRIPTION:Report\n27 Jun 19:25L (17:25Z)\nJNB\n\n27 Jun\nSA280  JNB →
  PER\nDep 20:55L (18:55Z)\nArr 28 Jun 12:20L (04:20Z)\nBlock 09h25\n\nLayov
  er\nRendevous Hotel\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\n
  Arr 28 Jun 12:20L (04:20Z)\nDep 29 Jun 23:50L (15:50Z)\n\n29 Jun\nSA281  P
- ER → JNB\nDep 23:50L (15:50Z)\nArr 30 Jun 05:15L (03:15Z)\nBlock 11h25\n
- \n── Flight Crew ──\nCaptain: Ian Jackson (Training Captain)\nFirs
- t Officer: Giovanni Titus (Co-Pilot)\nFirst Officer: Vaughan Chapman (Pilo
- t under Supervision)\n\n── Cabin Crew ──\nCabin Crew: Helena Vande
- keere\nPurser: Samantha Skosana\nCabin Crew: Talia Odendaal (AB-INITIO)\nC
- abin Crew: Dimakatso Mathibe\nCabin Crew: Darrel Lourie\nCabin Crew: Thape
- lo Malaka (AB-INITIO)\nCabin Crew: Ayanda Phahlane\nCabin Crew: Simpiwe Na
- ko\nCabin Crew: Thandisizwe Hashe\nCabin Crew: Nombuso Ngobeni
+ ER → JNB\nDep 23:50L (15:50Z)\nArr 30 Jun 05:15L (03:15Z)\nBlock 11h25
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -132,11 +118,22 @@ DTEND:20260623T200000
 DESCRIPTION:Report\n23 Jun 08:00L (06:00Z)
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:🟠 RESERVE
-DTSTART:20260622T113000
-DTEND:20260622T223000
-DESCRIPTION:Reserve Window\n11:30L (09:30Z) - 22:30L (20:30Z)\n\nType: PMT
- R\nBase: Johannesburg Int'l
+SUMMARY:✈️ JNB-MRU-JNB
+DTSTART:20260622T082500
+DTEND:20260622T193000
+DESCRIPTION:Report\n22 Jun 08:25L (06:25Z)\nJNB\n\n22 Jun\nSA190  JNB → 
+ MRU\nDep 09:40L (07:40Z)\nArr 22 Jun 15:40L (11:40Z)\nBlock 04h00\n\nLayov
+ er\nSir Seewoosagur Ramgoolam Int'l\nTel: 002306373312\nArr 22 Jun 15:40L 
+ (11:40Z)\nDep 22 Jun 16:40L (12:40Z)\n\n22 Jun\nSA191  MRU → JNB\nDep 16
+ :40L (12:40Z)\nArr 22 Jun 19:00L (17:00Z)\nBlock 04h20\n\n── Flight Cr
+ ew ──\nCaptain: Thomas Williamson (Training Captain)\nFirst Officer: G
+ iovanni Titus (Co-Pilot)\nFirst Officer: Vaughan Chapman (Pilot under Supe
+ rvision)\n\n── Cabin Crew ──\nPurser: Alison Smith\nCabin Crew: An
+ a Lourenco\nCabin Crew: Ushma Galal (AB-INITIO)\nCabin Crew: Ashli Naidu\n
+ Cabin Crew: Lebelo Kekana\nCabin Crew: Desmond Kodisang\nCabin Crew: Kesen
+ tseng Seritsane\nCabin Crew: Martin Waterson\nCabin Crew: Ronewa Nethulwe\
+ nCabin Crew: Ruth Nekene (AB-INITIO)\nCabin Crew: Leeanne Zane Rosaly Sche
+ epers (FAM FLIGHT)\nCabin Crew: Shyvoghn Ndlovu (FAM FLIGHT)
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
