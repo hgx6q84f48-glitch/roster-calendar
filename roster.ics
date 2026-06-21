@@ -20,10 +20,12 @@ SUMMARY:✈️ JNB-PER-JNB
 DTSTART:20260712T192500
 DTEND:20260715T054500
 DESCRIPTION:Report\n12 Jul 19:25L (17:25Z)\nJNB\n\n12 Jul\nSA280  JNB → 
- PER\nDep 20:55L (18:55Z)\nArr 13 Jul 12:20L (04:20Z)\nBlock 09h25\n\nLayov
- er\nRendevous Hotel\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\n
- Arr 13 Jul 12:20L (04:20Z)\nDep 14 Jul 23:50L (15:50Z)\n\n14 Jul\nSA281  P
- ER → JNB\nDep 23:50L (15:50Z)\nArr 15 Jul 05:15L (03:15Z)\nBlock 11h25
+ PER\nDep 20:55L (18:55Z)\nArr 13 Jul 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 13 Jul 12:20L
+  (04:20Z)\nDep 14 Jul 23:50L (15:50Z)\n\n14 Jul\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 15 Jul 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -88,10 +90,12 @@ SUMMARY:✈️ JNB-PER-JNB
 DTSTART:20260627T192500
 DTEND:20260630T054500
 DESCRIPTION:Report\n27 Jun 19:25L (17:25Z)\nJNB\n\n27 Jun\nSA280  JNB → 
- PER\nDep 20:55L (18:55Z)\nArr 28 Jun 12:20L (04:20Z)\nBlock 09h25\n\nLayov
- er\nRendevous Hotel\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\n
- Arr 28 Jun 12:20L (04:20Z)\nDep 29 Jun 23:50L (15:50Z)\n\n29 Jun\nSA281  P
- ER → JNB\nDep 23:50L (15:50Z)\nArr 30 Jun 05:15L (03:15Z)\nBlock 11h25
+ PER\nDep 20:55L (18:55Z)\nArr 28 Jun 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Jun 12:20L
+  (04:20Z)\nDep 29 Jun 23:50L (15:50Z)\n\n29 Jun\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 30 Jun 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -122,19 +126,20 @@ SUMMARY:✈️ JNB-MRU-JNB
 DTSTART:20260622T082500
 DTEND:20260622T193000
 DESCRIPTION:Report\n22 Jun 08:25L (06:25Z)\nJNB\n\n22 Jun\nSA190  JNB → 
- MRU\nDep 09:40L (07:40Z)\nArr 22 Jun 15:40L (11:40Z)\nBlock 04h00\n\nLayov
- er\nSir Seewoosagur Ramgoolam Int'l\nTel: 002302088792\nArr 22 Jun 15:40L 
- (11:40Z)\nDep 22 Jun 16:40L (12:40Z)\n\n22 Jun\nSA191  MRU → JNB\nDep 16
- :40L (12:40Z)\nArr 22 Jun 19:00L (17:00Z)\nBlock 04h20\n\n── Flight Cr
- ew ──\nCaptain: Thomas Williamson (Training Captain)\nFirst Officer: C
- harles Bron (Co-Pilot)\nFirst Officer: Vaughan Chapman (Pilot under Superv
- ision)\n\n── Cabin Crew ──\nCabin Crew: Herman Jansen (PAX)\nPurse
- r: Alison Smith\nCabin Crew: Ana Lourenco\nCabin Crew: Ushma Galal (AB-INI
- TIO)\nCabin Crew: Ashli Naidu\nCabin Crew: Lebelo Kekana\nCabin Crew: Desm
- ond Kodisang\nCabin Crew: Kesentseng Seritsane\nCabin Crew: Taylor Mokwena
- \nCabin Crew: Ronewa Nethulwe\nCabin Crew: Ruth Nekene (AB-INITIO)\nCabin 
- Crew: Leeanne Zane Rosaly Scheepers (FAM FLIGHT)\nCabin Crew: Shyvoghn Ndl
- ovu (FAM FLIGHT)
+ MRU\nDep 09:40L (07:40Z)\nArr 22 Jun 15:40L (11:40Z)\nBlock 04h00\nTrack: 
+ https://www.flightradar24.com/data/flights/sa190\n\nLayover\nSir Seewoosag
+ ur Ramgoolam Int'l\nTel: 002302088792\nArr 22 Jun 15:40L (11:40Z)\nDep 22 
+ Jun 16:40L (12:40Z)\n\n22 Jun\nSA191  MRU → JNB\nDep 16:40L (12:40Z)\nAr
+ r 22 Jun 19:00L (17:00Z)\nBlock 04h20\nTrack: https://www.flightradar24.co
+ m/data/flights/sa191\n\n── Flight Crew ──\nCaptain: Thomas William
+ son (Training Captain)\nFirst Officer: Charles Bron (Co-Pilot)\nFirst Offi
+ cer: Vaughan Chapman (Pilot under Supervision)\n\n── Cabin Crew ──
+ \nCabin Crew: Herman Jansen (PAX)\nPurser: Alison Smith\nCabin Crew: Ana L
+ ourenco\nCabin Crew: Ushma Galal (AB-INITIO)\nCabin Crew: Ashli Naidu\nCab
+ in Crew: Lebelo Kekana\nCabin Crew: Desmond Kodisang\nCabin Crew: Kesentse
+ ng Seritsane\nCabin Crew: Taylor Mokwena\nCabin Crew: Ronewa Nethulwe\nCab
+ in Crew: Ruth Nekene (AB-INITIO)\nCabin Crew: Leeanne Zane Rosaly Scheeper
+ s (FAM FLIGHT)\nCabin Crew: Shyvoghn Ndlovu (FAM FLIGHT)
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
