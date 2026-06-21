@@ -236,6 +236,27 @@ def fetch_crew_for_pairing(page, elem):
                     flight_crew, cabin_crew = parse_crew_response(captured[0])
                     if flight_crew or cabin_crew:
                         print(f"   ✅ {len(flight_crew)} flight crew, {len(cabin_crew)} cabin crew")
+
+                    # Explicitly close crewListModal first
+                    try:
+                        crew_modal = page.locator("#crewListModal")
+                        if crew_modal.is_visible(timeout=2000):
+                            print("   🚪 Closing crewListModal...")
+                            crew_modal.locator("button").first.click()
+                            page.wait_for_timeout(1500)
+                    except:
+                        pass
+
+                    # Then close pairingModal
+                    try:
+                        close_btn = modal.locator("button").first
+                        if close_btn.is_visible(timeout=2000):
+                            print("   🚪 Closing pairingModal...")
+                            close_btn.click()
+                            page.wait_for_timeout(1500)
+                    except:
+                        pass
+
                     break
             except Exception as e:
                 print(f"   ⚠️ Could not click leg {j+1}: {e}")
@@ -246,6 +267,7 @@ def fetch_crew_for_pairing(page, elem):
 
     finally:
         page.remove_listener("response", on_response)
+        # Force clear everything just in case
         force_close_modals(page)
 
     return flight_crew, cabin_crew
@@ -595,7 +617,6 @@ def parse(xml_data, crew_by_pairing):
                         )
                         if duration:
                             description_lines.append(f"Block {fmt_block(duration)}")
-                        # FlightRadar24 tracking link
                         description_lines.append(
                             f"Track: https://www.flightradar24.com/data/flights/{carrier.lower()}{number}"
                         )
