@@ -76,7 +76,7 @@ def force_close_modals(page):
             });
             document.body.classList.remove('modal-open');
         """)
-        page.wait_for_timeout(800)
+        page.wait_for_timeout(2000)
     except:
         pass
 
@@ -257,7 +257,6 @@ def fetch_crew_for_pairing(page, elem):
 def fetch_all_crew(page):
     print("\n🧑‍✈️ Fetching crew data for all pairings...")
 
-    # Dismiss notify modal
     try:
         notify = page.locator("#notifyModal")
         if notify.is_visible(timeout=3000):
@@ -268,7 +267,7 @@ def fetch_all_crew(page):
         pass
 
     crew_by_pairing = {}
-    seen_codes = set()  # outside month loop so we don't retry same pairing
+    seen_codes = set()
 
     for month_offset in range(3):
 
@@ -289,7 +288,6 @@ def fetch_all_crew(page):
         except:
             print(f"\n   📅 Scanning month {month_offset + 1}")
 
-        # Find pairing elements by class
         pairing_elems = page.locator(".fc-event.cma-generic-theme-pairing")
         count = pairing_elems.count()
 
@@ -322,7 +320,7 @@ def fetch_all_crew(page):
                 else:
                     print(f"   ⚠️  No crew found")
 
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(2000)
 
             except Exception as e:
                 print(f"   ⚠️  Error on pairing {i+1}: {e}")
@@ -597,6 +595,10 @@ def parse(xml_data, crew_by_pairing):
                         )
                         if duration:
                             description_lines.append(f"Block {fmt_block(duration)}")
+                        # FlightRadar24 tracking link
+                        description_lines.append(
+                            f"Track: https://www.flightradar24.com/data/flights/{carrier.lower()}{number}"
+                        )
                         description_lines.append("")
 
                     elif leg_type == "Layover":
