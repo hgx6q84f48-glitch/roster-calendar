@@ -237,7 +237,7 @@ def fetch_crew_for_pairing(page, elem):
                     if flight_crew or cabin_crew:
                         print(f"   ✅ {len(flight_crew)} flight crew, {len(cabin_crew)} cabin crew")
 
-                    # Explicitly close crewListModal first
+                    # Close crewListModal first
                     try:
                         crew_modal = page.locator("#crewListModal")
                         if crew_modal.is_visible(timeout=2000):
@@ -267,13 +267,14 @@ def fetch_crew_for_pairing(page, elem):
 
     finally:
         page.remove_listener("response", on_response)
-        # Force clear everything just in case
         force_close_modals(page)
 
     return flight_crew, cabin_crew
 
 # =====================================================
 # FETCH ALL CREW
+# Key is "PAIRINGCODE|YYYY-MM-DD" so same code on
+# different dates is always fetched independently
 # =====================================================
 
 def fetch_all_crew(page):
@@ -289,7 +290,6 @@ def fetch_all_crew(page):
         pass
 
     crew_by_pairing = {}
-    seen_codes = set()
 
     for month_offset in range(3):
 
@@ -322,20 +322,31 @@ def fetch_all_crew(page):
         for i in range(count):
             try:
                 elem = pairing_elems.nth(i)
-                label = elem.inner_text().strip()[:60]
 
+                # Get the date from the element's position in the calendar
+                # by reading the fc-daygrid-day ancestor's data-date attribute
+                date_str = page.evaluate("""
+                    (el) => {
+                        let parent = el.closest('[data-date]');
+                        return parent ? parent.getAttribute('data-date') : null;
+                    }
+                """, elem.element_handle())
+
+                label = elem.inner_text().strip()[:60]
                 match = re.search(r'([A-Z0-9]+-[A-Z0-9]+[A-Z])', label)
                 pairing_code = match.group(1) if match else label[:20]
 
-                if pairing_code in seen_codes:
-                    print(f"   ⏭  Already have: {pairing_code}")
+                # Unique key = code + date
+                unique_key = f"{pairing_code}|{date_str or 'unknown'}"
+
+                if unique_key in crew_by_pairing:
+                    print(f"   ⏭  Already have: {unique_key}")
                     continue
 
-                seen_codes.add(pairing_code)
-                print(f"\n   🖱  Clicking: {pairing_code}")
+                print(f"\n   🖱  Clicking: {unique_key}")
                 flight_crew, cabin_crew = fetch_crew_for_pairing(page, elem)
 
-                crew_by_pairing[pairing_code] = (flight_crew, cabin_crew)
+                crew_by_pairing[unique_key] = (flight_crew, cabin_crew)
 
                 if flight_crew or cabin_crew:
                     print(f"   ✅ {len(flight_crew)} flight crew, {len(cabin_crew)} cabin crew")
@@ -663,17 +674,30 @@ def parse(xml_data, crew_by_pairing):
                                     )
                                 description_lines.append("")
 
-        # ── Crew ──
-        if pairing_code and pairing_code in crew_by_pairing:
-            flight_crew, cabin_crew = crew_by_pairing[pairing_code]
-            if flight_crew:
-                description_lines.append("── Flight Crew ──")
-                description_lines.extend(flight_crew)
-                description_lines.append("")
-            if cabin_crew:
-                description_lines.append("── Cabin Crew ──")
-                description_lines.extend(cabin_crew)
-                description_lines.append("")
+        # ── Crew — match by pairing code + start date ──
+        if pairing_code:
+            date_key = start_dt.strftime("%Y-%m-%d")
+            unique_key = f"{pairing_code}|{date_key}"
+            crew = crew_by_pairing.get(unique_key)
+
+            # Fallback: try any key that starts with the same date
+            # (handles cases where calendar date differs slightly)
+            if not crew:
+                for k, v in crew_by_pairing.items():
+                    if k.endswith(f"|{date_key}"):
+                        crew = v
+                        break
+
+            if crew:
+                flight_crew, cabin_crew = crew
+                if flight_crew:
+                    description_lines.append("── Flight Crew ──")
+                    description_lines.extend(flight_crew)
+                    description_lines.append("")
+                if cabin_crew:
+                    description_lines.append("── Cabin Crew ──")
+                    description_lines.extend(cabin_crew)
+                    description_lines.append("")
 
         description_lines = [
             report_airport if line == "__AIRPORT__" else line
