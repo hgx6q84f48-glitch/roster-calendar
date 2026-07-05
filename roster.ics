@@ -39,7 +39,7 @@ DESCRIPTION:Report\n12 Jul 19:25L (17:25Z)\nJNB\n\n12 Jul\nSA280  JNB →
  3:50L (15:50Z)\nArr 15 Jul 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
  w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
  in: Merel Van Der Merwe (Training Captain)\nFirst Officer: Mohau Motsoenen
- g (Co-Pilot)\nFirst Officer: Vaughan Chapman (Pilot under Supervision)\n\n
+ g (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n
  ── Cabin Crew ──\nPurser: Agatha Meyers\nCabin Crew: Matome Kobe\n
  Cabin Crew: Themba Modau\nCabin Crew: Musawenkosi Mavuso\nCabin Crew: Monn
  ie Mashishi (AB-INITIO)\nCabin Crew: Joseph Ntsekalle\nCabin Crew: Sello M
@@ -78,10 +78,10 @@ DESCRIPTION:Report\n07 Jul 08:00L (06:00Z)
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
-DTSTART:20260706T113000
+DTSTART:20260706T133000
 DTEND:20260706T223000
-DESCRIPTION:Reserve Window\n11:30L (09:30Z) - 22:30L (20:30Z)\n\nType: PMT
- R\nBase: Johannesburg Int'l
+DESCRIPTION:Reserve Window\n13:30L (11:30Z) - 22:30L (20:30Z)\n\nType: PM3
+ 2\nBase: Johannesburg Int'l
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🎉 LEAVE
