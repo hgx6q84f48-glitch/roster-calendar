@@ -154,36 +154,22 @@ DTSTART:20260906T000000
 DTEND:20260907T000000
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:🟡 OPEN
-DTSTART:20260905T080000
-DTEND:20260905T200000
-DESCRIPTION:Report\n05 Sep 08:00L (06:00Z)
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟡 OPEN
-DTSTART:20260904T080000
-DTEND:20260904T200000
-DESCRIPTION:Report\n04 Sep 08:00L (06:00Z)
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟠 RESERVE
-DTSTART:20260903T060000
-DTEND:20260903T200000
-DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
- O\nBase: Johannesburg Int'l
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟡 OPEN
-DTSTART:20260902T080000
-DTEND:20260902T200000
-DESCRIPTION:Report\n02 Sep 08:00L (06:00Z)
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟠 RESERVE
-DTSTART:20260901T060000
-DTEND:20260901T200000
-DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
- O\nBase: Johannesburg Int'l
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20260901T192500
+DTEND:20260905T054500
+DESCRIPTION:Report\n01 Sep 19:25L (17:25Z)\nJNB\n\n01 Sep\nSA280  JNB → 
+ PER\nDep 20:55L (18:55Z)\nArr 02 Sep 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 02 Sep 12:20L
+  (04:20Z)\nDep 04 Sep 23:50L (15:50Z)\n\n04 Sep\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 05 Sep 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nFirst
+  Officer: Vaughan Chapman (Inflight Relief Seat 3)\nFirst Officer: Warren 
+ Sutherland (Co-Pilot)\n\n── Cabin Crew ──\nCabin Crew: Reney Mulde
+ r\nCabin Crew: Jayanthi Lawrence\nCabin Crew: Agnes Maabane\nCabin Crew: T
+ ania Terblanche\nCabin Crew: Amelia Lira\nPurser: Adele Khumalo\nCabin Cre
+ w: Ziyanda Dotwana\nCabin Crew: Ronewa Nethulwe\nCabin Crew: Tlamelo Selek
+ e\nCabin Crew: Natasha Wakeford
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
