@@ -21,7 +21,14 @@ DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 30 Sep 12:20L
   (04:20Z)\nDep 02 Oct 23:50L (15:50Z)\n\n02 Oct\nSA281  PER → JNB\nDep 2
  3:50L (15:50Z)\nArr 03 Oct 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Miron Zonomessis (Pilot In Command)\nFirst Officer: Albertus Smith (Co
+ -Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n──
+  Cabin Crew ──\nCabin Crew: Polometsi Mpako\nPurser: Felicia Senamela
+ \nCabin Crew: Obakeng Tinyane\nCabin Crew: Keaobaka Sekamoeng\nCabin Crew:
+  Monnie Mashishi\nCabin Crew: Teboho Tamanyane (AB-INITIO)\nCabin Crew: Sa
+ ndile Molemane\nCabin Crew: Shilion Moses\nCabin Crew: Zahir Ryklief\nCabi
+ n Crew: Nombuso Ngobeni
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -191,7 +198,7 @@ DESCRIPTION:Report\n25 Aug 19:25L (17:25Z)\nJNB\n\n25 Aug\nSA280  JNB →
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 26 Aug 12:20L
   (04:20Z)\nDep 28 Aug 23:50L (15:50Z)\n\n28 Aug\nSA281  PER → JNB\nDep 2
- 3:50L (15:50Z)\nArr 29 Aug 05:24L (03:24Z)\nBlock 11h25\nTrack: https://ww
+ 3:50L (15:50Z)\nArr 29 Aug 04:56L (02:56Z)\nBlock 11h25\nTrack: https://ww
  w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
  in: Anthony Stevenson (Pilot In Command)\nCaptain: Andrew Mildenhall (Chec
  k Captain)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n─
@@ -462,7 +469,7 @@ DTEND:20260622T193000
 DESCRIPTION:Report\n22 Jun 08:25L (06:25Z)\nJNB\n\n22 Jun\nSA190  JNB → 
  MRU\nDep 09:41L (07:41Z)\nArr 22 Jun 15:33L (11:33Z)\nBlock 04h00\nTrack: 
  https://www.flightradar24.com/data/flights/sa190\n\nLayover\nSir Seewoosag
- ur Ramgoolam Int'l\nTel: 002302088792\nArr 22 Jun 15:40L (11:40Z)\nDep 22 
+ ur Ramgoolam Int'l\nTel: 002306373312\nArr 22 Jun 15:40L (11:40Z)\nDep 22 
  Jun 16:40L (12:40Z)\n\n22 Jun\nSA191  MRU → JNB\nDep 16:29L (12:29Z)\nAr
  r 22 Jun 19:13L (17:13Z)\nBlock 04h20\nTrack: https://www.flightradar24.co
  m/data/flights/sa191
@@ -1147,10 +1154,5 @@ DTSTART:20260302T083000
 DTEND:20260302T160000
 DESCRIPTION:CRM INITIAL 4DAYS\nOther Course\n\n08:30L (06:30Z) - 16:00L (1
  4:00Z)\n\n── Modules ──\n08:30L - 16:00L\nCREW RESOURSE MGMT 01
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟢 DAY OFF
-DTSTART:20260301T060000
-DTEND:20260302T060000
 END:VEVENT
 END:VCALENDAR
