@@ -199,14 +199,7 @@ DESCRIPTION:Report\n25 Aug 19:25L (17:25Z)\nJNB\n\n25 Aug\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 26 Aug 12:20L
   (04:20Z)\nDep 28 Aug 23:50L (15:50Z)\n\n28 Aug\nSA281  PER → JNB\nDep 2
  3:50L (15:50Z)\nArr 29 Aug 04:56L (02:56Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Anthony Stevenson (Pilot In Command)\nCaptain: Andrew Mildenhall (Chec
- k Captain)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n─
- ─ Cabin Crew ──\nCabin Crew: Siobhain Jeftha\nPurser: Nombuso Koti\n
- Cabin Crew: Mashadishadi Molapo\nCabin Crew: Velile Ngobeni\nCabin Crew: T
- yson Matshabana (AB-INITIO)\nCabin Crew: Corlie Van Aswegen\nCabin Crew: M
- abale Mahamotsa (AB-INITIO)\nCabin Crew: Nelisiwe Manzini\nCabin Crew: Lip
- alesa Baduza\nCabin Crew: Ruth Nekene
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -325,14 +318,7 @@ DESCRIPTION:Report\n02 Aug 19:25L (17:25Z)\nJNB\n\n02 Aug\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 03 Aug 12:20L
   (04:20Z)\nDep 04 Aug 23:50L (15:50Z)\n\n04 Aug\nSA281  PER → JNB\nDep 2
  3:25L (15:25Z)\nArr 05 Aug 04:17L (02:17Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Naeem Kajee (Pilot In Command)\nFirst Officer: Siphesihle Mabaso (Co-P
- ilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── C
- abin Crew ──\nCabin Crew: Sindile Dhlamini\nCabin Crew: Boipelo Segopa
- \nCabin Crew: Linda Claassens (AB-INITIO)\nCabin Crew: Darrel Lourie\nPurs
- er: Matshepo Matilda Sandamela\nCabin Crew: Helena Carmelita (AB-INITIO)\n
- Cabin Crew: Lereko Motsiri\nCabin Crew: Refiloe Tshabalala\nCabin Crew: Si
- busiso Moela\nCabin Crew: Mohamed Adam
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🎉 LEAVE
@@ -1133,12 +1119,5 @@ DTSTART:20260305T083000
 DTEND:20260305T160000
 DESCRIPTION:CRM INITIAL 4DAYS\nOther Course\n\n08:30L (06:30Z) - 16:00L (1
  4:00Z)\n\n── Modules ──\n08:30L - 16:00L\nCREW RESOURSE MGMT 04
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:📘 CRM INT4
-DTSTART:20260304T083000
-DTEND:20260304T160000
-DESCRIPTION:CRM INITIAL 4DAYS\nOther Course\n\n08:30L (06:30Z) - 16:00L (1
- 4:00Z)\n\n── Modules ──\n08:30L - 16:00L\nCREW RESOURSE MGMT 03
 END:VEVENT
 END:VCALENDAR
