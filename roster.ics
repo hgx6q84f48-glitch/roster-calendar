@@ -12,6 +12,96 @@ DTEND:20270302T000000
 DESCRIPTION:Report\n15 Feb 00:00L (22:00Z)
 END:VEVENT
 BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20260929T192500
+DTEND:20261003T054500
+DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB → 
+ PER\nDep 20:55L (18:55Z)\nArr 30 Sep 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 30 Sep 12:20L
+  (04:20Z)\nDep 02 Oct 23:50L (15:50Z)\n\n02 Oct\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 03 Oct 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Miron Zonomessis (Pilot In Command)\nFirst Officer: Albertus Smith (Co
+ -Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n──
+  Cabin Crew ──\nCabin Crew: Polometsi Mpako\nPurser: Felicia Senamela
+ \nCabin Crew: Obakeng Tinyane\nCabin Crew: Keaobaka Sekamoeng\nCabin Crew:
+  Monnie Mashishi\nCabin Crew: Teboho Tamanyane (AB-INITIO)\nCabin Crew: Sa
+ ndile Molemane\nCabin Crew: Shilion Moses\nCabin Crew: Zahir Ryklief\nCabi
+ n Crew: Nombuso Ngobeni
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20260928T060000
+DTEND:20260928T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20260927T000000
+DTEND:20260928T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20260926T060000
+DTEND:20260926T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20260925T060000
+DTEND:20260926T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20260924T000000
+DTEND:20260925T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20260923T000000
+DTEND:20260924T000000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20260919T192500
+DTEND:20260922T054500
+DESCRIPTION:Report\n19 Sep 19:25L (17:25Z)\nJNB\n\n19 Sep\nSA280  JNB → 
+ PER\nDep 20:55L (18:55Z)\nArr 20 Sep 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 20 Sep 12:20L
+  (04:20Z)\nDep 21 Sep 23:50L (15:50Z)\n\n21 Sep\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 22 Sep 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Anthony Stevenson (Pilot In Command)\nFirst Officer: Sifiso Masilela (
+ Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n─
+ ─ Cabin Crew ──\nPurser: Samantha Skosana\nCabin Crew: Leonard Hudso
+ n-Masurik\nCabin Crew: Bertha Kotu\nCabin Crew: Daniel Jika Jika\nCabin Cr
+ ew: Alfred Kgasago\nCabin Crew: Lesego Maredi\nCabin Crew: Tanya Mihaleto
+ \nCabin Crew: Phenyo Matseke\nCabin Crew: Martin Waterson\nCabin Crew: Bra
+ iden Magurno
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20260918T060000
+DTEND:20260918T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20260917T000000
+DTEND:20260918T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟡 OPEN
+DTSTART:20260916T080000
+DTEND:20260916T200000
+DESCRIPTION:Report\n16 Sep 08:00L (06:00Z)
+END:VEVENT
+BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
 DTSTART:20260914T000000
 DTEND:20260915T060000
