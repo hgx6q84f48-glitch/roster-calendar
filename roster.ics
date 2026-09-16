@@ -13,6 +13,102 @@ DESCRIPTION:Report\n15 Feb 00:00L (22:00Z)
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20261027T190500
+DTEND:20261031T053500
+DESCRIPTION:Report\n27 Oct 19:05L (17:05Z)\nJNB\n\n27 Oct\nSA280  JNB → 
+ PER\nDep 20:35L (18:35Z)\nArr 28 Oct 12:10L (04:10Z)\nBlock 09h35\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Oct 12:10L
+  (04:10Z)\nDep 30 Oct 23:50L (15:50Z)\n\n30 Oct\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 31 Oct 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261026T060000
+DTEND:20261027T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261025T000000
+DTEND:20261026T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20261020T192500
+DTEND:20261024T054500
+DESCRIPTION:Report\n20 Oct 19:25L (17:25Z)\nJNB\n\n20 Oct\nSA280  JNB → 
+ PER\nDep 20:55L (18:55Z)\nArr 21 Oct 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 21 Oct 12:20L
+  (04:20Z)\nDep 23 Oct 23:50L (15:50Z)\n\n23 Oct\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 24 Oct 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20261019T060000
+DTEND:20261019T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261018T060000
+DTEND:20261019T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261017T000000
+DTEND:20261018T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-LOS-JNB
+DTSTART:20261015T135500
+DTEND:20261016T052500
+DESCRIPTION:Report\n15 Oct 13:55L (11:55Z)\nJNB\n\n15 Oct\nSA60  JNB → L
+ OS\nDep 15:10L (13:10Z)\nArr 15 Oct 20:30L (19:30Z)\nBlock 06h20\nTrack: h
+ ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
+ d\nTel: 0023417743573\nArr 15 Oct 20:30L (19:30Z)\nDep 15 Oct 22:00L (21:0
+ 0Z)\n\n15 Oct\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 16 Oct 04:55L (
+ 02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
+ 61\n\n── Flight Crew ──\nCaptain: Jacques De Lange (Pilot In Comma
+ nd)\nFirst Officer: Mahendra Naicker (PAX)\nFirst Officer: Vaughan Chapman
+  (Inflight Relief Seat 3)\nFirst Officer: Patrick Gericke (Inflight Relief
+  Seat 4)\n\n── Cabin Crew ──\nPurser: Ignatius Magudya\nCabin Crew
+ : Karabo Notshweleka\nCabin Crew: Gladwin Kgang\nCabin Crew: Tshegofatso M
+ angope\nCabin Crew: Roule Riley\nCabin Crew: Martin Waterson\nCabin Crew: 
+ Simpiwe Nako\nCabin Crew: Agnes Rustoff (FAM FLIGHT)\nCabin Crew: Themba C
+ indi
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261014T060000
+DTEND:20261015T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261013T000000
+DTEND:20261014T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🎉 LEAVE
+DTSTART:20261006T060000
+DTEND:20261013T000000
+DESCRIPTION:Report\n06 Oct 06:00L (04:00Z)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261005T060000
+DTEND:20261006T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261004T000000
+DTEND:20261005T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
 DTSTART:20260929T192500
 DTEND:20261003T054500
 DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB → 
