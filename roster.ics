@@ -43,7 +43,14 @@ DESCRIPTION:Report\n20 Oct 19:25L (17:25Z)\nJNB\n\n20 Oct\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 21 Oct 12:20L
   (04:20Z)\nDep 23 Oct 23:50L (15:50Z)\n\n23 Oct\nSA281  PER → JNB\nDep 2
  3:50L (15:50Z)\nArr 24 Oct 05:15L (03:15Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Yougandran Govender (Pilot In Command)\nFirst Officer: Vaughan Chapman
+  (Inflight Relief Seat 3)\nFirst Officer: Patrick Gericke (Co-Pilot)\n\n
+ ── Cabin Crew ──\nCabin Crew: Clement Isaac Van Reenen\nCabin Crew
+ : Ushma Galal\nCabin Crew: Jessica Phalatse\nCabin Crew: Palesa Mogatusi\n
+ Cabin Crew: Kgaugelo Rankhumise\nPurser: Dikabelo Kanono\nCabin Crew: Clau
+ dene Ketley\nCabin Crew: Sechaba Toho\nCabin Crew: Roger Simon\nCabin Crew
+ : Siyamthanda Masiso
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -1108,10 +1115,5 @@ SUMMARY:🟡 OPEN
 DTSTART:20260323T080000
 DTEND:20260323T200000
 DESCRIPTION:Report\n23 Mar 08:00L (06:00Z)
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟢 DAY OFF
-DTSTART:20260322T060000
-DTEND:20260323T060000
 END:VEVENT
 END:VCALENDAR
