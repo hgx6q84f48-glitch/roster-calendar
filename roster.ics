@@ -21,7 +21,13 @@ DESCRIPTION:Report\n27 Oct 19:05L (17:05Z)\nJNB\n\n27 Oct\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Oct 12:10L
   (04:10Z)\nDep 30 Oct 23:50L (15:50Z)\n\n30 Oct\nSA281  PER → JNB\nDep 2
  3:50L (15:50Z)\nArr 31 Oct 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Petrus Le Roux (PAX)\nFirst Officer: Albertus Smith (Co-Pilot)\nFirst 
+ Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── Cabin Crew ─
+ ─\nPurser: Nqabisa Mcata\nCabin Crew: Brenda Shiburi\nCabin Crew: Oratil
+ we Mashala\nCabin Crew: Dilshaad Vanker\nCabin Crew: Steven Petersen\nCabi
+ n Crew: Mmamokebe Phosa\nCabin Crew: Pumla Nkosana\nCabin Crew: Colette Pi
+ llay\nCabin Crew: Zandile Delicious Nhlapo\nCabin Crew: Buzani Sigubudu
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -1074,19 +1080,5 @@ BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
 DTSTART:20260331T060000
 DTEND:20260401T060000
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:🟢 DAY OFF
-DTSTART:20260330T000000
-DTEND:20260331T060000
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:📘 A340APT
-DTSTART:20260329T070000
-DTEND:20260329T130000
-DESCRIPTION:A340 APT CONVERSION CREW C\nConversion Course\n\n07:00L (05:00
- Z) - 13:00L (11:00Z)\n\n── Modules ──\n07:00L - 08:30L\nA340 APT B
- RIEF 2\n\n08:30L - 12:30L\nA340 APT TRAINER 2\n\n12:30L - 13:00L\nA340 APT
-  DE BRIEF 2
 END:VEVENT
 END:VCALENDAR
