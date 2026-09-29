@@ -125,7 +125,7 @@ SUMMARY:✈️ JNB-PER-JNB
 DTSTART:20260929T192500
 DTEND:20261003T054500
 DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB → 
- PER\nDep 20:55L (18:55Z)\nArr 30 Sep 12:20L (04:20Z)\nBlock 09h25\nTrack: 
+ PER\nDep 20:51L (18:51Z)\nArr 30 Sep 12:25L (04:25Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 30 Sep 12:20L
   (04:20Z)\nDep 02 Oct 23:50L (15:50Z)\n\n02 Oct\nSA281  PER → JNB\nDep 2
@@ -134,10 +134,10 @@ DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB →
  in: Miron Zonomessis (Pilot In Command)\nFirst Officer: Albertus Smith (Co
  -Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n──
   Cabin Crew ──\nCabin Crew: Reney Mulder\nPurser: Felicia Senamela\nCa
- bin Crew: Obakeng Tinyane\nCabin Crew: Keaobaka Sekamoeng\nCabin Crew: Teb
- oho Tamanyane (AB-INITIO)\nCabin Crew: Sandile Molemane\nCabin Crew: Shili
- on Moses\nCabin Crew: Zahir Ryklief\nCabin Crew: Hlengiwe Luthuli\nCabin C
- rew: Sabelo Khoza
+ bin Crew: Obakeng Tinyane\nCabin Crew: Keaobaka Sekamoeng\nCabin Crew: Mar
+ k Giezing\nCabin Crew: Teboho Tamanyane (AB-INITIO)\nCabin Crew: Shilion M
+ oses\nCabin Crew: Zahir Ryklief\nCabin Crew: Hlengiwe Luthuli\nCabin Crew:
+  Sabelo Khoza
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
