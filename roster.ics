@@ -22,12 +22,13 @@ DESCRIPTION:Report\n27 Oct 19:05L (17:05Z)\nJNB\n\n27 Oct\nSA280  JNB →
   (04:10Z)\nDep 30 Oct 23:50L (15:50Z)\n\n30 Oct\nSA281  PER → JNB\nDep 2
  3:50L (15:50Z)\nArr 31 Oct 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
  w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Petrus Le Roux (PAX)\nFirst Officer: Albertus Smith (Co-Pilot)\nFirst 
- Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── Cabin Crew ─
- ─\nPurser: Nqabisa Mcata\nCabin Crew: Brenda Shiburi\nCabin Crew: Sibusi
- so Moela\nCabin Crew: Oratilwe Mashala\nCabin Crew: Steven Petersen\nCabin
-  Crew: Mmamokebe Phosa\nCabin Crew: Pumla Nkosana\nCabin Crew: Colette Pil
- lay\nCabin Crew: Zandile Delicious Nhlapo\nCabin Crew: Buzani Sigubudu
+ in: Petrus Le Roux (Pilot In Command)\nFirst Officer: Albertus Smith (Co-P
+ ilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── C
+ abin Crew ──\nPurser: Nqabisa Mcata\nCabin Crew: Brenda Shiburi\nCabin
+  Crew: Sibusiso Moela\nCabin Crew: Oratilwe Mashala\nCabin Crew: Steven Pe
+ tersen\nCabin Crew: Mmamokebe Phosa\nCabin Crew: Pumla Nkosana\nCabin Crew
+ : Colette Pillay\nCabin Crew: Zandile Delicious Nhlapo\nCabin Crew: Buzani
+  Sigubudu
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -86,14 +87,14 @@ DESCRIPTION:Report\n15 Oct 13:55L (11:55Z)\nJNB\n\n15 Oct\nSA60  JNB → L
  0Z)\n\n15 Oct\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 16 Oct 04:55L (
  02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
  61\n\n── Flight Crew ──\nCaptain: Jacques De Lange (Pilot In Comma
- nd)\nFirst Officer: Mahendra Naicker (Co-Pilot)\nFirst Officer: Vaughan Ch
- apman (Inflight Relief Seat 3)\nFirst Officer: Patrick Gericke (Inflight R
- elief Seat 4)\n\n── Cabin Crew ──\nCabin Crew: Herman Jansen (PAX)
- \nPurser: Ignatius Magudya\nCabin Crew: Karabo Notshweleka\nCabin Crew: Gl
- adwin Kgang\nCabin Crew: Tshegofatso Mangope\nCabin Crew: Lebohang Sekhobo
-  (AB-INITIO)\nCabin Crew: Roule Riley\nCabin Crew: Martin Waterson\nCabin 
- Crew: Simpiwe Nako\nCabin Crew: Ellah Diutloileng (AB-INITIO)\nCabin Crew:
-  Agnes Rustoff (FAM FLIGHT)\nCabin Crew: Themba Cindi
+ nd)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\nFirst Office
+ r: Patrick Gericke (Co-Pilot)\n\n── Cabin Crew ──\nCabin Crew: Her
+ man Jansen (PAX)\nPurser: Ignatius Magudya\nCabin Crew: Karabo Notshweleka
+ \nCabin Crew: Gladwin Kgang\nCabin Crew: Tshegofatso Mangope\nCabin Crew: 
+ Lebohang Sekhobo (AB-INITIO)\nCabin Crew: Roule Riley\nCabin Crew: Milagre
+  Faustino\nCabin Crew: Simpiwe Nako\nCabin Crew: Ellah Diutloileng (AB-INI
+ TIO)\nCabin Crew: Thato Weeto (FAM FLIGHT)\nCabin Crew: Agnes Rustoff (FAM
+  FLIGHT)\nCabin Crew: Themba Cindi
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
