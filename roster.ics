@@ -162,13 +162,7 @@ DESCRIPTION:Report\n27 Oct 19:05L (17:05Z)\nJNB\n\n27 Oct\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Oct 12:10L
   (04:10Z)\nDep 30 Oct 23:50L (15:50Z)\n\n30 Oct\nSA281  PER → JNB\nDep 2
  3:38L (15:38Z)\nArr 31 Oct 04:20L (02:20Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Petrus Le Roux (Pilot In Command)\nFirst Officer: Albertus Smith (Co-P
- ilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── C
- abin Crew ──\nPurser: Nqabisa Mcata\nCabin Crew: Brenda Shiburi\nCabin
-  Crew: Sibusiso Moela\nCabin Crew: Oratilwe Mashala\nCabin Crew: Steven Pe
- tersen\nCabin Crew: Mmamokebe Phosa\nCabin Crew: Pumla Nkosana\nCabin Crew
- : Colette Pillay\nCabin Crew: Zandile Nhlapo\nCabin Crew: Buzani Sigubudu
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -190,14 +184,7 @@ DESCRIPTION:Report\n20 Oct 19:25L (17:25Z)\nJNB\n\n20 Oct\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 21 Oct 12:20L
   (04:20Z)\nDep 23 Oct 23:50L (15:50Z)\n\n23 Oct\nSA281  PER → JNB\nDep 2
  3:48L (15:48Z)\nArr 24 Oct 04:43L (02:43Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Yougandran Govender (Pilot In Command)\nFirst Officer: Vaughan Chapman
-  (Inflight Relief Seat 3)\nFirst Officer: Patrick Gericke (Co-Pilot)\n\n
- ── Cabin Crew ──\nCabin Crew: Clement Van Reenen\nCabin Crew: Ushm
- a Galal\nCabin Crew: Jessica Phalatse\nCabin Crew: Sheila Musi\nCabin Crew
- : Kgaugelo Rankhumise\nPurser: Dikabelo Kanono\nCabin Crew: Claudene Ketle
- y\nCabin Crew: Sechaba Toho\nCabin Crew: Roger Simon\nCabin Crew: Siyamtha
- nda Masiso
+ w.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -226,16 +213,7 @@ DESCRIPTION:Report\n15 Oct 13:55L (11:55Z)\nJNB\n\n15 Oct\nSA60  JNB → L
  d\nTel: 0023417743573\nArr 15 Oct 20:30L (19:30Z)\nDep 15 Oct 22:00L (21:0
  0Z)\n\n15 Oct\nSA61  LOS → JNB\nDep 21:57L (20:57Z)\nArr 16 Oct 04:29L (
  02:29Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
- 61\n\n── Flight Crew ──\nCaptain: Jacques De Lange (Pilot In Comma
- nd)\nFirst Officer: Giovanni Titus (Inflight Relief Seat 4)\nFirst Officer
- : Vaughan Chapman (Inflight Relief Seat 3)\nFirst Officer: Patrick Gericke
-  (Co-Pilot)\n\n── Cabin Crew ──\nCabin Crew: Herman Jansen (PAX)\n
- Purser: Ignatius Magudya\nCabin Crew: Karabo Notshweleka\nCabin Crew: Glad
- win Kgang\nCabin Crew: Tshegofatso Mangope\nCabin Crew: Lebohang Sekhobo (
- AB-INITIO)\nCabin Crew: Roule Riley\nCabin Crew: Milagre Faustino\nCabin C
- rew: Simpiwe Nako\nCabin Crew: Ellah Diutloileng (AB-INITIO)\nCabin Crew: 
- Thato Weeto (FAM FLIGHT)\nCabin Crew: Agnes Rustoff (FAM FLIGHT)\nCabin Cr
- ew: Themba Cindi
+ 61
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -1011,11 +989,5 @@ DESCRIPTION:A340 APT CONVERSION CREW C\nConversion Course\n\n15:30L (13:30
  Z) - 21:30L (19:30Z)\n\n── Modules ──\n15:30L - 17:00L\nA340 APT B
  RIEF 6\n\n17:00L - 21:00L\nA340 APT TRAINER 6\n\n21:00L - 21:30L\nA340 APT
   DE BRIEF 6
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:📋 Available
-DTSTART:20260504T080000
-DTEND:20260504T200000
-DESCRIPTION:Report\n04 May 08:00L (06:00Z)
 END:VEVENT
 END:VCALENDAR
