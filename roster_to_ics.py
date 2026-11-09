@@ -674,4 +674,164 @@ def parse(xml_data, crew_by_pairing):
                                 hotel = tel = email = lcl_s = lcl_e = ""
                                 for lc in child.iter():
                                     lt = lc.tag.split('}')[-1]
-                                    if lt
+                                    if lt == "LocationName":    hotel = lc.text or ""
+                                    elif lt == "LCLStart":     lcl_s = lc.text or ""
+                                    elif lt == "LCLEnd":       lcl_e = lc.text or ""
+                                    elif lt == "WorkTelephone": tel   = lc.text or ""
+                                    elif lt == "Email":        email = lc.text or ""
+
+                                arr_lcl = parse_dt(lcl_s)
+                                dep_lcl = parse_dt(lcl_e)
+                                arr_utc = parse_dt(utc_s)
+                                dep_utc = parse_dt(utc_e)
+
+                                description_lines.append("Layover")
+                                if hotel:
+                                    description_lines.append(hotel)
+                                if tel:
+                                    description_lines.append(f"Tel: {tel}")
+                                if email:
+                                    description_lines.append(f"Email: {email}")
+                                if arr_lcl:
+                                    description_lines.append(
+                                        f"Arr {fmt_local(arr_lcl)}"
+                                        + (f" ({fmt_utc(arr_utc)})" if arr_utc else "")
+                                    )
+                                if dep_lcl:
+                                    description_lines.append(
+                                        f"Dep {fmt_local(dep_lcl)}"
+                                        + (f" ({fmt_utc(dep_utc)})" if dep_utc else "")
+                                    )
+                                description_lines.append("")
+
+        # ── Crew — match by pairing code + start date ──
+        if pairing_code:
+            date_key = start_dt.strftime("%Y-%m-%d")
+            unique_key = f"{pairing_code}|{date_key}"
+            crew = crew_by_pairing.get(unique_key)
+
+            if not crew:
+                for k, v in crew_by_pairing.items():
+                    if k.endswith(f"|{date_key}"):
+                        crew = v
+                        break
+
+            if crew:
+                flight_crew, cabin_crew = crew
+                if flight_crew:
+                    description_lines.append("── Flight Crew ──")
+                    description_lines.extend(flight_crew)
+                    description_lines.append("")
+                if cabin_crew:
+                    description_lines.append("── Cabin Crew ──")
+                    description_lines.extend(cabin_crew)
+                    description_lines.append("")
+
+        description_lines = [
+            report_airport if line == "__AIRPORT__" else line
+            for line in description_lines
+        ]
+        description_lines = [
+            line for line in description_lines
+            if line != "__AIRPORT__"
+        ]
+
+        description = (
+            "\n".join(description_lines).strip()
+            if description_lines else None
+        )
+
+        activities.append((title, start_dt, end_dt, description, subtitle))
+
+    print(f"🔍 Found {len(activities)} activities")
+    return activities
+
+# =====================================================
+# BUILD ICS
+# =====================================================
+
+def build_ics(activities):
+    cal = Calendar()
+
+    for title, start, end, description, subtitle in activities:
+        event = Event()
+        t = title.upper()
+        sub = (subtitle or "").upper()
+
+        if "SICK" in t or "SICK" in sub:
+            summary = "🤒 SICK LEAVE"
+        elif "FAMIL" in t or "FAMIL" in sub:
+            summary = "👫🏻🏡 FAMILY RESPONSIBILITY"
+        elif "OFF" in t:
+            summary = "🟢 DAY OFF"
+        elif "OPEN" in t or "AVAILABLE" in t:
+            summary = "🟡 OPEN"
+        elif "LEAVE" in t:
+            summary = "🎉 LEAVE"
+        elif "RESERVE" in t:
+            summary = "🟠 RESERVE"
+        elif "GROUND" in t:
+            summary = "🕹️ GROUND DUTY"
+        elif "TRAINING" in t:
+            summary = f"📘 {subtitle}" if subtitle else "📘 TRAINING"
+        elif "PAIRING" in t:
+            routes = []
+            if description:
+                for line in description.split("\n"):
+                    if "→" not in line:
+                        continue
+                    try:
+                        route = line.split("  ")[1]
+                        dep   = route.split("→")[0].strip()
+                        arr   = route.split("→")[1].strip()
+                        if not routes:
+                            routes.append(dep)
+                        routes.append(arr)
+                    except:
+                        pass
+            summary = f"✈️ {'-'.join(routes)}" if len(routes) >= 2 else "✈️ DUTY"
+        else:
+            summary = f"📋 {title}"
+
+        event.add("summary", summary)
+        event.add("dtstart", start)
+        event.add("dtend", end)
+        if description:
+            event.add("description", description)
+        cal.add_component(event)
+
+    return cal
+
+# =====================================================
+# SAVE
+# =====================================================
+
+def save(cal):
+    with open("roster.ics", "wb") as f:
+        f.write(cal.to_ical())
+    print("📅 roster.ics saved")
+
+# =====================================================
+# MAIN
+# =====================================================
+
+if __name__ == "__main__":
+    playwright = None
+    browser = None
+    try:
+        playwright, browser, context, page = login()
+        open_roster(page)
+        xml_data = fetch_roster_xml(page)
+        crew_by_pairing = fetch_all_crew(page)
+        activities = parse(xml_data, crew_by_pairing)
+        cal = build_ics(activities)
+        save(cal)
+    finally:
+        try:
+            browser.close()
+        except:
+            pass
+        try:
+            playwright.stop()
+        except:
+            pass
