@@ -12,6 +12,159 @@ DTEND:20270302T000000
 DESCRIPTION:Paid Leave
 END:VEVENT
 BEGIN:VEVENT
+SUMMARY:✈️ JNB-LOS-JNB
+DTSTART:20261231T135500
+DTEND:20270101T052500
+DESCRIPTION:Report\n31 Dec 13:55L (11:55Z)\nJNB\n\n31 Dec\nSA60  JNB → L
+ OS\nDep 15:10L (13:10Z)\nArr 31 Dec 20:30L (19:30Z)\nBlock 06h20\nTrack: h
+ ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
+ d\nTel: 0023417743573\nArr 31 Dec 20:30L (19:30Z)\nDep 31 Dec 22:00L (21:0
+ 0Z)\n\n31 Dec\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 01 Jan 04:55L (
+ 02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
+ 61
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261230T000000
+DTEND:20261231T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟡 OPEN
+DTSTART:20261229T080000
+DTEND:20261229T200000
+DESCRIPTION:Report\n29 Dec 08:00L (06:00Z)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20261228T060000
+DTEND:20261228T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261227T000000
+DTEND:20261228T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🎉 LEAVE
+DTSTART:20261224T000000
+DTEND:20261227T000000
+DESCRIPTION:ADHOC PAID LEAVE\nPAID LEAVE
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261223T060000
+DTEND:20261224T000000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261222T000000
+DTEND:20261223T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20261217T190500
+DTEND:20261221T053500
+DESCRIPTION:Report\n17 Dec 19:05L (17:05Z)\nJNB\n\n17 Dec\nSA280  JNB → 
+ PER\nDep 20:35L (18:35Z)\nArr 18 Dec 12:10L (04:10Z)\nBlock 09h35\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 18 Dec 12:10L
+  (04:10Z)\nDep 20 Dec 23:50L (15:50Z)\n\n20 Dec\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 21 Dec 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Jacob Setlhake (Pilot In Command)\nFirst Officer: Marinus Roberts (Co-
+ Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
+ Cabin Crew ──\nPurser: Robert Jansen\nCabin Crew: Agnes Maabane\nCabin
+  Crew: Tania Terblanche\nCabin Crew: Michelle Martin\nCabin Crew: Megan Ma
+ ckay\nCabin Crew: Phumza Rabaza\nCabin Crew: Slungile Makhaya\nCabin Crew:
+  Tlamelo Monchwe\nCabin Crew: Salang Motshegwe\nCabin Crew: Agnes Rustoff
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261216T000000
+DTEND:20261217T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20261215T060000
+DTEND:20261215T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261213T000000
+DTEND:20261215T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-PER-JNB
+DTSTART:20261208T190500
+DTEND:20261212T053500
+DESCRIPTION:Report\n08 Dec 19:05L (17:05Z)\nJNB\n\n08 Dec\nSA280  JNB → 
+ PER\nDep 20:35L (18:35Z)\nArr 09 Dec 12:10L (04:10Z)\nBlock 09h35\nTrack: 
+ https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
+ el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 09 Dec 12:10L
+  (04:10Z)\nDep 11 Dec 23:50L (15:50Z)\n\n11 Dec\nSA281  PER → JNB\nDep 2
+ 3:50L (15:50Z)\nArr 12 Dec 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
+ w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
+ in: Petrus Le Roux (Pilot In Command)\nFirst Officer: Marinus Roberts (Co-
+ Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
+ Cabin Crew ──\nCabin Crew: Jaco Grobler\nCabin Crew: Lindelwa Mbi\nCab
+ in Crew: Amanda Mpungose\nCabin Crew: Boipelo Segopa\nPurser: Ignatius Mag
+ udya\nCabin Crew: Tinie Moema\nCabin Crew: Muule Matjila\nCabin Crew: Sini
+ kiwe Mlagisi\nCabin Crew: Lindokuhle Maluleka\nCabin Crew: Alexandrina Pet
+ er
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟡 OPEN
+DTSTART:20261207T080000
+DTEND:20261207T200000
+DESCRIPTION:Report\n07 Dec 08:00L (06:00Z)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟠 RESERVE
+DTSTART:20261206T060000
+DTEND:20261206T200000
+DESCRIPTION:Reserve Window\n06:00L (04:00Z) - 20:00L (18:00Z)\n\nType: RES
+ O\nBase: Johannesburg Int'l
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261205T000000
+DTEND:20261206T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:✈️ JNB-LOS-JNB
+DTSTART:20261203T135500
+DTEND:20261204T052500
+DESCRIPTION:Report\n03 Dec 13:55L (11:55Z)\nJNB\n\n03 Dec\nSA60  JNB → L
+ OS\nDep 15:10L (13:10Z)\nArr 03 Dec 20:30L (19:30Z)\nBlock 06h20\nTrack: h
+ ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
+ d\nTel: 0023417743573\nArr 03 Dec 20:30L (19:30Z)\nDep 03 Dec 22:00L (21:0
+ 0Z)\n\n03 Dec\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 04 Dec 04:55L (
+ 02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
+ 61\n\n── Flight Crew ──\nCaptain: Mpho Mamashela (Inflight Relief 
+ Seat 4)\nCaptain: Miron Zonomessis (Pilot In Command)\nFirst Officer: Giov
+ anni Titus (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Sea
+ t 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco Grobler\nCabin Crew: Ol
+ ela Selemani\nPurser: Charmaine Dumisa\nCabin Crew: Tsepo Siboto\nCabin Cr
+ ew: Ashford Ntsimane\nCabin Crew: Naledi Mthembu\nCabin Crew: Lindokuhle M
+ asilela\nCabin Crew: Milagre Faustino\nCabin Crew: Nyiko Machaba\nCabin Cr
+ ew: Helga Green
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟡 OPEN
+DTSTART:20261202T080000
+DTEND:20261202T200000
+DESCRIPTION:Report\n02 Dec 08:00L (06:00Z)
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🟢 DAY OFF
+DTSTART:20261201T060000
+DTEND:20261202T060000
+END:VEVENT
+BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
 DTSTART:20261129T000000
 DTEND:20261201T060000
@@ -29,9 +182,9 @@ DESCRIPTION:Report\n24 Nov 19:05L (17:05Z)\nJNB\n\n24 Nov\nSA280  JNB →
  w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
  in: Anthony Stevenson (Pilot In Command)\nFirst Officer: Charles Bron (Co-
  Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
- Cabin Crew ──\nCabin Crew: Siobhain Jeftha\nPurser: Noresh Ramdhani\nC
- abin Crew: Kesentseng Seritsane\nCabin Crew: Lerato Mdluli\nCabin Crew: Le
- rato Madonsela\nCabin Crew: Tshegofatso Mangope\nCabin Crew: Zahir Ryklief
+ Cabin Crew ──\nCabin Crew: Siobhain Jeftha\nPurser: Nazlie Fortune\nCa
+ bin Crew: Kesentseng Seritsane\nCabin Crew: Lerato Mdluli\nCabin Crew: Ler
+ ato Madonsela\nCabin Crew: Tshegofatso Mangope\nCabin Crew: Zahir Ryklief
  \nCabin Crew: Pumlani Kose\nCabin Crew: Shandre Losper\nCabin Crew: Sabelo
   Khoza
 END:VEVENT
