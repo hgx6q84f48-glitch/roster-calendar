@@ -6,7 +6,7 @@ import urllib3
 import xml.etree.ElementTree as ET
 
 from collections import Counter
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, date, timezone, timedelta
 from zoneinfo import ZoneInfo
 
 from icalendar import Calendar, Event
@@ -33,6 +33,11 @@ BASELINE_FILE = "roster_baseline.json"
 SNAPSHOT_FILE = "roster_snapshot.json"
 CHANGES_JSON  = "roster_changes.json"
 CHANGES_MD    = "roster_changes.md"
+ALERT_FILE    = "roster_alert.md"
+ALERT_TITLE   = "roster_alert_title.txt"
+
+# Filled in by parse(): one (departure date, block minutes) per flight leg
+FLIGHT_LOG = []
 
 # =====================================================
 # HELPERS
@@ -57,6 +62,16 @@ def fmt_block(duration):
         return f"{h.zfill(2)}h{m.zfill(2)}"
     return duration
 
+def fmt_hm(minutes):
+    return f"{minutes // 60}h{minutes % 60:02d}"
+
+def parse_minutes(duration):
+    try:
+        parts = duration.strip().split(":")
+        return int(parts[0]) * 60 + int(parts[1])
+    except:
+        return 0
+
 def clean(s):
     if not s:
         return ""
@@ -69,6 +84,17 @@ def parse_dt(s):
         return datetime.strptime(s.strip(), "%Y-%m-%d %H:%M")
     except:
         return None
+
+def sa_suffix(local_dt, utc_dt):
+    """' · 06:20 SA' when the local time differs from South African time."""
+    if not local_dt or not utc_dt:
+        return ""
+    sa = utc_dt + timedelta(hours=2)
+    if sa == local_dt:
+        return ""
+    if sa.date() != local_dt.date():
+        return f" · {sa.strftime('%d %b %H:%M')} SA"
+    return f" · {sa.strftime('%H:%M')} SA"
 
 # =====================================================
 # FORCE CLOSE ALL MODALS
@@ -371,6 +397,7 @@ def fetch_all_crew(page):
 # =====================================================
 
 def parse(xml_data, crew_by_pairing):
+    FLIGHT_LOG.clear()
     root = ET.fromstring(xml_data)
     activities = []
 
@@ -652,6 +679,11 @@ def parse(xml_data, crew_by_pairing):
                         if not dep_lcl or not arr_lcl:
                             continue
 
+                        # Record for monthly totals
+                        block_min = parse_minutes(duration)
+                        if block_min:
+                            FLIGHT_LOG.append((dep_lcl.date(), block_min))
+
                         flight_no = f"{carrier}{number}"
                         description_lines.append(dep_lcl.strftime("%d %b"))
                         description_lines.append(f"{flight_no}  {dep} → {arr}")
@@ -703,11 +735,13 @@ def parse(xml_data, crew_by_pairing):
                                     description_lines.append(
                                         f"Arr {fmt_local(arr_lcl)}"
                                         + (f" ({fmt_utc(arr_utc)})" if arr_utc else "")
+                                        + sa_suffix(arr_lcl, arr_utc)
                                     )
                                 if dep_lcl:
                                     description_lines.append(
                                         f"Dep {fmt_local(dep_lcl)}"
                                         + (f" ({fmt_utc(dep_utc)})" if dep_utc else "")
+                                        + sa_suffix(dep_lcl, dep_utc)
                                     )
                                 description_lines.append("")
 
@@ -797,10 +831,76 @@ def make_summary(title, description, subtitle):
         return f"📋 {title}"
 
 # =====================================================
+# MONTHLY TOTALS
+# =====================================================
+
+def classify(title, subtitle):
+    t = title.upper()
+    sub = (subtitle or "").upper()
+    if "SICK" in t or "SICK" in sub or "FAMIL" in t or "FAMIL" in sub:
+        return "leave"
+    if "OFF" in t:
+        return "off"
+    if "OPEN" in t or "AVAILABLE" in t:
+        return "open"
+    if "LEAVE" in t:
+        return "leave"
+    if "RESERVE" in t:
+        return "reserve"
+    if "GROUND" in t:
+        return "ground"
+    if "TRAINING" in t:
+        return "training"
+    if "PAIRING" in t:
+        return "pairing"
+    return "other"
+
+def days_covered(start, end):
+    """Calendar days an activity occupies. An end time before noon on a
+    later date (e.g. a day off ending 06:00) doesn't count that last date."""
+    first = start.date()
+    last = end.date()
+    if last > first and end.hour < 12:
+        last = last - timedelta(days=1)
+    days = []
+    d = first
+    while d <= last:
+        days.append(d)
+        d = d + timedelta(days=1)
+    return days
+
+def build_totals(activities):
+    months = {}
+
+    def bucket(d):
+        key = (d.year, d.month)
+        if key not in months:
+            months[key] = {
+                "block": 0, "sectors": 0, "pairings": 0,
+                "reserve": 0, "training": 0, "leave": 0, "off": 0,
+            }
+        return months[key]
+
+    for d, minutes in FLIGHT_LOG:
+        b = bucket(d)
+        b["block"] += minutes
+        b["sectors"] += 1
+
+    for title, start, end, description, subtitle in activities:
+        kind = classify(title, subtitle)
+        if kind == "pairing":
+            bucket(start.date())["pairings"] += 1
+        elif kind in ("reserve", "training", "leave", "off"):
+            for d in days_covered(start, end):
+                bucket(d)[kind] += 1
+
+    return months
+
+# =====================================================
 # BUILD ICS
 # =====================================================
 
-def build_ics(activities):
+def build_ics(activities, now):
     cal = Calendar()
 
     for title, start, end, description, subtitle in activities:
@@ -813,6 +913,49 @@ def build_ics(activities):
         if description:
             event.add("description", description)
         cal.add_component(event)
+
+    # ── Monthly totals: all-day event on the 1st ──
+    for (y, m), b in sorted(build_totals(activities).items()):
+        # Skip months that only contain leave (not really published yet)
+        if not (b["block"] or b["sectors"] or b["pairings"]
+                or b["reserve"] or b["training"] or b["off"]):
+            continue
+
+        first = date(y, m, 1)
+        label = first.strftime("%b %Y").upper()
+        lines = [
+            f"Block time: {fmt_hm(b['block'])}",
+            f"Sectors: {b['sectors']}",
+            f"Pairings: {b['pairings']}",
+            f"Reserve days: {b['reserve']}",
+            f"Training days: {b['training']}",
+            f"Leave/sick days: {b['leave']}",
+            f"Days off: {b['off']}",
+        ]
+
+        event = Event()
+        event.add("uid", f"totals-{y}-{m:02d}@roster-calendar")
+        event.add("dtstamp", datetime.now(timezone.utc))
+        event.add("summary", f"📊 {label} TOTALS")
+        event.add("dtstart", first)
+        event.add("dtend", first + timedelta(days=1))
+        event.add("description", "\n".join(lines))
+        cal.add_component(event)
+
+    # ── Last updated marker: all-day event on today's date ──
+    stamp_short = now.strftime("%d %b %H:%M")
+    stamp_long = now.strftime("%d %b %Y %H:%M")
+    marker = Event()
+    marker.add("uid", "sync-marker@roster-calendar")
+    marker.add("dtstamp", datetime.now(timezone.utc))
+    marker.add("summary", f"🔄 Synced {stamp_short}")
+    marker.add("dtstart", now.date())
+    marker.add("dtend", now.date() + timedelta(days=1))
+    marker.add(
+        "description",
+        f"Last successful roster update: {stamp_long}\nDuties loaded: {len(activities)}"
+    )
+    cal.add_component(marker)
 
     return cal
 
@@ -836,6 +979,9 @@ CATEGORY_ICON = {
     "Crew": "👥", "Added": "➕", "Removed": "➖",
 }
 
+# The "· 06:20 SA" additions are display-only, so the tracker ignores them
+SA_SUFFIX_RE = re.compile(r"\s·\s(?:\d{2}\s[A-Za-z]{3}\s)?\d{2}:\d{2}\sSA$")
+
 def load_json(path, default):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -853,10 +999,10 @@ def split_description(desc):
         return [], None
     positions = [desc.find(m) for m in CREW_MARKERS if desc.find(m) != -1]
     if not positions:
-        body = [l for l in desc.split("\n") if l.strip()]
+        body = [SA_SUFFIX_RE.sub("", l) for l in desc.split("\n") if l.strip()]
         return body, None
     cut = min(positions)
-    body = [l for l in desc[:cut].split("\n") if l.strip()]
+    body = [SA_SUFFIX_RE.sub("", l) for l in desc[:cut].split("\n") if l.strip()]
     crew = [l for l in desc[cut:].split("\n") if l.strip()]
     return body, crew
 
@@ -877,241 +1023,4 @@ def build_state(activities):
         }
         state.setdefault(start.strftime("%Y-%m-%d"), []).append(rec)
     for k in state:
-        state[k].sort(key=lambda r: (r["start"], r["summary"]))
-    return state
-
-def diff_lines(old, new):
-    sm = difflib.SequenceMatcher(None, old, new)
-    out = []
-    for op, i1, i2, j1, j2 in sm.get_opcodes():
-        if op == "equal":
-            continue
-        o = old[i1:i2]
-        n = new[j1:j2]
-        if op == "replace" and len(o) == len(n):
-            out += [f"{a} → {b}" for a, b in zip(o, n)]
-        else:
-            out += [f"− {a}" for a in o]
-            out += [f"+ {b}" for b in n]
-    return out
-
-def compare_day(old_list, new_list):
-    """Returns list of (category, summary, lines)."""
-    items = []
-    old = list(old_list)
-    new = list(new_list)
-    pairs = []
-
-    for o in list(old):
-        for n in new:
-            if n["summary"] == o["summary"]:
-                pairs.append((o, n))
-                old.remove(o)
-                new.remove(n)
-                break
-
-    while old and new:
-        o = old.pop(0)
-        n = new.pop(0)
-        items.append(("Swapped", f"{o['summary']} → {n['summary']}", []))
-
-    for o in old:
-        items.append(("Removed", o["summary"], []))
-    for n in new:
-        items.append(("Added", n["summary"], []))
-
-    for o, n in pairs:
-        time_lines = []
-        other_lines = []
-
-        if o["start"] != n["start"]:
-            time_lines.append(f"Start {o['start']} → {n['start']}")
-        if o["end"] != n["end"]:
-            time_lines.append(f"End {o['end']} → {n['end']}")
-
-        for line in diff_lines(o["body"], n["body"]):
-            if re.search(r"\d{2}:\d{2}", line):
-                time_lines.append(line)
-            else:
-                other_lines.append(line)
-
-        if time_lines:
-            items.append(("Times", o["summary"], time_lines))
-        if other_lines:
-            items.append(("Details", o["summary"], other_lines))
-
-        # Crew only compared when both versions captured crew
-        if o.get("crew") is not None and n.get("crew") is not None:
-            crew_lines = diff_lines(o["crew"], n["crew"])
-            if crew_lines:
-                items.append(("Crew", o["summary"], crew_lines))
-
-    return items
-
-def differs_from_baseline(baseline, current):
-    count = 0
-    for d, recs in current.items():
-        base = baseline.get(d)
-        if base is None:
-            continue
-        a = [(r["summary"], r["start"], r["end"], r["body"]) for r in recs]
-        b = [(r["summary"], r["start"], r["end"], r["body"]) for r in base]
-        if a != b:
-            count += 1
-    return count
-
-def write_markdown(log, baseline, current):
-    entries = log["entries"]
-    counts = Counter(e["category"] for e in entries)
-
-    lines = [
-        f"# ROSTER CHANGES (tracking since {log['tracking_since']})",
-        "",
-        f"**Total changes: {len(entries)}**",
-    ]
-    for cat in CATEGORY_ORDER:
-        if counts.get(cat):
-            lines.append(f"- {CATEGORY_ICON[cat]} {cat}: {counts[cat]}")
-    lines.append("")
-    lines.append(
-        f"Days currently different from the original roster: "
-        f"{differs_from_baseline(baseline, current)}"
-    )
-    lines.append("")
-    lines.append("_Tracked from tomorrow onwards. Today's duties are excluded because actual flight times creep in on the day._")
-    lines.append("")
-
-    runs = []
-    seen = {}
-    for e in entries:
-        if e["logged"] not in seen:
-            seen[e["logged"]] = []
-            runs.append(e["logged"])
-        seen[e["logged"]].append(e)
-
-    for logged in reversed(runs):
-        lines.append(f"## Logged {logged}")
-        lines.append("")
-        for e in seen[logged]:
-            try:
-                day = datetime.strptime(e["date"], "%Y-%m-%d").strftime("%d %b %Y")
-            except:
-                day = e["date"]
-            lines.append(
-                f"- **{day}** {CATEGORY_ICON.get(e['category'], '')} "
-                f"{e['category']}: {e['summary']}"
-            )
-            for l in e["lines"]:
-                lines.append(f"    - {l}")
-        lines.append("")
-
-    with open(CHANGES_MD, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-
-def track_changes(activities):
-    now = datetime.now(SA_TZ)
-    stamp = now.strftime("%d %b %Y %H:%M")
-    current = build_state(activities)
-
-    baseline = load_json(BASELINE_FILE, None)
-    snapshot = load_json(SNAPSHOT_FILE, None)
-    log = load_json(CHANGES_JSON, None)
-
-    # ── First run: create the original ──
-    if baseline is None or snapshot is None or log is None:
-        log = {"tracking_since": now.strftime("%d %b %Y"), "entries": []}
-        save_json(BASELINE_FILE, current)
-        save_json(SNAPSHOT_FILE, current)
-        save_json(CHANGES_JSON, log)
-        write_markdown(log, current, current)
-        print(f"📒 Tracking started — original saved ({len(current)} days)")
-        return
-
-    prev_future = {d: v for d, v in snapshot.items() if d in current or d >= min(current or {"9999": 0})}
-    prev_future = {d: v for d, v in snapshot.items() if d > now.strftime("%Y-%m-%d")}
-
-    # ── Safety: portal glitch returning far too little ──
-    if len(prev_future) >= 10 and len(current) < 0.5 * len(prev_future):
-        print("⚠️ Roster looks incomplete this run — skipping change tracking")
-        return
-
-    prev_max = max(snapshot) if snapshot else ""
-    new_entries = []
-
-    for d in sorted(set(prev_future) | set(current)):
-        old = prev_future.get(d)
-        new = current.get(d)
-
-        if old is None:
-            if d > prev_max:
-                # Newly published period — becomes the original, not a change
-                baseline.setdefault(d, new)
-            else:
-                for rec in new:
-                    new_entries.append({
-                        "logged": stamp, "date": d, "category": "Added",
-                        "summary": rec["summary"], "lines": []
-                    })
-            continue
-
-        if new is None:
-            for rec in old:
-                new_entries.append({
-                    "logged": stamp, "date": d, "category": "Removed",
-                    "summary": rec["summary"], "lines": []
-                })
-            continue
-
-        # Keep last known crew if this run failed to capture it
-        for n in new:
-            if n.get("crew") is None:
-                for o in old:
-                    if o["summary"] == n["summary"] and o.get("crew") is not None:
-                        n["crew"] = o["crew"]
-                        break
-
-        for cat, summary, lns in compare_day(old, new):
-            new_entries.append({
-                "logged": stamp, "date": d, "category": cat,
-                "summary": summary, "lines": lns
-            })
-
-    log["entries"].extend(new_entries)
-
-    save_json(BASELINE_FILE, baseline)
-    save_json(SNAPSHOT_FILE, current)
-    save_json(CHANGES_JSON, log)
-    write_markdown(log, baseline, current)
-
-    print(f"📒 Change tracking: {len(new_entries)} new change(s) logged "
-          f"({len(log['entries'])} total)")
-
-# =====================================================
-# MAIN
-# =====================================================
-
-if __name__ == "__main__":
-    playwright = None
-    browser = None
-    try:
-        playwright, browser, context, page = login()
-        open_roster(page)
-        xml_data = fetch_roster_xml(page)
-        crew_by_pairing = fetch_all_crew(page)
-        activities = parse(xml_data, crew_by_pairing)
-        cal = build_ics(activities)
-        save(cal)
-
-        try:
-            track_changes(activities)
-        except Exception as e:
-            print(f"⚠️ Change tracking failed (calendar still saved): {e}")
-    finally:
-        try:
-            browser.close()
-        except:
-            pass
-        try:
-            playwright.stop()
-        except:
-            pass
+        state[k].sort(key=lambda r:
