@@ -18,10 +18,10 @@ DTEND:20270101T052500
 DESCRIPTION:Report\n31 Dec 13:55L (11:55Z)\nJNB\n\n31 Dec\nSA60  JNB → L
  OS\nDep 15:10L (13:10Z)\nArr 31 Dec 20:30L (19:30Z)\nBlock 06h20\nTrack: h
  ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
- d\nTel: 0023417743573\nArr 31 Dec 20:30L (19:30Z)\nDep 31 Dec 22:00L (21:0
- 0Z)\n\n31 Dec\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 01 Jan 04:55L (
- 02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
- 61
+ d\nTel: 0023417743573\nArr 31 Dec 20:30L (19:30Z) · 21:30 SA\nDep 31 Dec 
+ 22:00L (21:00Z) · 23:00 SA\n\n31 Dec\nSA61  LOS → JNB\nDep 22:00L (21:0
+ 0Z)\nArr 01 Jan 04:55L (02:55Z)\nBlock 05h55\nTrack: https://www.flightrad
+ ar24.com/data/flights/sa61
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -70,15 +70,16 @@ DESCRIPTION:Report\n17 Dec 19:05L (17:05Z)\nJNB\n\n17 Dec\nSA280  JNB →
  PER\nDep 20:35L (18:35Z)\nArr 18 Dec 12:10L (04:10Z)\nBlock 09h35\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 18 Dec 12:10L
-  (04:10Z)\nDep 20 Dec 23:50L (15:50Z)\n\n20 Dec\nSA281  PER → JNB\nDep 2
- 3:50L (15:50Z)\nArr 21 Dec 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Jacob Setlhake (Pilot In Command)\nFirst Officer: Marinus Roberts (Co-
- Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
- Cabin Crew ──\nPurser: Robert Jansen\nCabin Crew: Agnes Maabane\nCabin
-  Crew: Tania Terblanche\nCabin Crew: Michelle Martin\nCabin Crew: Megan Ma
- ckay\nCabin Crew: Phumza Rabaza\nCabin Crew: Thabang Molewa\nCabin Crew: S
- lungile Makhaya\nCabin Crew: Tlamelo Monchwe\nCabin Crew: Salang Motshegwe
+  (04:10Z) · 06:10 SA\nDep 20 Dec 23:50L (15:50Z) · 17:50 SA\n\n20 Dec\nS
+ A281  PER → JNB\nDep 23:50L (15:50Z)\nArr 21 Dec 05:05L (03:05Z)\nBlock 
+ 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281\n\n── F
+ light Crew ──\nCaptain: Jacob Setlhake (Pilot In Command)\nFirst Offic
+ er: Marinus Roberts (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight R
+ elief Seat 3)\n\n── Cabin Crew ──\nPurser: Robert Jansen\nCabin Cr
+ ew: Agnes Maabane\nCabin Crew: Tania Terblanche\nCabin Crew: Michelle Mart
+ in\nCabin Crew: Megan Mackay\nCabin Crew: Phumza Rabaza\nCabin Crew: Thaba
+ ng Molewa\nCabin Crew: Slungile Makhaya\nCabin Crew: Tlamelo Monchwe\nCabi
+ n Crew: Salang Motshegwe
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -105,16 +106,16 @@ DESCRIPTION:Report\n08 Dec 19:05L (17:05Z)\nJNB\n\n08 Dec\nSA280  JNB →
  PER\nDep 20:35L (18:35Z)\nArr 09 Dec 12:10L (04:10Z)\nBlock 09h35\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 09 Dec 12:10L
-  (04:10Z)\nDep 11 Dec 23:50L (15:50Z)\n\n11 Dec\nSA281  PER → JNB\nDep 2
- 3:50L (15:50Z)\nArr 12 Dec 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Petrus Le Roux (Pilot In Command)\nFirst Officer: Marinus Roberts (Co-
- Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
- Cabin Crew ──\nCabin Crew: Jaco Grobler\nCabin Crew: Lindelwa Mbi\nCab
- in Crew: Amanda Mpungose\nCabin Crew: Norman Bester\nCabin Crew: Boipelo S
- egopa\nPurser: Ignatius Magudya\nCabin Crew: Tinie Moema\nCabin Crew: Sini
- kiwe Mlagisi\nCabin Crew: Lindokuhle Maluleka\nCabin Crew: Alexandrina Pet
- er
+  (04:10Z) · 06:10 SA\nDep 11 Dec 23:50L (15:50Z) · 17:50 SA\n\n11 Dec\nS
+ A281  PER → JNB\nDep 23:50L (15:50Z)\nArr 12 Dec 05:05L (03:05Z)\nBlock 
+ 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281\n\n── F
+ light Crew ──\nCaptain: Petrus Le Roux (Pilot In Command)\nFirst Offic
+ er: Marinus Roberts (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight R
+ elief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco Grobler\nCabin
+  Crew: Lindelwa Mbi\nCabin Crew: Amanda Mpungose\nCabin Crew: Norman Beste
+ r\nCabin Crew: Boipelo Segopa\nPurser: Ignatius Magudya\nCabin Crew: Tinie
+  Moema\nCabin Crew: Sinikiwe Mlagisi\nCabin Crew: Lindokuhle Maluleka\nCab
+ in Crew: Alexandrina Peter
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -141,17 +142,17 @@ DTEND:20261204T052500
 DESCRIPTION:Report\n03 Dec 13:55L (11:55Z)\nJNB\n\n03 Dec\nSA60  JNB → L
  OS\nDep 15:10L (13:10Z)\nArr 03 Dec 20:30L (19:30Z)\nBlock 06h20\nTrack: h
  ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
- d\nTel: 0023417743573\nArr 03 Dec 20:30L (19:30Z)\nDep 03 Dec 22:00L (21:0
- 0Z)\n\n03 Dec\nSA61  LOS → JNB\nDep 22:00L (21:00Z)\nArr 04 Dec 04:55L (
- 02:55Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
- 61\n\n── Flight Crew ──\nCaptain: Mpho Mamashela (Inflight Relief 
- Seat 4)\nCaptain: Miron Zonomessis (Pilot In Command)\nFirst Officer: Giov
- anni Titus (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Sea
- t 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco Grobler\nCabin Crew: Ol
- ela Selemani\nPurser: Charmaine Dumisa\nCabin Crew: Tsepo Siboto\nCabin Cr
- ew: Ashford Ntsimane\nCabin Crew: Naledi Mthembu\nCabin Crew: Lindokuhle M
- asilela\nCabin Crew: Milagre Faustino\nCabin Crew: Nyiko Machaba\nCabin Cr
- ew: Helga Green
+ d\nTel: 0023417743573\nArr 03 Dec 20:30L (19:30Z) · 21:30 SA\nDep 03 Dec 
+ 22:00L (21:00Z) · 23:00 SA\n\n03 Dec\nSA61  LOS → JNB\nDep 22:00L (21:0
+ 0Z)\nArr 04 Dec 04:55L (02:55Z)\nBlock 05h55\nTrack: https://www.flightrad
+ ar24.com/data/flights/sa61\n\n── Flight Crew ──\nCaptain: Mpho Mam
+ ashela (Inflight Relief Seat 4)\nCaptain: Miron Zonomessis (Pilot In Comma
+ nd)\nFirst Officer: Giovanni Titus (Co-Pilot)\nFirst Officer: Vaughan Chap
+ man (Inflight Relief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco
+  Grobler\nCabin Crew: Olela Selemani\nPurser: Charmaine Dumisa\nCabin Crew
+ : Tsepo Siboto\nCabin Crew: Ashford Ntsimane\nCabin Crew: Naledi Mthembu\n
+ Cabin Crew: Lindokuhle Masilela\nCabin Crew: Milagre Faustino\nCabin Crew:
+  Nyiko Machaba\nCabin Crew: Helga Green
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -177,16 +178,16 @@ DESCRIPTION:Report\n24 Nov 19:05L (17:05Z)\nJNB\n\n24 Nov\nSA280  JNB →
  PER\nDep 20:35L (18:35Z)\nArr 25 Nov 12:10L (04:10Z)\nBlock 09h35\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 25 Nov 12:10L
-  (04:10Z)\nDep 27 Nov 23:50L (15:50Z)\n\n27 Nov\nSA281  PER → JNB\nDep 2
- 3:50L (15:50Z)\nArr 28 Nov 05:05L (03:05Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281\n\n── Flight Crew ──\nCapta
- in: Anthony Stevenson (Pilot In Command)\nFirst Officer: Charles Bron (Co-
- Pilot)\nFirst Officer: Vaughan Chapman (Inflight Relief Seat 3)\n\n── 
- Cabin Crew ──\nCabin Crew: Siobhain Jeftha\nPurser: Nazlie Fortune\nCa
- bin Crew: Kesentseng Seritsane\nCabin Crew: Lerato Mdluli\nCabin Crew: Ler
- ato Madonsela\nCabin Crew: Tshegofatso Mangope\nCabin Crew: Zahir Ryklief
- \nCabin Crew: Pumlani Kose\nCabin Crew: Shandre Losper\nCabin Crew: Sabelo
-  Khoza
+  (04:10Z) · 06:10 SA\nDep 27 Nov 23:50L (15:50Z) · 17:50 SA\n\n27 Nov\nS
+ A281  PER → JNB\nDep 23:50L (15:50Z)\nArr 28 Nov 05:05L (03:05Z)\nBlock 
+ 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281\n\n── F
+ light Crew ──\nCaptain: Anthony Stevenson (Pilot In Command)\nFirst Of
+ ficer: Charles Bron (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight R
+ elief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Siobhain Jeftha\nPu
+ rser: Nazlie Fortune\nCabin Crew: Kesentseng Seritsane\nCabin Crew: Lerato
+  Mdluli\nCabin Crew: Lerato Madonsela\nCabin Crew: Tshegofatso Mangope\nCa
+ bin Crew: Zahir Ryklief\nCabin Crew: Pumlani Kose\nCabin Crew: Shandre Los
+ per\nCabin Crew: Sabelo Khoza
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📘 WORKSHOP
@@ -305,9 +306,9 @@ DESCRIPTION:Report\n27 Oct 19:05L (17:05Z)\nJNB\n\n27 Oct\nSA280  JNB →
  PER\nDep 20:22L (18:22Z)\nArr 28 Oct 11:48L (03:48Z)\nBlock 09h35\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Oct 12:10L
-  (04:10Z)\nDep 30 Oct 23:50L (15:50Z)\n\n30 Oct\nSA281  PER → JNB\nDep 2
- 3:38L (15:38Z)\nArr 31 Oct 04:20L (02:20Z)\nBlock 11h15\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:10Z) · 06:10 SA\nDep 30 Oct 23:50L (15:50Z) · 17:50 SA\n\n30 Oct\nS
+ A281  PER → JNB\nDep 23:38L (15:38Z)\nArr 31 Oct 04:20L (02:20Z)\nBlock 
+ 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -327,9 +328,9 @@ DESCRIPTION:Report\n20 Oct 19:25L (17:25Z)\nJNB\n\n20 Oct\nSA280  JNB →
  PER\nDep 21:02L (19:02Z)\nArr 21 Oct 12:09L (04:09Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 21 Oct 12:20L
-  (04:20Z)\nDep 23 Oct 23:50L (15:50Z)\n\n23 Oct\nSA281  PER → JNB\nDep 2
- 3:48L (15:48Z)\nArr 24 Oct 04:43L (02:43Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 23 Oct 23:50L (15:50Z) · 17:50 SA\n\n23 Oct\nS
+ A281  PER → JNB\nDep 23:48L (15:48Z)\nArr 24 Oct 04:43L (02:43Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -355,10 +356,10 @@ DTEND:20261016T052500
 DESCRIPTION:Report\n15 Oct 13:55L (11:55Z)\nJNB\n\n15 Oct\nSA60  JNB → L
  OS\nDep 15:24L (13:24Z)\nArr 15 Oct 20:19L (19:19Z)\nBlock 06h20\nTrack: h
  ttps://www.flightradar24.com/data/flights/sa60\n\nLayover\nMurtala Muhamme
- d\nTel: 0023417743573\nArr 15 Oct 20:30L (19:30Z)\nDep 15 Oct 22:00L (21:0
- 0Z)\n\n15 Oct\nSA61  LOS → JNB\nDep 21:57L (20:57Z)\nArr 16 Oct 04:29L (
- 02:29Z)\nBlock 05h55\nTrack: https://www.flightradar24.com/data/flights/sa
- 61
+ d\nTel: 0023417743573\nArr 15 Oct 20:30L (19:30Z) · 21:30 SA\nDep 15 Oct 
+ 22:00L (21:00Z) · 23:00 SA\n\n15 Oct\nSA61  LOS → JNB\nDep 21:57L (20:5
+ 7Z)\nArr 16 Oct 04:29L (02:29Z)\nBlock 05h55\nTrack: https://www.flightrad
+ ar24.com/data/flights/sa61
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -394,9 +395,9 @@ DESCRIPTION:Report\n29 Sep 19:25L (17:25Z)\nJNB\n\n29 Sep\nSA280  JNB →
  PER\nDep 20:51L (18:51Z)\nArr 30 Sep 12:18L (04:18Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 30 Sep 12:20L
-  (04:20Z)\nDep 02 Oct 23:50L (15:50Z)\n\n02 Oct\nSA281  PER → JNB\nDep 2
- 3:54L (15:54Z)\nArr 03 Oct 04:12L (02:12Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 02 Oct 23:50L (15:50Z) · 17:50 SA\n\n02 Oct\nS
+ A281  PER → JNB\nDep 23:54L (15:54Z)\nArr 03 Oct 04:12L (02:12Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -537,9 +538,9 @@ DESCRIPTION:Report\n01 Sep 19:25L (17:25Z)\nJNB\n\n01 Sep\nSA280  JNB →
  PER\nDep 20:53L (18:53Z)\nArr 02 Sep 12:06L (04:06Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 02 Sep 12:20L
-  (04:20Z)\nDep 04 Sep 23:50L (15:50Z)\n\n04 Sep\nSA281  PER → JNB\nDep 2
- 3:45L (15:45Z)\nArr 05 Sep 05:03L (03:03Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 04 Sep 23:50L (15:50Z) · 17:50 SA\n\n04 Sep\nS
+ A281  PER → JNB\nDep 23:45L (15:45Z)\nArr 05 Sep 05:03L (03:03Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -559,9 +560,9 @@ DESCRIPTION:Report\n25 Aug 19:25L (17:25Z)\nJNB\n\n25 Aug\nSA280  JNB →
  PER\nDep 22:09L (20:09Z)\nArr 26 Aug 13:20L (05:20Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 26 Aug 12:20L
-  (04:20Z)\nDep 28 Aug 23:50L (15:50Z)\n\n28 Aug\nSA281  PER → JNB\nDep 2
- 3:50L (15:50Z)\nArr 29 Aug 04:56L (02:56Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 28 Aug 23:50L (15:50Z) · 17:50 SA\n\n28 Aug\nS
+ A281  PER → JNB\nDep 23:50L (15:50Z)\nArr 29 Aug 04:56L (02:56Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟠 RESERVE
@@ -678,9 +679,9 @@ DESCRIPTION:Report\n02 Aug 19:25L (17:25Z)\nJNB\n\n02 Aug\nSA280  JNB →
  PER\nDep 20:55L (18:55Z)\nArr 03 Aug 11:28L (03:28Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 03 Aug 12:20L
-  (04:20Z)\nDep 04 Aug 23:50L (15:50Z)\n\n04 Aug\nSA281  PER → JNB\nDep 2
- 3:25L (15:25Z)\nArr 05 Aug 04:17L (02:17Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 04 Aug 23:50L (15:50Z) · 17:50 SA\n\n04 Aug\nS
+ A281  PER → JNB\nDep 23:25L (15:25Z)\nArr 05 Aug 04:17L (02:17Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🎉 LEAVE
@@ -712,9 +713,9 @@ DESCRIPTION:Report\n12 Jul 19:25L (17:25Z)\nJNB\n\n12 Jul\nSA280  JNB →
  PER\nDep 21:11L (19:11Z)\nArr 13 Jul 12:07L (04:07Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 13 Jul 12:20L
-  (04:20Z)\nDep 14 Jul 23:50L (15:50Z)\n\n14 Jul\nSA281  PER → JNB\nDep 2
- 3:32L (15:32Z)\nArr 15 Jul 04:39L (02:39Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 14 Jul 23:50L (15:50Z) · 17:50 SA\n\n14 Jul\nS
+ A281  PER → JNB\nDep 23:32L (15:32Z)\nArr 15 Jul 04:39L (02:39Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -782,9 +783,9 @@ DESCRIPTION:Report\n27 Jun 19:25L (17:25Z)\nJNB\n\n27 Jun\nSA280  JNB →
  PER\nDep 22:30L (20:30Z)\nArr 28 Jun 13:32L (05:32Z)\nBlock 09h25\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 28 Jun 12:20L
-  (04:20Z)\nDep 29 Jun 23:50L (15:50Z)\n\n29 Jun\nSA281  PER → JNB\nDep 2
- 3:43L (15:43Z)\nArr 30 Jun 04:31L (02:31Z)\nBlock 11h25\nTrack: https://ww
- w.flightradar24.com/data/flights/sa281
+  (04:20Z) · 06:20 SA\nDep 29 Jun 23:50L (15:50Z) · 17:50 SA\n\n29 Jun\nS
+ A281  PER → JNB\nDep 23:43L (15:43Z)\nArr 30 Jun 04:31L (02:31Z)\nBlock 
+ 11h25\nTrack: https://www.flightradar24.com/data/flights/sa281
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -817,10 +818,10 @@ DTEND:20260622T193000
 DESCRIPTION:Report\n22 Jun 08:25L (06:25Z)\nJNB\n\n22 Jun\nSA190  JNB → 
  MRU\nDep 09:41L (07:41Z)\nArr 22 Jun 15:33L (11:33Z)\nBlock 04h00\nTrack: 
  https://www.flightradar24.com/data/flights/sa190\n\nLayover\nSir Seewoosag
- ur Ramgoolam Int'l\nTel: 002302088792\nArr 22 Jun 15:40L (11:40Z)\nDep 22 
- Jun 16:40L (12:40Z)\n\n22 Jun\nSA191  MRU → JNB\nDep 16:29L (12:29Z)\nAr
- r 22 Jun 19:13L (17:13Z)\nBlock 04h20\nTrack: https://www.flightradar24.co
- m/data/flights/sa191
+ ur Ramgoolam Int'l\nTel: 002302088792\nArr 22 Jun 15:40L (11:40Z) · 13:40
+  SA\nDep 22 Jun 16:40L (12:40Z) · 14:40 SA\n\n22 Jun\nSA191  MRU → JNB
+ \nDep 16:29L (12:29Z)\nArr 22 Jun 19:13L (17:13Z)\nBlock 04h20\nTrack: htt
+ ps://www.flightradar24.com/data/flights/sa191
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -1000,5 +1001,86 @@ BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
 DTSTART:20260525T060000
 DTEND:20260526T060000
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 MAY 2026 TOTALS
+DTSTART;VALUE=DATE:20260501
+DTEND;VALUE=DATE:20260502
+DTSTAMP:20261121T151914Z
+UID:totals-2026-05@roster-calendar
+DESCRIPTION:Block time: 0h00\nSectors: 0\nPairings: 0\nReserve days: 0\nTr
+ aining days: 4\nLeave/sick days: 0\nDays off: 2
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 JUN 2026 TOTALS
+DTSTART;VALUE=DATE:20260601
+DTEND;VALUE=DATE:20260602
+DTSTAMP:20261121T151914Z
+UID:totals-2026-06@roster-calendar
+DESCRIPTION:Block time: 29h10\nSectors: 4\nPairings: 2\nReserve days: 3\nT
+ raining days: 3\nLeave/sick days: 0\nDays off: 9
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 JUL 2026 TOTALS
+DTSTART;VALUE=DATE:20260701
+DTEND;VALUE=DATE:20260702
+DTSTAMP:20261121T151914Z
+UID:totals-2026-07@roster-calendar
+DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 2\nT
+ raining days: 0\nLeave/sick days: 16\nDays off: 6
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 AUG 2026 TOTALS
+DTSTART;VALUE=DATE:20260801
+DTEND;VALUE=DATE:20260802
+DTSTAMP:20261121T151914Z
+UID:totals-2026-08@roster-calendar
+DESCRIPTION:Block time: 41h40\nSectors: 4\nPairings: 2\nReserve days: 4\nT
+ raining days: 0\nLeave/sick days: 1\nDays off: 13
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 SEP 2026 TOTALS
+DTSTART;VALUE=DATE:20260901
+DTEND;VALUE=DATE:20260902
+DTSTAMP:20261121T151914Z
+UID:totals-2026-09@roster-calendar
+DESCRIPTION:Block time: 30h15\nSectors: 3\nPairings: 2\nReserve days: 7\nT
+ raining days: 1\nLeave/sick days: 2\nDays off: 10
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 OCT 2026 TOTALS
+DTSTART;VALUE=DATE:20261001
+DTEND;VALUE=DATE:20261002
+DTSTAMP:20261121T151914Z
+UID:totals-2026-10@roster-calendar
+DESCRIPTION:Block time: 65h20\nSectors: 7\nPairings: 3\nReserve days: 1\nT
+ raining days: 0\nLeave/sick days: 7\nDays off: 8
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 NOV 2026 TOTALS
+DTSTART;VALUE=DATE:20261101
+DTEND;VALUE=DATE:20261102
+DTSTAMP:20261121T151914Z
+UID:totals-2026-11@roster-calendar
+DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 3\nT
+ raining days: 3\nLeave/sick days: 6\nDays off: 11
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:📊 DEC 2026 TOTALS
+DTSTART;VALUE=DATE:20261201
+DTEND;VALUE=DATE:20261202
+DTSTAMP:20261121T151914Z
+UID:totals-2026-12@roster-calendar
+DESCRIPTION:Block time: 66h10\nSectors: 8\nPairings: 4\nReserve days: 3\nT
+ raining days: 0\nLeave/sick days: 3\nDays off: 9
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:🔄 Synced 21 Nov 17:19
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+DTSTAMP:20261121T151914Z
+UID:sync-marker@roster-calendar
+DESCRIPTION:Last successful roster update: 21 Nov 2026 17:19\nDuties loade
+ d: 150
 END:VEVENT
 END:VCALENDAR
