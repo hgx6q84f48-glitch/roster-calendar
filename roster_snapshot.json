@@ -1,0 +1,438 @@
+{
+ "2026-11-22": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-11-23 06:00",
+   "start": "2026-11-22 06:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-11-23": [
+  {
+   "body": [
+    "WORKSHOP",
+    "Other Course",
+    "08:00L (06:00Z) - 16:00L (14:00Z)",
+    "── Modules ──",
+    "08:00L - 16:00L",
+    "GENERIC COURSE MODULE"
+   ],
+   "crew": null,
+   "end": "2026-11-23 16:00",
+   "start": "2026-11-23 08:00",
+   "summary": "📘 WORKSHOP"
+  }
+ ],
+ "2026-11-24": [
+  {
+   "body": [
+    "Report",
+    "24 Nov 19:05L (17:05Z)",
+    "JNB",
+    "24 Nov",
+    "SA280  JNB → PER",
+    "Dep 20:35L (18:35Z)",
+    "Arr 25 Nov 12:10L (04:10Z)",
+    "Block 09h35",
+    "Track: https://www.flightradar24.com/data/flights/sa280",
+    "Layover",
+    "Rendevous Hotel",
+    "Tel: (61)8 9245 1000",
+    "Email: npasqual@tfehotels.com",
+    "Arr 25 Nov 12:10L (04:10Z)",
+    "Dep 27 Nov 23:50L (15:50Z)",
+    "27 Nov",
+    "SA281  PER → JNB",
+    "Dep 23:50L (15:50Z)",
+    "Arr 28 Nov 05:05L (03:05Z)",
+    "Block 11h15",
+    "Track: https://www.flightradar24.com/data/flights/sa281"
+   ],
+   "crew": [
+    "── Flight Crew ──",
+    "Captain: Anthony Stevenson (Pilot In Command)",
+    "First Officer: Charles Bron (Co-Pilot)",
+    "First Officer: Vaughan Chapman (Inflight Relief Seat 3)",
+    "── Cabin Crew ──",
+    "Cabin Crew: Siobhain Jeftha",
+    "Purser: Nazlie Fortune",
+    "Cabin Crew: Kesentseng Seritsane",
+    "Cabin Crew: Lerato Mdluli",
+    "Cabin Crew: Lerato Madonsela",
+    "Cabin Crew: Tshegofatso Mangope",
+    "Cabin Crew: Zahir Ryklief",
+    "Cabin Crew: Pumlani Kose",
+    "Cabin Crew: Shandre Losper",
+    "Cabin Crew: Sabelo Khoza"
+   ],
+   "end": "2026-11-28 05:35",
+   "start": "2026-11-24 19:05",
+   "summary": "✈️ JNB-PER-JNB"
+  }
+ ],
+ "2026-11-29": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-01 06:00",
+   "start": "2026-11-29 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-01": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-02 06:00",
+   "start": "2026-12-01 06:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-02": [
+  {
+   "body": [
+    "Report",
+    "02 Dec 08:00L (06:00Z)"
+   ],
+   "crew": null,
+   "end": "2026-12-02 20:00",
+   "start": "2026-12-02 08:00",
+   "summary": "🟡 OPEN"
+  }
+ ],
+ "2026-12-03": [
+  {
+   "body": [
+    "Report",
+    "03 Dec 13:55L (11:55Z)",
+    "JNB",
+    "03 Dec",
+    "SA60  JNB → LOS",
+    "Dep 15:10L (13:10Z)",
+    "Arr 03 Dec 20:30L (19:30Z)",
+    "Block 06h20",
+    "Track: https://www.flightradar24.com/data/flights/sa60",
+    "Layover",
+    "Murtala Muhammed",
+    "Tel: 0023417743573",
+    "Arr 03 Dec 20:30L (19:30Z)",
+    "Dep 03 Dec 22:00L (21:00Z)",
+    "03 Dec",
+    "SA61  LOS → JNB",
+    "Dep 22:00L (21:00Z)",
+    "Arr 04 Dec 04:55L (02:55Z)",
+    "Block 05h55",
+    "Track: https://www.flightradar24.com/data/flights/sa61"
+   ],
+   "crew": [
+    "── Flight Crew ──",
+    "Captain: Mpho Mamashela (Inflight Relief Seat 4)",
+    "Captain: Miron Zonomessis (Pilot In Command)",
+    "First Officer: Giovanni Titus (Co-Pilot)",
+    "First Officer: Vaughan Chapman (Inflight Relief Seat 3)",
+    "── Cabin Crew ──",
+    "Cabin Crew: Jaco Grobler",
+    "Cabin Crew: Olela Selemani",
+    "Purser: Charmaine Dumisa",
+    "Cabin Crew: Tsepo Siboto",
+    "Cabin Crew: Ashford Ntsimane",
+    "Cabin Crew: Naledi Mthembu",
+    "Cabin Crew: Lindokuhle Masilela",
+    "Cabin Crew: Milagre Faustino",
+    "Cabin Crew: Nyiko Machaba",
+    "Cabin Crew: Helga Green"
+   ],
+   "end": "2026-12-04 05:25",
+   "start": "2026-12-03 13:55",
+   "summary": "✈️ JNB-LOS-JNB"
+  }
+ ],
+ "2026-12-05": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-06 06:00",
+   "start": "2026-12-05 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-06": [
+  {
+   "body": [
+    "Reserve Window",
+    "06:00L (04:00Z) - 20:00L (18:00Z)",
+    "Type: RESO",
+    "Base: Johannesburg Int'l"
+   ],
+   "crew": null,
+   "end": "2026-12-06 20:00",
+   "start": "2026-12-06 06:00",
+   "summary": "🟠 RESERVE"
+  }
+ ],
+ "2026-12-07": [
+  {
+   "body": [
+    "Report",
+    "07 Dec 08:00L (06:00Z)"
+   ],
+   "crew": null,
+   "end": "2026-12-07 20:00",
+   "start": "2026-12-07 08:00",
+   "summary": "🟡 OPEN"
+  }
+ ],
+ "2026-12-08": [
+  {
+   "body": [
+    "Report",
+    "08 Dec 19:05L (17:05Z)",
+    "JNB",
+    "08 Dec",
+    "SA280  JNB → PER",
+    "Dep 20:35L (18:35Z)",
+    "Arr 09 Dec 12:10L (04:10Z)",
+    "Block 09h35",
+    "Track: https://www.flightradar24.com/data/flights/sa280",
+    "Layover",
+    "Rendevous Hotel",
+    "Tel: (61)8 9245 1000",
+    "Email: npasqual@tfehotels.com",
+    "Arr 09 Dec 12:10L (04:10Z)",
+    "Dep 11 Dec 23:50L (15:50Z)",
+    "11 Dec",
+    "SA281  PER → JNB",
+    "Dep 23:50L (15:50Z)",
+    "Arr 12 Dec 05:05L (03:05Z)",
+    "Block 11h15",
+    "Track: https://www.flightradar24.com/data/flights/sa281"
+   ],
+   "crew": [
+    "── Flight Crew ──",
+    "Captain: Petrus Le Roux (Pilot In Command)",
+    "First Officer: Marinus Roberts (Co-Pilot)",
+    "First Officer: Vaughan Chapman (Inflight Relief Seat 3)",
+    "── Cabin Crew ──",
+    "Cabin Crew: Jaco Grobler",
+    "Cabin Crew: Lindelwa Mbi",
+    "Cabin Crew: Amanda Mpungose",
+    "Cabin Crew: Norman Bester",
+    "Cabin Crew: Boipelo Segopa",
+    "Purser: Ignatius Magudya",
+    "Cabin Crew: Tinie Moema",
+    "Cabin Crew: Sinikiwe Mlagisi",
+    "Cabin Crew: Lindokuhle Maluleka",
+    "Cabin Crew: Alexandrina Peter"
+   ],
+   "end": "2026-12-12 05:35",
+   "start": "2026-12-08 19:05",
+   "summary": "✈️ JNB-PER-JNB"
+  }
+ ],
+ "2026-12-13": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-15 06:00",
+   "start": "2026-12-13 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-15": [
+  {
+   "body": [
+    "Reserve Window",
+    "06:00L (04:00Z) - 20:00L (18:00Z)",
+    "Type: RESO",
+    "Base: Johannesburg Int'l"
+   ],
+   "crew": null,
+   "end": "2026-12-15 20:00",
+   "start": "2026-12-15 06:00",
+   "summary": "🟠 RESERVE"
+  }
+ ],
+ "2026-12-16": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-17 06:00",
+   "start": "2026-12-16 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-17": [
+  {
+   "body": [
+    "Report",
+    "17 Dec 19:05L (17:05Z)",
+    "JNB",
+    "17 Dec",
+    "SA280  JNB → PER",
+    "Dep 20:35L (18:35Z)",
+    "Arr 18 Dec 12:10L (04:10Z)",
+    "Block 09h35",
+    "Track: https://www.flightradar24.com/data/flights/sa280",
+    "Layover",
+    "Rendevous Hotel",
+    "Tel: (61)8 9245 1000",
+    "Email: npasqual@tfehotels.com",
+    "Arr 18 Dec 12:10L (04:10Z)",
+    "Dep 20 Dec 23:50L (15:50Z)",
+    "20 Dec",
+    "SA281  PER → JNB",
+    "Dep 23:50L (15:50Z)",
+    "Arr 21 Dec 05:05L (03:05Z)",
+    "Block 11h15",
+    "Track: https://www.flightradar24.com/data/flights/sa281"
+   ],
+   "crew": [
+    "── Flight Crew ──",
+    "Captain: Jacob Setlhake (Pilot In Command)",
+    "First Officer: Marinus Roberts (Co-Pilot)",
+    "First Officer: Vaughan Chapman (Inflight Relief Seat 3)",
+    "── Cabin Crew ──",
+    "Purser: Robert Jansen",
+    "Cabin Crew: Agnes Maabane",
+    "Cabin Crew: Tania Terblanche",
+    "Cabin Crew: Michelle Martin",
+    "Cabin Crew: Megan Mackay",
+    "Cabin Crew: Phumza Rabaza",
+    "Cabin Crew: Thabang Molewa",
+    "Cabin Crew: Slungile Makhaya",
+    "Cabin Crew: Tlamelo Monchwe",
+    "Cabin Crew: Salang Motshegwe"
+   ],
+   "end": "2026-12-21 05:35",
+   "start": "2026-12-17 19:05",
+   "summary": "✈️ JNB-PER-JNB"
+  }
+ ],
+ "2026-12-22": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-23 06:00",
+   "start": "2026-12-22 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-23": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-24 00:00",
+   "start": "2026-12-23 06:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-24": [
+  {
+   "body": [
+    "ADHOC PAID LEAVE",
+    "PAID LEAVE"
+   ],
+   "crew": null,
+   "end": "2026-12-27 00:00",
+   "start": "2026-12-24 00:00",
+   "summary": "🎉 LEAVE"
+  }
+ ],
+ "2026-12-27": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-28 06:00",
+   "start": "2026-12-27 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-28": [
+  {
+   "body": [
+    "Reserve Window",
+    "06:00L (04:00Z) - 20:00L (18:00Z)",
+    "Type: RESO",
+    "Base: Johannesburg Int'l"
+   ],
+   "crew": null,
+   "end": "2026-12-28 20:00",
+   "start": "2026-12-28 06:00",
+   "summary": "🟠 RESERVE"
+  }
+ ],
+ "2026-12-29": [
+  {
+   "body": [
+    "Report",
+    "29 Dec 08:00L (06:00Z)"
+   ],
+   "crew": null,
+   "end": "2026-12-29 20:00",
+   "start": "2026-12-29 08:00",
+   "summary": "🟡 OPEN"
+  }
+ ],
+ "2026-12-30": [
+  {
+   "body": [],
+   "crew": null,
+   "end": "2026-12-31 06:00",
+   "start": "2026-12-30 00:00",
+   "summary": "🟢 DAY OFF"
+  }
+ ],
+ "2026-12-31": [
+  {
+   "body": [
+    "Report",
+    "31 Dec 13:55L (11:55Z)",
+    "JNB",
+    "31 Dec",
+    "SA60  JNB → LOS",
+    "Dep 15:10L (13:10Z)",
+    "Arr 31 Dec 20:30L (19:30Z)",
+    "Block 06h20",
+    "Track: https://www.flightradar24.com/data/flights/sa60",
+    "Layover",
+    "Murtala Muhammed",
+    "Tel: 0023417743573",
+    "Arr 31 Dec 20:30L (19:30Z)",
+    "Dep 31 Dec 22:00L (21:00Z)",
+    "31 Dec",
+    "SA61  LOS → JNB",
+    "Dep 22:00L (21:00Z)",
+    "Arr 01 Jan 04:55L (02:55Z)",
+    "Block 05h55",
+    "Track: https://www.flightradar24.com/data/flights/sa61"
+   ],
+   "crew": null,
+   "end": "2027-01-01 05:25",
+   "start": "2026-12-31 13:55",
+   "summary": "✈️ JNB-LOS-JNB"
+  }
+ ],
+ "2027-02-15": [
+  {
+   "body": [
+    "Paid Leave"
+   ],
+   "crew": null,
+   "end": "2027-03-02 00:00",
+   "start": "2027-02-15 00:00",
+   "summary": "🎉 LEAVE"
+  }
+ ],
+ "2027-08-07": [
+  {
+   "body": [
+    "Paid Leave"
+   ],
+   "crew": null,
+   "end": "2027-08-22 00:00",
+   "start": "2027-08-07 00:00",
+   "summary": "🎉 LEAVE"
+  }
+ ]
+}
