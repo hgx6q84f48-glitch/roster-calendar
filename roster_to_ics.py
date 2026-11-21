@@ -1023,4 +1023,287 @@ def build_state(activities):
         }
         state.setdefault(start.strftime("%Y-%m-%d"), []).append(rec)
     for k in state:
-        state[k].sort(key=lambda r:
+        state[k].sort(key=lambda r: (r["start"], r["summary"]))
+    return state
+
+def diff_lines(old, new):
+    sm = difflib.SequenceMatcher(None, old, new)
+    out = []
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            continue
+        o = old[i1:i2]
+        n = new[j1:j2]
+        if op == "replace" and len(o) == len(n):
+            out += [f"{a} → {b}" for a, b in zip(o, n)]
+        else:
+            out += [f"− {a}" for a in o]
+            out += [f"+ {b}" for b in n]
+    return out
+
+def compare_day(old_list, new_list):
+    """Returns list of (category, summary, lines)."""
+    items = []
+    old = list(old_list)
+    new = list(new_list)
+    pairs = []
+
+    for o in list(old):
+        for n in new:
+            if n["summary"] == o["summary"]:
+                pairs.append((o, n))
+                old.remove(o)
+                new.remove(n)
+                break
+
+    while old and new:
+        o = old.pop(0)
+        n = new.pop(0)
+        items.append(("Swapped", f"{o['summary']} → {n['summary']}", []))
+
+    for o in old:
+        items.append(("Removed", o["summary"], []))
+    for n in new:
+        items.append(("Added", n["summary"], []))
+
+    for o, n in pairs:
+        time_lines = []
+        other_lines = []
+
+        if o["start"] != n["start"]:
+            time_lines.append(f"Start {o['start']} → {n['start']}")
+        if o["end"] != n["end"]:
+            time_lines.append(f"End {o['end']} → {n['end']}")
+
+        for line in diff_lines(o["body"], n["body"]):
+            if re.search(r"\d{2}:\d{2}", line):
+                time_lines.append(line)
+            else:
+                other_lines.append(line)
+
+        if time_lines:
+            items.append(("Times", o["summary"], time_lines))
+        if other_lines:
+            items.append(("Details", o["summary"], other_lines))
+
+        # Crew only compared when both versions captured crew
+        if o.get("crew") is not None and n.get("crew") is not None:
+            crew_lines = diff_lines(o["crew"], n["crew"])
+            if crew_lines:
+                items.append(("Crew", o["summary"], crew_lines))
+
+    return items
+
+def differs_from_baseline(baseline, current):
+    count = 0
+    for d, recs in current.items():
+        base = baseline.get(d)
+        if base is None:
+            continue
+        a = [(r["summary"], r["start"], r["end"], r["body"]) for r in recs]
+        b = [(r["summary"], r["start"], r["end"], r["body"]) for r in base]
+        if a != b:
+            count += 1
+    return count
+
+def write_markdown(log, baseline, current):
+    entries = log["entries"]
+    counts = Counter(e["category"] for e in entries)
+
+    lines = [
+        f"# ROSTER CHANGES (tracking since {log['tracking_since']})",
+        "",
+        f"**Total changes: {len(entries)}**",
+    ]
+    for cat in CATEGORY_ORDER:
+        if counts.get(cat):
+            lines.append(f"- {CATEGORY_ICON[cat]} {cat}: {counts[cat]}")
+    lines.append("")
+    lines.append(
+        f"Days currently different from the original roster: "
+        f"{differs_from_baseline(baseline, current)}"
+    )
+    lines.append("")
+    lines.append("_Tracked from tomorrow onwards. Today's duties are excluded because actual flight times creep in on the day._")
+    lines.append("")
+
+    runs = []
+    seen = {}
+    for e in entries:
+        if e["logged"] not in seen:
+            seen[e["logged"]] = []
+            runs.append(e["logged"])
+        seen[e["logged"]].append(e)
+
+    for logged in reversed(runs):
+        lines.append(f"## Logged {logged}")
+        lines.append("")
+        for e in seen[logged]:
+            try:
+                day = datetime.strptime(e["date"], "%Y-%m-%d").strftime("%d %b %Y")
+            except:
+                day = e["date"]
+            lines.append(
+                f"- **{day}** {CATEGORY_ICON.get(e['category'], '')} "
+                f"{e['category']}: {e['summary']}"
+            )
+            for l in e["lines"]:
+                lines.append(f"    - {l}")
+        lines.append("")
+
+    with open(CHANGES_MD, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+def write_alert(new_entries, log, stamp):
+    """Writes the files the workflow turns into a GitHub Issue (= your email).
+    Crew names are left out because the repo is public."""
+    if not new_entries:
+        return
+
+    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    owner = os.environ.get("GITHUB_REPOSITORY_OWNER", "")
+    n = len(new_entries)
+
+    lines = []
+    if owner:
+        lines.append(f"@{owner}")
+        lines.append("")
+    lines.append(f"Logged {stamp}")
+    lines.append("")
+
+    for e in new_entries:
+        try:
+            day = datetime.strptime(e["date"], "%Y-%m-%d").strftime("%d %b")
+        except:
+            day = e["date"]
+        lines.append(
+            f"- **{day}** {CATEGORY_ICON.get(e['category'], '')} "
+            f"{e['category']}: {e['summary']}"
+        )
+        if e["category"] == "Crew":
+            lines.append("    - Crew list changed")
+        else:
+            for l in e["lines"]:
+                lines.append(f"    - {l}")
+
+    lines.append("")
+    lines.append(f"Total changes since original roster: {len(log['entries'])}")
+    if repo:
+        lines.append("")
+        lines.append(f"Full log: https://github.com/{repo}/blob/main/{CHANGES_MD}")
+
+    with open(ALERT_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+    with open(ALERT_TITLE, "w", encoding="utf-8") as f:
+        f.write(f"✈️ Roster changed: {n} change{'s' if n != 1 else ''}")
+
+def track_changes(activities):
+    now = datetime.now(SA_TZ)
+    stamp = now.strftime("%d %b %Y %H:%M")
+    current = build_state(activities)
+
+    baseline = load_json(BASELINE_FILE, None)
+    snapshot = load_json(SNAPSHOT_FILE, None)
+    log = load_json(CHANGES_JSON, None)
+
+    # ── First run: create the original ──
+    if baseline is None or snapshot is None or log is None:
+        log = {"tracking_since": now.strftime("%d %b %Y"), "entries": []}
+        save_json(BASELINE_FILE, current)
+        save_json(SNAPSHOT_FILE, current)
+        save_json(CHANGES_JSON, log)
+        write_markdown(log, current, current)
+        print(f"📒 Tracking started — original saved ({len(current)} days)")
+        return
+
+    prev_future = {d: v for d, v in snapshot.items() if d > now.strftime("%Y-%m-%d")}
+
+    # ── Safety: portal glitch returning far too little ──
+    if len(prev_future) >= 10 and len(current) < 0.5 * len(prev_future):
+        print("⚠️ Roster looks incomplete this run — skipping change tracking")
+        return
+
+    prev_max = max(snapshot) if snapshot else ""
+    new_entries = []
+
+    for d in sorted(set(prev_future) | set(current)):
+        old = prev_future.get(d)
+        new = current.get(d)
+
+        if old is None:
+            if d > prev_max:
+                # Newly published period — becomes the original, not a change
+                baseline.setdefault(d, new)
+            else:
+                for rec in new:
+                    new_entries.append({
+                        "logged": stamp, "date": d, "category": "Added",
+                        "summary": rec["summary"], "lines": []
+                    })
+            continue
+
+        if new is None:
+            for rec in old:
+                new_entries.append({
+                    "logged": stamp, "date": d, "category": "Removed",
+                    "summary": rec["summary"], "lines": []
+                })
+            continue
+
+        # Keep last known crew if this run failed to capture it
+        for n in new:
+            if n.get("crew") is None:
+                for o in old:
+                    if o["summary"] == n["summary"] and o.get("crew") is not None:
+                        n["crew"] = o["crew"]
+                        break
+
+        for cat, summary, lns in compare_day(old, new):
+            new_entries.append({
+                "logged": stamp, "date": d, "category": cat,
+                "summary": summary, "lines": lns
+            })
+
+    log["entries"].extend(new_entries)
+
+    save_json(BASELINE_FILE, baseline)
+    save_json(SNAPSHOT_FILE, current)
+    save_json(CHANGES_JSON, log)
+    write_markdown(log, baseline, current)
+    write_alert(new_entries, log, stamp)
+
+    print(f"📒 Change tracking: {len(new_entries)} new change(s) logged "
+          f"({len(log['entries'])} total)")
+
+# =====================================================
+# MAIN
+# =====================================================
+
+if __name__ == "__main__":
+    playwright = None
+    browser = None
+    try:
+        playwright, browser, context, page = login()
+        open_roster(page)
+        xml_data = fetch_roster_xml(page)
+        crew_by_pairing = fetch_all_crew(page)
+        activities = parse(xml_data, crew_by_pairing)
+
+        now = datetime.now(SA_TZ)
+        cal = build_ics(activities, now)
+        save(cal)
+
+        try:
+            track_changes(activities)
+        except Exception as e:
+            print(f"⚠️ Change tracking failed (calendar still saved): {e}")
+    finally:
+        try:
+            browser.close()
+        except:
+            pass
+        try:
+            playwright.stop()
+        except:
+            pass
