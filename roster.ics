@@ -76,9 +76,9 @@ DESCRIPTION:Report\n17 Dec 19:05L (17:05Z)\nJNB\n\n17 Dec\nSA280  JNB →
  light Crew ──\nCaptain: Jacob Setlhake (Pilot In Command)\nFirst Offic
  er: Marinus Roberts (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight R
  elief Seat 3)\n\n── Cabin Crew ──\nPurser: Robert Jansen\nCabin Cr
- ew: Agnes Maabane\nCabin Crew: Tania Terblanche\nCabin Crew: Michelle Mart
- in\nCabin Crew: Clinton Pillay\nCabin Crew: Megan Mackay\nCabin Crew: Phum
- za Rabaza\nCabin Crew: Thabang Molewa\nCabin Crew: Slungile Makhaya\nCabin
+ ew: Agnes Maabane\nCabin Crew: Tania Terblanche\nCabin Crew: Rohena Pillay
+ \nCabin Crew: Michelle Martin\nCabin Crew: Clinton Pillay\nCabin Crew: Meg
+ an Mackay\nCabin Crew: Thabang Molewa\nCabin Crew: Slungile Makhaya\nCabin
   Crew: Tlamelo Monchwe
 END:VEVENT
 BEGIN:VEVENT
@@ -175,7 +175,7 @@ SUMMARY:✈️ JNB-PER-JNB
 DTSTART:20261124T190500
 DTEND:20261128T053500
 DESCRIPTION:Report\n24 Nov 19:05L (17:05Z)\nJNB\n\n24 Nov\nSA280  JNB → 
- PER\nDep 20:35L (18:35Z)\nArr 25 Nov 12:10L (04:10Z)\nBlock 09h35\nTrack: 
+ PER\nDep 20:48L (18:48Z)\nArr 25 Nov 12:21L (04:21Z)\nBlock 09h35\nTrack: 
  https://www.flightradar24.com/data/flights/sa280\n\nLayover\nRendevous Hot
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 25 Nov 12:10L
   (04:10Z) · 06:10 SA\nDep 27 Nov 23:50L (15:50Z) · 17:50 SA\n\n27 Nov\nS
@@ -986,7 +986,7 @@ BEGIN:VEVENT
 SUMMARY:📊 MAY 2026 TOTALS
 DTSTART;VALUE=DATE:20260501
 DTEND;VALUE=DATE:20260502
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-05@roster-calendar
 DESCRIPTION:Block time: 0h00\nSectors: 0\nPairings: 0\nReserve days: 0\nTr
  aining days: 3\nLeave/sick days: 0\nDays off: 1
@@ -995,7 +995,7 @@ BEGIN:VEVENT
 SUMMARY:📊 JUN 2026 TOTALS
 DTSTART;VALUE=DATE:20260601
 DTEND;VALUE=DATE:20260602
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-06@roster-calendar
 DESCRIPTION:Block time: 29h10\nSectors: 4\nPairings: 2\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 0\nDays off: 9
@@ -1004,7 +1004,7 @@ BEGIN:VEVENT
 SUMMARY:📊 JUL 2026 TOTALS
 DTSTART;VALUE=DATE:20260701
 DTEND;VALUE=DATE:20260702
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-07@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 2\nT
  raining days: 0\nLeave/sick days: 16\nDays off: 6
@@ -1013,7 +1013,7 @@ BEGIN:VEVENT
 SUMMARY:📊 AUG 2026 TOTALS
 DTSTART;VALUE=DATE:20260801
 DTEND;VALUE=DATE:20260802
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-08@roster-calendar
 DESCRIPTION:Block time: 41h40\nSectors: 4\nPairings: 2\nReserve days: 4\nT
  raining days: 0\nLeave/sick days: 1\nDays off: 13
@@ -1022,7 +1022,7 @@ BEGIN:VEVENT
 SUMMARY:📊 SEP 2026 TOTALS
 DTSTART;VALUE=DATE:20260901
 DTEND;VALUE=DATE:20260902
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-09@roster-calendar
 DESCRIPTION:Block time: 30h15\nSectors: 3\nPairings: 2\nReserve days: 7\nT
  raining days: 1\nLeave/sick days: 2\nDays off: 10
@@ -1031,7 +1031,7 @@ BEGIN:VEVENT
 SUMMARY:📊 OCT 2026 TOTALS
 DTSTART;VALUE=DATE:20261001
 DTEND;VALUE=DATE:20261002
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-10@roster-calendar
 DESCRIPTION:Block time: 65h20\nSectors: 7\nPairings: 3\nReserve days: 1\nT
  raining days: 0\nLeave/sick days: 7\nDays off: 8
@@ -1040,7 +1040,7 @@ BEGIN:VEVENT
 SUMMARY:📊 NOV 2026 TOTALS
 DTSTART;VALUE=DATE:20261101
 DTEND;VALUE=DATE:20261102
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-11@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 6\nDays off: 11
@@ -1049,18 +1049,18 @@ BEGIN:VEVENT
 SUMMARY:📊 DEC 2026 TOTALS
 DTSTART;VALUE=DATE:20261201
 DTEND;VALUE=DATE:20261202
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:totals-2026-12@roster-calendar
 DESCRIPTION:Block time: 66h10\nSectors: 8\nPairings: 4\nReserve days: 3\nT
  raining days: 0\nLeave/sick days: 3\nDays off: 9
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:🔄 Synced 24 Nov 13:22
+SUMMARY:🔄 Synced 24 Nov 23:28
 DTSTART;VALUE=DATE:20261124
 DTEND;VALUE=DATE:20261125
-DTSTAMP:20261124T112203Z
+DTSTAMP:20261124T212852Z
 UID:sync-marker@roster-calendar
-DESCRIPTION:Last successful roster update: 24 Nov 2026 13:22\nDuties loade
+DESCRIPTION:Last successful roster update: 24 Nov 2026 23:28\nDuties loade
  d: 147
 END:VEVENT
 END:VCALENDAR
