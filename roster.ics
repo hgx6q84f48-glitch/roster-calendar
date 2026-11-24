@@ -72,7 +72,14 @@ DESCRIPTION:Report\n17 Dec 19:05L (17:05Z)\nJNB\n\n17 Dec\nSA280  JNB →
  el\nTel: (61)8 9245 1000\nEmail: npasqual@tfehotels.com\nArr 18 Dec 12:10L
   (04:10Z) · 06:10 SA\nDep 20 Dec 23:50L (15:50Z) · 17:50 SA\n\n20 Dec\nS
  A281  PER → JNB\nDep 23:50L (15:50Z)\nArr 21 Dec 05:05L (03:05Z)\nBlock 
- 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281
+ 11h15\nTrack: https://www.flightradar24.com/data/flights/sa281\n\n── F
+ light Crew ──\nCaptain: Jacob Setlhake (Pilot In Command)\nFirst Offic
+ er: Marinus Roberts (Co-Pilot)\nFirst Officer: Vaughan Chapman (Inflight R
+ elief Seat 3)\n\n── Cabin Crew ──\nPurser: Robert Jansen\nCabin Cr
+ ew: Agnes Maabane\nCabin Crew: Tania Terblanche\nCabin Crew: Michelle Mart
+ in\nCabin Crew: Megan Mackay\nCabin Crew: Phumza Rabaza\nCabin Crew: Thaba
+ ng Molewa\nCabin Crew: Slungile Makhaya\nCabin Crew: Tlamelo Monchwe\nCabi
+ n Crew: Salang Motshegwe
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟢 DAY OFF
@@ -144,8 +151,8 @@ DESCRIPTION:Report\n03 Dec 13:55L (11:55Z)\nJNB\n\n03 Dec\nSA60  JNB → L
  man (Inflight Relief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco
   Grobler\nCabin Crew: Olela Selemani\nPurser: Charmaine Dumisa\nCabin Crew
  : Tsepo Siboto\nCabin Crew: Ashford Ntsimane\nCabin Crew: Naledi Mthembu\n
- Cabin Crew: Lindokuhle Masilela\nCabin Crew: Milagre Faustino\nCabin Crew:
-  Nyiko Machaba\nCabin Crew: Helga Green
+ Cabin Crew: Martin Waterson\nCabin Crew: Milagre Faustino\nCabin Crew: Nyi
+ ko Machaba\nCabin Crew: Helga Green
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -976,28 +983,19 @@ DESCRIPTION:A340 FULL FLIGHT SIM CREW A\nConversion Course\n\n11:15L (09:1
  S A-5 DEBRIEF
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:📘 A340FFA
-DTSTART:20260527T111500
-DTEND:20260527T171500
-DESCRIPTION:A340 FULL FLIGHT SIM CREW A\nConversion Course\n\n11:15L (09:1
- 5Z) - 17:15L (15:15Z)\n\n── Modules ──\n11:15L - 12:45L\nA340 FFS 
- A-4 BRIEF\n\n12:45L - 16:45L\nA340 FFS A-4 SIM\n\n16:45L - 17:15L\nA340 FF
- S A-4 DEBRIEF
-END:VEVENT
-BEGIN:VEVENT
 SUMMARY:📊 MAY 2026 TOTALS
 DTSTART;VALUE=DATE:20260501
 DTEND;VALUE=DATE:20260502
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-05@roster-calendar
 DESCRIPTION:Block time: 0h00\nSectors: 0\nPairings: 0\nReserve days: 0\nTr
- aining days: 4\nLeave/sick days: 0\nDays off: 1
+ aining days: 3\nLeave/sick days: 0\nDays off: 1
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:📊 JUN 2026 TOTALS
 DTSTART;VALUE=DATE:20260601
 DTEND;VALUE=DATE:20260602
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-06@roster-calendar
 DESCRIPTION:Block time: 29h10\nSectors: 4\nPairings: 2\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 0\nDays off: 9
@@ -1006,7 +1004,7 @@ BEGIN:VEVENT
 SUMMARY:📊 JUL 2026 TOTALS
 DTSTART;VALUE=DATE:20260701
 DTEND;VALUE=DATE:20260702
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-07@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 2\nT
  raining days: 0\nLeave/sick days: 16\nDays off: 6
@@ -1015,7 +1013,7 @@ BEGIN:VEVENT
 SUMMARY:📊 AUG 2026 TOTALS
 DTSTART;VALUE=DATE:20260801
 DTEND;VALUE=DATE:20260802
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-08@roster-calendar
 DESCRIPTION:Block time: 41h40\nSectors: 4\nPairings: 2\nReserve days: 4\nT
  raining days: 0\nLeave/sick days: 1\nDays off: 13
@@ -1024,7 +1022,7 @@ BEGIN:VEVENT
 SUMMARY:📊 SEP 2026 TOTALS
 DTSTART;VALUE=DATE:20260901
 DTEND;VALUE=DATE:20260902
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-09@roster-calendar
 DESCRIPTION:Block time: 30h15\nSectors: 3\nPairings: 2\nReserve days: 7\nT
  raining days: 1\nLeave/sick days: 2\nDays off: 10
@@ -1033,7 +1031,7 @@ BEGIN:VEVENT
 SUMMARY:📊 OCT 2026 TOTALS
 DTSTART;VALUE=DATE:20261001
 DTEND;VALUE=DATE:20261002
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-10@roster-calendar
 DESCRIPTION:Block time: 65h20\nSectors: 7\nPairings: 3\nReserve days: 1\nT
  raining days: 0\nLeave/sick days: 7\nDays off: 8
@@ -1042,7 +1040,7 @@ BEGIN:VEVENT
 SUMMARY:📊 NOV 2026 TOTALS
 DTSTART;VALUE=DATE:20261101
 DTEND;VALUE=DATE:20261102
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-11@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 6\nDays off: 11
@@ -1051,18 +1049,18 @@ BEGIN:VEVENT
 SUMMARY:📊 DEC 2026 TOTALS
 DTSTART;VALUE=DATE:20261201
 DTEND;VALUE=DATE:20261202
-DTSTAMP:20261123T133003Z
+DTSTAMP:20261124T011018Z
 UID:totals-2026-12@roster-calendar
 DESCRIPTION:Block time: 66h10\nSectors: 8\nPairings: 4\nReserve days: 3\nT
  raining days: 0\nLeave/sick days: 3\nDays off: 9
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:🔄 Synced 23 Nov 15:30
-DTSTART;VALUE=DATE:20261123
-DTEND;VALUE=DATE:20261124
-DTSTAMP:20261123T133003Z
+SUMMARY:🔄 Synced 24 Nov 03:10
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+DTSTAMP:20261124T011018Z
 UID:sync-marker@roster-calendar
-DESCRIPTION:Last successful roster update: 23 Nov 2026 15:30\nDuties loade
- d: 148
+DESCRIPTION:Last successful roster update: 24 Nov 2026 03:10\nDuties loade
+ d: 147
 END:VEVENT
 END:VCALENDAR

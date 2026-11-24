@@ -1,51 +1,4 @@
 {
- "2026-11-24": [
-  {
-   "body": [
-    "Report",
-    "24 Nov 19:05L (17:05Z)",
-    "JNB",
-    "24 Nov",
-    "SA280  JNB → PER",
-    "Dep 20:35L (18:35Z)",
-    "Arr 25 Nov 12:10L (04:10Z)",
-    "Block 09h35",
-    "Track: https://www.flightradar24.com/data/flights/sa280",
-    "Layover",
-    "Rendevous Hotel",
-    "Tel: (61)8 9245 1000",
-    "Email: npasqual@tfehotels.com",
-    "Arr 25 Nov 12:10L (04:10Z)",
-    "Dep 27 Nov 23:50L (15:50Z)",
-    "27 Nov",
-    "SA281  PER → JNB",
-    "Dep 23:50L (15:50Z)",
-    "Arr 28 Nov 05:05L (03:05Z)",
-    "Block 11h15",
-    "Track: https://www.flightradar24.com/data/flights/sa281"
-   ],
-   "crew": [
-    "── Flight Crew ──",
-    "Captain: Anthony Stevenson (Pilot In Command)",
-    "First Officer: Charles Bron (Co-Pilot)",
-    "First Officer: Vaughan Chapman (Inflight Relief Seat 3)",
-    "── Cabin Crew ──",
-    "Cabin Crew: Siobhain Jeftha",
-    "Purser: Nazlie Fortune",
-    "Cabin Crew: Kesentseng Seritsane",
-    "Cabin Crew: Lerato Mdluli",
-    "Cabin Crew: Lerato Madonsela",
-    "Cabin Crew: Tshegofatso Mangope",
-    "Cabin Crew: Zahir Ryklief",
-    "Cabin Crew: Pumlani Kose",
-    "Cabin Crew: Shandre Losper",
-    "Cabin Crew: Sabelo Khoza"
-   ],
-   "end": "2026-11-28 05:35",
-   "start": "2026-11-24 19:05",
-   "summary": "✈️ JNB-PER-JNB"
-  }
- ],
  "2026-11-29": [
   {
    "body": [],
@@ -113,7 +66,7 @@
     "Cabin Crew: Tsepo Siboto",
     "Cabin Crew: Ashford Ntsimane",
     "Cabin Crew: Naledi Mthembu",
-    "Cabin Crew: Lindokuhle Masilela",
+    "Cabin Crew: Martin Waterson",
     "Cabin Crew: Milagre Faustino",
     "Cabin Crew: Nyiko Machaba",
     "Cabin Crew: Helga Green"
