@@ -148,11 +148,11 @@ DESCRIPTION:Report\n03 Dec 13:55L (11:55Z)\nJNB\n\n03 Dec\nSA60  JNB → L
  ar24.com/data/flights/sa61\n\n── Flight Crew ──\nCaptain: Mpho Mam
  ashela (Inflight Relief Seat 4)\nCaptain: Miron Zonomessis (Pilot In Comma
  nd)\nFirst Officer: Giovanni Titus (Co-Pilot)\nFirst Officer: Vaughan Chap
- man (Inflight Relief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Jaco
-  Grobler\nCabin Crew: Mulaba Lukamba\nCabin Crew: Olela Selemani\nPurser: 
- Charmaine Dumisa\nCabin Crew: Tsepo Siboto\nCabin Crew: Ashford Ntsimane\n
- Cabin Crew: Naledi Mthembu\nCabin Crew: Martin Waterson\nCabin Crew: Nyiko
-  Machaba\nCabin Crew: Helga Green
+ man (Inflight Relief Seat 3)\n\n── Cabin Crew ──\nCabin Crew: Chri
+ stopher Sebopela (PAX)\nCabin Crew: Jaco Grobler\nCabin Crew: Mulaba Lukam
+ ba\nCabin Crew: Olela Selemani\nPurser: Charmaine Dumisa\nCabin Crew: Tsep
+ o Siboto\nCabin Crew: Ashford Ntsimane\nCabin Crew: Naledi Mthembu\nCabin 
+ Crew: Martin Waterson\nCabin Crew: Nyiko Machaba\nCabin Crew: Helga Green
 END:VEVENT
 BEGIN:VEVENT
 SUMMARY:🟡 OPEN
@@ -954,7 +954,7 @@ BEGIN:VEVENT
 SUMMARY:📊 JUN 2026 TOTALS
 DTSTART;VALUE=DATE:20260601
 DTEND;VALUE=DATE:20260602
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-06@roster-calendar
 DESCRIPTION:Block time: 29h10\nSectors: 4\nPairings: 2\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 0\nDays off: 9
@@ -963,7 +963,7 @@ BEGIN:VEVENT
 SUMMARY:📊 JUL 2026 TOTALS
 DTSTART;VALUE=DATE:20260701
 DTEND;VALUE=DATE:20260702
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-07@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 2\nT
  raining days: 0\nLeave/sick days: 16\nDays off: 6
@@ -972,7 +972,7 @@ BEGIN:VEVENT
 SUMMARY:📊 AUG 2026 TOTALS
 DTSTART;VALUE=DATE:20260801
 DTEND;VALUE=DATE:20260802
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-08@roster-calendar
 DESCRIPTION:Block time: 41h40\nSectors: 4\nPairings: 2\nReserve days: 4\nT
  raining days: 0\nLeave/sick days: 1\nDays off: 13
@@ -981,7 +981,7 @@ BEGIN:VEVENT
 SUMMARY:📊 SEP 2026 TOTALS
 DTSTART;VALUE=DATE:20260901
 DTEND;VALUE=DATE:20260902
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-09@roster-calendar
 DESCRIPTION:Block time: 30h15\nSectors: 3\nPairings: 2\nReserve days: 7\nT
  raining days: 1\nLeave/sick days: 2\nDays off: 10
@@ -990,7 +990,7 @@ BEGIN:VEVENT
 SUMMARY:📊 OCT 2026 TOTALS
 DTSTART;VALUE=DATE:20261001
 DTEND;VALUE=DATE:20261002
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-10@roster-calendar
 DESCRIPTION:Block time: 65h20\nSectors: 7\nPairings: 3\nReserve days: 1\nT
  raining days: 0\nLeave/sick days: 7\nDays off: 8
@@ -999,7 +999,7 @@ BEGIN:VEVENT
 SUMMARY:📊 NOV 2026 TOTALS
 DTSTART;VALUE=DATE:20261101
 DTEND;VALUE=DATE:20261102
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-11@roster-calendar
 DESCRIPTION:Block time: 20h50\nSectors: 2\nPairings: 1\nReserve days: 3\nT
  raining days: 3\nLeave/sick days: 6\nDays off: 11
@@ -1008,18 +1008,18 @@ BEGIN:VEVENT
 SUMMARY:📊 DEC 2026 TOTALS
 DTSTART;VALUE=DATE:20261201
 DTEND;VALUE=DATE:20261202
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:totals-2026-12@roster-calendar
 DESCRIPTION:Block time: 66h10\nSectors: 8\nPairings: 4\nReserve days: 3\nT
  raining days: 0\nLeave/sick days: 3\nDays off: 9
 END:VEVENT
 BEGIN:VEVENT
-SUMMARY:🔄 Synced 28 Nov 11:44
+SUMMARY:🔄 Synced 28 Nov 19:57
 DTSTART;VALUE=DATE:20261128
 DTEND;VALUE=DATE:20261129
-DTSTAMP:20261128T094442Z
+DTSTAMP:20261128T175724Z
 UID:sync-marker@roster-calendar
-DESCRIPTION:Last successful roster update: 28 Nov 2026 11:44\nDuties loade
+DESCRIPTION:Last successful roster update: 28 Nov 2026 19:57\nDuties loade
  d: 143
 END:VEVENT
 END:VCALENDAR

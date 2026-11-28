@@ -1,11 +1,16 @@
 # ROSTER CHANGES (tracking since 21 Nov 2026)
 
-**Total changes: 4**
-- 👥 Crew: 4
+**Total changes: 5**
+- 👥 Crew: 5
 
 Days currently different from the original roster: 0
 
 _Tracked from tomorrow onwards. Today's duties are excluded because actual flight times creep in on the day._
+
+## Logged 28 Nov 2026 19:57
+
+- **03 Dec 2026** 👥 Crew: ✈️ JNB-LOS-JNB
+    - + Cabin Crew: Christopher Sebopela (PAX)
 
 ## Logged 26 Nov 2026 17:36
 
